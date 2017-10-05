@@ -6,7 +6,7 @@ we are under construction. This page is a placeholder
 
 
 
-### More Info [GroupLens] (https://grouplens.org)
+### More Info [GroupLens](https://grouplens.org)
 
 
 
