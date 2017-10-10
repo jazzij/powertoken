@@ -3,13 +3,15 @@
 * OAuth2 flow adapted from sample code from JeremiahLee
 * Uses Fetch & Fitbit Web API
 */
-var fbTok;
 
+//VARIOUS KEYS and AUTH IDS needed
+var fbTok;
 var clientID = 'YOUR_ID_HERE';
 var callback = 'YOUR_WEBSITE_HERE'; 
 var authURI = 'https://www.fitbit.com/oauth2/authorize';
 var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
+// Implementing 'Implicit Auth in OATH2.0'
 if (!window.location.hash){
 	window.location.replace( authURI+'?response_type=token'+'&client_id='+clientID
 		+'&redirect_uri='+callback+'&scope=activity');
@@ -22,7 +24,8 @@ if (!window.location.hash){
     
     fbTok = fragmentQueryParameters.access_token;
 }
-			
+
+// HANDLE the response from FITBIT API (expect JSON)
 var processResponse = function(response){
 	if (!response.ok){
 		throw new Error('Fitbit API request failed' + response);
@@ -36,16 +39,19 @@ var processResponse = function(response){
 	}
 }
 
+// HANDLE the data from an /ACTIVITY api endpoint
 var processActivity = function(activity){
+	document.getElementById('activityHeader').textContent = 'Fitbit - GET Activity';
 	prettyAct = JSON.stringify(activity, null, 2);
 	console.log(prettyAct)
-//	var display = document.getElementById('display');
-	var desplay = document.querySelector('p');
-//	display.textContent = prettyAct;
-	desplay.textContent = 'New stuff: ' + prettyAct;
+	var display = document.getElementById('display');
+	display.textContent = prettyAct;
+	
 }
 
-fetch( 'https://api.fitbit.com/1/user/-/activities.json', 
+// Now, actually go forth and FETCH
+var activityURL = 'https://api.fitbit.com/1/user/-/activities.json';
+fetch( activityURL, 
 	{
 		headers: new Headers({
 			'Authorization': 'Bearer ' + fbTok
