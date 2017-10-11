@@ -76,16 +76,13 @@ var processActivityWithDate = function(activity){
 
         //print out the data (buggy, need to figure out how to print new lines in javascript!)
         var newpara = document.createElement("p");
-        var br = document.createElement("br");
-        newpara.append( 'Goal Steps:' +goalSteps);
-        newpara.append(br);
-        newpara.append( 'Steps by Activity: ' + activityStepsStr);
-        newpara.append(br);
-        newpara.append( 'Summary (total) Steps Today: '+ sumSteps);
-
+        var dataStr = 'Goal Steps:' +goalSteps + '<br/>'
+        	+ 'Steps by Activity: ' + activityStepsStr + '<br/>'        
+        	+ 'Summary (total) Steps Today: '+ sumSteps + '<br/>';
+	newpara.innerHTML = dataStr;
+	
         var nextHeader = document.getElementById("otherHeader");
         document.body.insertBefore(newpara, nextHeader);
-
 //      console.log(JSON.stringify(activity, null, 2));
 }
 
