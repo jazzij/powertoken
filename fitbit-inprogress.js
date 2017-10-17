@@ -1,11 +1,9 @@
 var fbTok;
 
-var clientID = '228N3P';
-var callback = 'http://localhost/fitbit/fitbit.html';
+var clientID = 'YOUR_ID_HERE';
+var callback = 'YOUR_CALLBACK_HERE';
 var authURI = 'https://www.fitbit.com/oauth2/authorize';
 var authTokenReq = 'https://api.fitbit.com/oauth2/token';
-//'https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=227H22&redirect_uri=https%3A%2F%2F15359f83.ngrok.io%2F&scope=activity%20nutrition%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight');
-//"https://www.fitbit.com/oauth2/authorize&response_type=token&client_id=228N3P&redirect_uri=http://localhost/fitbit/fitbit.html&scope=activity"
 
 if (!window.location.hash){
 	window.location.replace( authURI+'?response_type=token'+'&client_id='+clientID
