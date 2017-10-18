@@ -2,6 +2,8 @@
 * This code is for the PowerTokens project. 
 * OAuth2 flow adapted from sample code from JeremiahLee
 * Uses Fetch & Fitbit Web API
+*
+* This work is shared under the MIT License, 2017 (jazzij). Please feel free to use & share, but attribute appropriately. 
 */
 
 //VARIOUS KEYS and AUTH IDS needed
@@ -39,6 +41,7 @@ var processResponse = function(response){
 	}
 }
 
+/**************** GET DATA *****************/
 // HANDLE the data from an /ACTIVITY api endpoint - summary data
 var processActivity = function(activity){
 	document.getElementById('activityHeader').textContent = 'Fitbit - GET Activity';
@@ -86,7 +89,6 @@ var processActivityWithDate = function(activity){
 //      console.log(JSON.stringify(activity, null, 2));
 }
 
-
 // Now, actually go forth and FETCH Activity Summary data
 var activityURL = 'https://api.fitbit.com/1/user/-/activities.json';
 fetch( activityURL, 
@@ -115,3 +117,38 @@ fetch( activityWithDateUrl,
         ).then(processResponse)
         .then(processActivityWithDate)
         .catch(function(error){ console.log(error);});
+
+/***************** POST Data *************************/
+//note: you can use these same URL's for GETting data, just change the the request type
+var baseURL = 'https://api.fitbit.com/1/user/-/';
+var dailyGoalURL = 'activities/goals/daily.json';
+var logWeightURL = 'body/log/weight/goal.json';
+
+
+//UPDATE DAILY STEP COUNT GOAL
+//SAMPLE OUTPUT: {"goals":{"activeMinutes":45,"caloriesOut":2297,"distance":8.05,"steps":25000}} 
+fetch( baseURL+dailyGoalURL+'?steps=25000',
+        {
+                method: 'POST',
+                headers: new Headers({
+                        'Authorization': 'Bearer ' + fbTok,
+                }),
+                mode: 'cors',
+        }
+        ).then(processResponse)
+        .then(function(data){ console.log('Request succeeded with response', data);})
+        .catch(function(error){ console.log(error.message);});
+
+//ADD A BODY WEIGHT GOAL
+//SAMPLE OUTPUT: {goalType: "LOSE", startDate: "2017-10-18", startWeight: 65.7, weight: 63, weightThreshold: 0.05}
+fetch( baseURL+testURL+"?startDate=2017-10-18&startWeight=65.7&weight=63",
+        {
+                method: 'POST',
+                headers: new Headers({
+                        'Authorization': 'Bearer ' + fbTok,
+                }),
+                mode: 'cors',
+        }
+        ).then(processResponse)
+        .then(function(data){ console.log('Request succeeded with response', data);})
+        .catch(function(error){ console.log(error.message);});
