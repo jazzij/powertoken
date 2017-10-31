@@ -10,10 +10,6 @@ import datetime
 import requests
 import sys
 
-wcBaseUrl = 'https://palalinq.herokuapp.com/api'
-user = 'a2zfranz@gmail.com'
-pw = 'daya2Beronad!'
-
 class PowerToken:
     wcBaseUrl = "https://palalinq.herokuapp.com/api"
     _userEmail = ""
@@ -37,6 +33,7 @@ class PowerToken:
             self._userToken = str(jres["accessToken"]["id"])
             print("Logged in!")
 
+    # Polls WEconnect for percent of daily activities completed
     def poll(self):
         temp = datetime.datetime(1977, 1, 1)
         d = temp.today()
@@ -47,6 +44,7 @@ class PowerToken:
         percentProgress = self.getProgress(beginDate, endDate)
         print(percentProgress)
         stepsTaken = int(percentProgress * self.dailyStepGoal)
+        print(stepsTaken)
         # send stepsTaken to Fitbit in the form of a walking activity
 
     # GET a list of progress for all activities
@@ -54,7 +52,9 @@ class PowerToken:
     def getProgress(self, fromDate, toDate):
         print("_userId:", self._userId)
         print("_userToken:", self._userToken)
-        requestUrl = self.wcBaseUrl + "/People/" + self._userId + "/activities/progress?access_token=" + self._userToken + "&from=" + fromDate + "&to=" + toDate
+        requestUrl = self.wcBaseUrl + "/People/" + self._userId + \
+                     "/activities/progress?access_token=" + self._userToken + \
+                     "&from=" + fromDate + "&to=" + toDate
         print(requestUrl)
         result = requests.get(requestUrl)	
         if self.isValid(result):
