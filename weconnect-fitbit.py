@@ -1,11 +1,3 @@
-# Pseudocode
-# Poll progress at intervals, say of 1 hr
-# If progress has changed since last poll, send updates to Fitbit
-# See if we can listen for WEconnect updates
-# See if we can do weekly (set week or 7 days from now?)
-# Run from browser (CS server)
-# Save token in text file (maybe encrypt?)
-
 import datetime
 import requests
 import sys
