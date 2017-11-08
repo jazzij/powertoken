@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class=container>
+
+<p>This page will redirect to the Fitbit website for you to enter your information shortly</p>
+<p id="token_disp">{{ fb_response}}</p>
+
+</div>
+<script type="text/javascript" src="{{url_for( 'static', filename='fitbit_login.js') }}"></script>
+
+{% endblock %}
