@@ -15,9 +15,13 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
+		received = request.form
+		#INSERT LOGIN CODE HERE, & ADD received["token"] to dict
+		with open('userID.json', 'w') as f:
+			json.dump(received, f, ensure_ascii=False)
 		print (request)
-		print (request.form["name"])
-		print (request.form["psk"])
+		#print (request.form["name"])
+		#print (request.form["psk"])
 		return render_template('home.html', wc_response="Login successful")
 	elif request.method == 'GET':
 		return render_template('login.html')
