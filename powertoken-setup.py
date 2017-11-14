@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # This Python script does the necessary WEconnect setup for the PowerToken
 # project. It only needs to be run once.
 
