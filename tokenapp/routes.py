@@ -1,9 +1,7 @@
 # might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
 
-
 app = Flask(__name__)
-
 
 #THE LANDING PAGE
 @app.route('/')
@@ -35,7 +33,7 @@ def fb_login():
 #WHEN FITBIT is all setup, login.html sends 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
-	data = request.data	
+	data = request.data
 	print(data)
 	convData = data.decode('utf8')
 	datajs = json.loads(convData)
