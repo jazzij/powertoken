@@ -6,6 +6,7 @@ Python 2.7, (but should be compatible with Python 3)
 Javascript / Fetch API, https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
 Fitbit Web API, https://dev.fitbit.com/reference/web-api/quickstart/
 
+
 Interaction:
 Users enter the login details into the form, and in the Fitbit website. They get redirected to the landing page, and that's it for them.
 On the server side, some magic and ladders to get all the data into a form where it can be saved to a json file for easy access later.
