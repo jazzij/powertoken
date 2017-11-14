@@ -1,5 +1,6 @@
 # might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
+import powertoken_setup
 
 app = Flask(__name__)
 
@@ -14,12 +15,17 @@ def home():
 def login():
 	if request.method == 'POST':
 		received = request.form
+
 		#INSERT LOGIN CODE HERE, & ADD received["token"] to dict
 		with open('userID.json', 'w') as f:
 			json.dump(received, f, ensure_ascii=False)
 		print (request)
-		#print (request.form["name"])
-		#print (request.form["psk"])
+		print (request.form["name"])
+		print (request.form["psk"])
+
+		# Actually logs user into WEconnect
+		powertoken_setup.loginToWc(request.form["name"], request.form["psk"])
+
 		return render_template('home.html', wc_response="Login successful")
 	elif request.method == 'GET':
 		return render_template('login.html')
@@ -37,8 +43,8 @@ def result():
 	print(data)
 	convData = data.decode('utf8')
 	datajs = json.loads(convData)
-	#print(datajs)
-	#print(datajs["tok"])
+	print(datajs)
+	print(datajs["tok"])
 
 	print('Result achieved')
 	
