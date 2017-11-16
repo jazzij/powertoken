@@ -53,9 +53,8 @@ def result():
 	print(datajs["tok"])
 
 	# Stores access token in a JSON file
-	jsonStr = '{"userToken":"' + tok + '"}'
 	with open("fb.json", "w+") as file:
-		file.write(jsonStr)
+		file.write(data)
 
 	print('Result achieved')
 	

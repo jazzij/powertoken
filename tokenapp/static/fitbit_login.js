@@ -1,8 +1,9 @@
 var fbTok;
 
 var clientID = '228N3P';
-var callback = 'http://127.0.0.1:5000/fb_login'; //login.html'; //fitbit/fitbit.html';
-var landingPage = 'http://127.0.0.1:5000/home';
+var callback = 'https://powertoken.grouplens.org/fb_login'; //'http://127.0.0.1:5000/fb_login'; //login.html'; //fitbit/fitbit.html';
+var homeURL = 'https://powertoken.grouplens.org'
+var landingPage = 'https://powertoken.grouplens.org/home';
 var authURI = 'https://www.fitbit.com/oauth2/authorize';
 var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
@@ -31,7 +32,7 @@ var processResponse = function(response) {
 // SEND token to server
 if (fbTok) {
     console.log("redirecting back to app")
-    fetch('http://127.0.0.1:5000/result', {
+    fetch( homeURL+'/result', {
         method: 'POST', 
 	   mode: 'no-cors',
 	   body: JSON.stringify({tok: fbTok})
