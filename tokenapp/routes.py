@@ -1,6 +1,7 @@
 # might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
 import powertoken_setup
+import weconnect_fitbit
 
 app = Flask(__name__)
 
@@ -16,17 +17,22 @@ def login():
 	if request.method == 'POST':
 		received = request.form
 
-		#INSERT LOGIN CODE HERE, & ADD received["token"] to dict
-		with open('userID.json', 'w') as f:
-			json.dump(received, f, ensure_ascii=False)
-		print (request)
-		print (request.form["name"])
-		print (request.form["psk"])
+		# If user is already logged in, tells him/her so
+		if powertoken_setup.isLoggedIn():
+			return render_template('home.html', wc_response="You are already logged into WEconnect.")
 
-		# Actually logs user into WEconnect
+		#INSERT LOGIN CODE HERE, & ADD received["token"] to dict
+		#with open('userID.json', 'w') as f:
+		#	json.dump(received, f, ensure_ascii=False)
+		#print (request)
+		#print (request.form["name"])
+		#print (request.form["psk"])
+
+		# Logs user into WEconnect if he/she isn't already
 		powertoken_setup.loginToWc(request.form["name"], request.form["psk"])
 
 		return render_template('home.html', wc_response="Login successful")
+
 	elif request.method == 'GET':
 		return render_template('login.html')
 
@@ -46,10 +52,19 @@ def result():
 	print(datajs)
 	print(datajs["tok"])
 
+	# Stores access token in a JSON file
+	jsonStr = '{"userToken":"' + tok + '"}'
+	with open("fb.json", "w+") as file:
+		file.write(jsonStr)
+
 	print('Result achieved')
 	
 	return render_template('home.html', fb_response="Login successful")
 
+@app.route('/start', methods=['GET', 'POST'])
+def start():
+	powerToken = weconnect_fitbit.PowerToken()
+	powerToken.listenForWcChange()
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
