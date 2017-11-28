@@ -1,0 +1,4 @@
+data/*
+*.txt
+venv
+__pycache__
