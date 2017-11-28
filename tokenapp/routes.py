@@ -40,21 +40,26 @@ def login():
 #Note: login.html contains javascript
 @app.route('/fb_login', methods=['GET'])
 def fb_login():
-	return render_template('login.html')
+	# First, sees if the user is already logged in to Fitbit
+	if powertoken_setup.isLoggedIntoFb():
+		return render_template('home.html', fb_response="You are already logged into Fitbit.")
+	# If not, logs in and stores access token
+	else:
+		return render_template('login.html')
 
 #WHEN FITBIT is all setup, login.html sends 
 @app.route('/result', methods=['GET', 'POST'])
 def result():
 	data = request.data
-	print(data)
+	#print(data)
 	convData = data.decode('utf8')
 	datajs = json.loads(convData)
-	print(datajs)
+	#print(datajs)
 	print(datajs["tok"])
 
 	# Stores access token in a JSON file
-	jsonStr = '{"userToken":"' + tok + '"}'
-	with open("fb.json", "w+") as file:
+	jsonStr = '{"userToken":"' + datajs["tok"] + '"}'
+	with open("data/fb.json", "w+") as file:
 		file.write(jsonStr)
 
 	print('Result achieved')
@@ -63,6 +68,10 @@ def result():
 
 @app.route('/start', methods=['GET', 'POST'])
 def start():
+	return render_template('running.html')
+
+@app.route('/running', methods=['GET'])
+def running():
 	powerToken = weconnect_fitbit.PowerToken()
 	powerToken.listenForWcChange()
 
@@ -74,4 +83,4 @@ def test():
 	return render_template('home.html')
 
 if __name__ == "__main__":
-        app.run(debug=True)
+	app.run(debug=True)
