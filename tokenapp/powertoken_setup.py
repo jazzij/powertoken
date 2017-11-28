@@ -47,3 +47,26 @@ def isLoggedIn():
 	# access.json doesn't exist
 	else:
 		return False
+
+def isLoggedIntoFb():
+	text = ""
+	if os.path.isfile("data/fb.json"):
+		with open("data/fb.json", "r") as file:
+			file.seek(0)
+			text = file.read()
+		try:
+			loginInfo = json.loads(text)
+
+			# Only returns True if userToken field is filled
+			if not loginInfo["userToken"]:
+				return False
+			else:
+				return True
+
+		# fb.json is empty or doesn't contain valid JSON
+		except:
+			return False
+
+	# fb.json doesn't exist
+	else:
+		return False

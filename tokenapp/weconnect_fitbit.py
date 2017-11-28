@@ -6,11 +6,14 @@ import time
 
 class PowerToken:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"
-	filepath = "data/wc.json"
+	wc_filepath = "data/wc.json"
+	fb_filepath = "data/fb.json"
 	_userEmail = ""
 	_userPwd = ""
-	_userId = ""
-	_userToken = ""
+	_wc_userId = ""
+	_wc_userToken = ""
+	_fb_userId = ""
+	_fb_userToken = ""
 
 	dailyStepGoal = 1000000
     
@@ -18,11 +21,15 @@ class PowerToken:
 		self.loadAccessInfo()
 
 	def loadAccessInfo(self):
-		with open(self.filepath, "r") as file:
+		with open(self.wc_filepath, "r") as file:
 			rawJsonStr = file.read()
 			jsonObj = json.loads(rawJsonStr)
-			self._userId = jsonObj["userId"]
-			self._userToken = jsonObj["userToken"]
+			self._wc_userId = jsonObj["userId"]
+			self._wc_userToken = jsonObj["userToken"]
+		#with open(self.fb_filepath, "r") as file:
+		#	rawJsonStr = file.read()
+		#	jsonObj = json.loads(rawJsonStr)
+		#	self._fb_userToken = jsonObj["userToken"]
 
 	def listenForWcChange(self):
 		while True:
@@ -45,12 +52,13 @@ class PowerToken:
 		stepsTaken = int(percentProgress * self.dailyStepGoal)
 		print(stepsTaken)
 		# send stepsTaken to Fitbit in the form of a walking activity
+		
 
 	# GET a list of progress for all activities
 	# Dates in format 'YYYY-MM-DD'
 	def getProgress(self, fromDate, toDate):
-		requestUrl = self.wcBaseUrl + "/People/" + self._userId + \
-				"/activities/progress?access_token=" + self._userToken + \
+		requestUrl = self.wcBaseUrl + "/People/" + self._wc_userId + \
+				"/activities/progress?access_token=" + self._wc_userToken + \
 				"&from=" + fromDate + "&to=" + toDate
 		print(requestUrl)
 		result = requests.get(requestUrl)
