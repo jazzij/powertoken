@@ -3,7 +3,7 @@
 <h2>Enter login details...</h2>
 <div class=container>
 <h3> ... for WeConnect </h3>
-<form id='wc_form' action="http://localhost:5000/login" method="post">
+<form id='wc_form' action={{url_for('login')}} method="post">
         <label for="name">Name:</label>
         <input id="name" type="text" name="name">
         <label for="psk">Password:</label>
@@ -22,7 +22,7 @@ None of your private information is seen or stored by researchers. You will be r
 <br /> {{ fb_response }}
 </p>
 
-<form id='start_listener_form' action="http://localhost:5000/start" method="get">
+<form id='start_listener_form' action={{url_for('start')}} method="get">
 	<input type="submit" value="Start Experiment" />
 </form>
 

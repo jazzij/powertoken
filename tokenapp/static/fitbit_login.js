@@ -1,8 +1,19 @@
 var fbTok;
 
-var clientID = '228N2H';
-var callback = 'http://localhost:5000/fb_login'; //login.html'; //fitbit/fitbit.html';
-var landingPage = 'http://localhost:5000/home';
+// If this boolean is set to false, the callback will just be localhost
+var usingCsServer = true;
+
+var clientID = '228N3P'; // '228N2H' for Abigail
+
+homeURL = '';
+if (usingCsServer) {
+	homeURL = 'https://powertoken.grouplens.org';
+} else {
+	homeURL = 'http://localhost:5000';
+}
+callback = homeURL + '/fb_login';
+landingPage = homeURL + '/home';
+
 var authURI = 'https://www.fitbit.com/oauth2/authorize';
 var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
@@ -30,13 +41,13 @@ var processResponse = function(response) {
 
 // SEND token to server
 if (fbTok) {
-	console.log("redirecting back to app")
-	fetch('http://localhost:5000/result', {
-		method: 'POST', 
-		mode: 'no-cors',
-		body: JSON.stringify({"tok": fbTok})
-	})
-	.then(processResponse)
-	//.then( function(response){ if (response.ok) { return response.json()} })
-	//.then(function(data){ window.location.replace('') })
+    console.log("redirecting back to app")
+    fetch( homeURL+'/result', {
+        method: 'POST', 
+	   mode: 'no-cors',
+	   body: JSON.stringify({tok: fbTok})
+    })
+    .then(processResponse)
+    //.then( function(response){ if (response.ok) { return response.json()} })
+    //.then(function(data){ window.location.replace('') })
 }
