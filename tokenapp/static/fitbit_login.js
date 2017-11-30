@@ -1,9 +1,16 @@
 var fbTok;
 
 // If this boolean is set to false, the callback will just be localhost
-var usingCsServer = true;
+var usingCsServer = false;
+var isJasmine = false;
 
-var clientID = '228N3P'; // '228N2H' for Abigail
+var clientID = '';
+if (isJasmine) {
+	clientID = '228N3P';
+} else {
+	clientId = '228N2H'; // Abigail
+}
+console.log('clientID = ' + clientID);
 
 homeURL = '';
 if (usingCsServer) {
@@ -19,7 +26,7 @@ var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
 // CHECK for returned code i.e. url#code, if no hash there, then redirect to auth site
 if (!window.location.hash) {
-	window.location.replace(authURI+'?response_type=token'+'&client_id='+clientID
+	window.location.replace(authURI+'?response_type=token&client_id='+clientID
 													+'&redirect_uri='+callback+'&scope=activity%20weight');
 } else {
 	var fragmentQueryParameters = {};
@@ -33,6 +40,7 @@ if (!window.location.hash) {
 
 var processResponse = function(response) {
 	if (!response.ok) {
+		console.log("response = " + response);
 		throw new Error('Request failed' + response);
 	} else {
 		window.location.href = landingPage;

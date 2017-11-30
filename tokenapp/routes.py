@@ -1,9 +1,10 @@
 # might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
-import powertoken_setup
-import weconnect_fitbit
+import powertoken, weconnect
 
 app = Flask(__name__)
+
+powertoken = powertoken.PowerToken()
 
 #THE LANDING PAGE
 @app.route('/')
@@ -18,7 +19,7 @@ def login():
 		received = request.form
 
 		# If user is already logged in, tells him/her so
-		if powertoken_setup.isLoggedIn():
+		if powertoken.isLoggedIntoWc():
 			return render_template('home.html', wc_response="You are already logged into WEconnect.")
 
 		#INSERT LOGIN CODE HERE, & ADD received["token"] to dict
@@ -29,7 +30,7 @@ def login():
 		#print (request.form["psk"])
 
 		# Logs user into WEconnect if he/she isn't already
-		powertoken_setup.loginToWc(request.form["name"], request.form["psk"])
+		powertoken.loginToWc(request.form["name"], request.form["psk"])
 
 		return render_template('home.html', wc_response="Login successful")
 
@@ -41,7 +42,7 @@ def login():
 @app.route('/fb_login', methods=['GET'])
 def fb_login():
 	# First, sees if the user is already logged in to Fitbit
-	if powertoken_setup.isLoggedIntoFb():
+	if powertoken.isLoggedIntoFb():
 		return render_template('home.html', fb_response="You are already logged into Fitbit.")
 	# If not, logs in and stores access token
 	else:
@@ -68,12 +69,9 @@ def result():
 
 @app.route('/start', methods=['GET', 'POST'])
 def start():
-	return render_template('running.html')
-
-@app.route('/running', methods=['GET'])
-def running():
-	powerToken = weconnect_fitbit.PowerToken()
-	powerToken.listenForWcChange()
+	#wc = weconnect.WeConnect()
+	#wc.listForWcChange()
+	powertoken.startExperiment()
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():

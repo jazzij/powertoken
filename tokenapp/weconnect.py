@@ -1,13 +1,9 @@
-import datetime
-import json
-import requests
-import sys
-import time
+import datetime, json, requests, sys, time
 
-class PowerToken:
+class WeConnect:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"
-	wc_filepath = "data/wc.json"
-	fb_filepath = "data/fb.json"
+	wcAccessFile = "data/wc.json"
+	fbAccessFile = "data/fb.json"
 	_userEmail = ""
 	_userPwd = ""
 	_wc_userId = ""
@@ -18,19 +14,16 @@ class PowerToken:
 	dailyStepGoal = 1000000
     
 	def __init__(self):
-		self.loadAccessInfo()
+		self._loadAccessInfo()
 
-	def loadAccessInfo(self):
-		with open(self.wc_filepath, "r") as file:
+	def _loadAccessInfo(self):
+		with open(self.wcAccessFile, "r") as file:
 			rawJsonStr = file.read()
 			jsonObj = json.loads(rawJsonStr)
 			self._wc_userId = jsonObj["userId"]
 			self._wc_userToken = jsonObj["userToken"]
-		#with open(self.fb_filepath, "r") as file:
-		#	rawJsonStr = file.read()
-		#	jsonObj = json.loads(rawJsonStr)
-		#	self._fb_userToken = jsonObj["userToken"]
 
+	# Will probably spawn off a new thread to do the busy waiting
 	def listenForWcChange(self):
 		while True:
 			# Waits 15 min (800 sec), then polls WEconnect
@@ -49,10 +42,7 @@ class PowerToken:
 		if percentProgress == -1:
 			print("Something went wrong in sending the request...")
 			return False
-		stepsTaken = int(percentProgress * self.dailyStepGoal)
-		print(stepsTaken)
-		# send stepsTaken to Fitbit in the form of a walking activity
-		
+		return percentProgress
 
 	# GET a list of progress for all activities
 	# Dates in format 'YYYY-MM-DD'
@@ -62,7 +52,7 @@ class PowerToken:
 				"&from=" + fromDate + "&to=" + toDate
 		print(requestUrl)
 		result = requests.get(requestUrl)
-		if self.isValid(result):
+		if self._isValid(result):
 			progress = result.json()
 			print("Total vs Completed Events in ", fromDate, "to ", toDate, ": ",
 					progress["events"]["completed"],"/", progress["events"]["total"])
@@ -71,10 +61,11 @@ class PowerToken:
 		else:
 			return -1
 
-	def isValid(self, result):
+	def _isValid(self, result):
 		if result.status_code != 200:
 			print("Request could not be completed:", str(result.status_code),
 					result.text)
 			return False
 		else:
 			return True
+
