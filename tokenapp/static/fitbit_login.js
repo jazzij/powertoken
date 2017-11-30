@@ -3,7 +3,7 @@ var fbTok;
 // If this boolean is set to false, the callback will just be localhost
 var usingCsServer = true;
 
-var clientID = '228N3P'; // '228N2H' for Abigail
+var clientID = '228N2H'; // '228N2H' for Abigail
 
 homeURL = '';
 if (usingCsServer) {
