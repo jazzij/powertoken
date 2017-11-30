@@ -21,25 +21,26 @@ class Fitbit:
 
 	# Given a percentage (from WeConnect), updates the progress towards the step goal
 	def update(self, percent):
-		numSteps = percent * self.getDailyActivityGoals()
+		numSteps = int(percent * self.getDailyActivityGoals())
 		self.logStepActivity(numSteps)
 
 	#-GET- DAILY ACTIVITY GOALS
 	def getDailyActivityGoals(self):
 		#summary of all goals
 		dailyGoalSummaryURL =  "activities/goals/daily.json"
-		urlStr = baseURL+dailyGoalSummaryURL
-		dailyGoal = requests.get(urlStr, headers=authHeaders)
-		#print (dailyGoal.json())
-		return dailyGoal.json()
+		urlStr = self.baseURL+dailyGoalSummaryURL
+		dailyGoals = requests.get(urlStr, headers=self.authHeaders)
+		dailyGoalsJson = dailyGoals.json()
+		print dailyGoalsJson
+		return dailyGoalsJson["goals"]["steps"]
 
 	#-GET- STEP COUNT BY DATE
 	def getCurrentSteps(self): 
 		#by date - default to current date
 		date = self._getCurrentDate()
 		dateActivityURL = "activities/date/"+date+'.json'
-		urlStr = baseURL+dateActivityURL
-		dateActivity = requests.get(urlStr, headers=authHeaders)
+		urlStr = self.baseURL+dateActivityURL
+		dateActivity = requests.get(urlStr, headers=self.authHeaders)
 		activities = dateActivity.json()
 		#print (activities["summary"]["steps"])
 		return activities["summary"]["steps"]
@@ -47,20 +48,20 @@ class Fitbit:
 	#-POST- CHANGE DAILY ACTIVITY STEP GOAL
 	def changeDailyStepGoal(self, newStepGoal):
 		goalURL = "activities/goals/daily.json"
-		urlStr = baseURL+activityURL
+		urlStr = self.baseURL+activityURL
 		params = {
 			"period" : "daily",
 			"type" : "steps",
 			"value" : newStepGoal
 		}
-		changeGoal = requests.post(urlStr, headers=authHeaders, params=params)
+		changeGoal = requests.post(urlStr, headers=self.authHeaders, params=params)
 		#print (changeGoal.json())
 		return changeGoal.json()
 		
 	#-POST- LOG A STEP ACTIVITY 
 	def logStepActivity(self, newStepCount):
 		activityURL = "activities.json"
-		urlStr = baseURL+activityURL
+		urlStr = self.baseURL+activityURL
 		params = {
 			"activityId" : '90013', #Walking (activityId=90013), Running (activityId=90009)
 			"activityName" : "wc_dummy",
@@ -70,7 +71,7 @@ class Fitbit:
 			"distance" : newStepCount,
 			"distanceUnit" : "steps"
 		}
-		loggedActivity = requests.post(urlStr, headers=authHeaders, params=params)
+		loggedActivity = requests.post(urlStr, headers=self.authHeaders, params=params)
 		print (loggedActivity)
 		return loggedActivity
 

@@ -5,13 +5,8 @@ import json, os, requests, time, fitbit, weconnect
 
 class PowerToken:
 	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
-	wcAccessFile = ""
-	fbAccessFile = ""
-
-	def __init__(self):
-		self.wcAccessFile = "data/wc.json"
-		self.fbAccessFile = "data/fb.json"
-		# Empty right now
+	wcAccessFile = "data/wc.json"
+	fbAccessFile = "data/fb.json"
 
 	# Logs user into WEconnect and produces an access token that will last 90 days
 	def loginToWc(self, email, password):
@@ -26,7 +21,7 @@ class PowerToken:
 
 		# Stores user's ID and access token in a JSON file
 		jsonStr = '{"userId":"' + userId + '","userToken":"' + userToken + '"}'
-		with open(filepath, "w+") as file:
+		with open(self.wcAccessFile, "w+") as file:
 			file.write(jsonStr)
 
 	# Checks if user is already logged into WEconnect
