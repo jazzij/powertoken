@@ -48,7 +48,7 @@ class Fitbit:
 	#-POST- CHANGE DAILY ACTIVITY STEP GOAL
 	def changeDailyStepGoal(self, newStepGoal):
 		goalURL = "activities/goals/daily.json"
-		urlStr = self.baseURL+activityURL
+		urlStr = self.baseURL+goalURL
 		params = {
 			"period" : "daily",
 			"type" : "steps",
