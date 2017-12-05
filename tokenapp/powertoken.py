@@ -1,5 +1,5 @@
 # powertoken.py
-# Contains the WEconnect login function
+# Contains the necessary functions for interfacing between WEconnect and Fitbit
 
 import json, os, requests, time, fitbit, weconnect
 
@@ -24,7 +24,8 @@ class PowerToken:
 		with open(self.wcAccessFile, "w+") as file:
 			file.write(jsonStr)
 
-	# Checks if user is already logged into WEconnect
+	# Returns a boolean value signifying that the user is or isn't logged into 
+	# WEconnect
 	def isLoggedIntoWc(self):
 		text = ""
 		if os.path.isfile(self.wcAccessFile):
@@ -40,14 +41,16 @@ class PowerToken:
 				else:
 					return True
 
-			# access.json is empty or doesn't contain valid JSON
+			# wc.json is empty or doesn't contain valid JSON
 			except:
 				return False
 
-		# access.json doesn't exist
+		# wc.json doesn't exist
 		else:
 			return False
 
+	# Returns a boolean value signifying that the user is or isn't logged into
+	# Fitbit.
 	def isLoggedIntoFb(self):
 		text = ""
 		if os.path.isfile(self.fbAccessFile):

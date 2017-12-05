@@ -72,7 +72,7 @@ class Fitbit:
 			"distanceUnit" : "steps"
 		}
 		loggedActivity = requests.post(urlStr, headers=self.authHeaders, params=params)
-		print (loggedActivity)
+		print(loggedActivity)
 		return loggedActivity
 
 	#helper - returns current date as a string in YYYY-MM-dd format
