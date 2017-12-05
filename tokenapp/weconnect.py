@@ -34,7 +34,7 @@ class WeConnect:
 	def poll(self):
 		beginDate = self._getCurrentDate() + "T00:00:00"
 		endDate = self._getCurrentDate() + "T" + self._getCurrentTime()
-		percentProgress = self.getProgress(currentDate, currentDate)
+		percentProgress = self.getProgress(beginDate, endDate)
 		if percentProgress == -1:
 			print("Something went wrong in sending the request...")
 			return False
