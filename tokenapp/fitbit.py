@@ -22,13 +22,14 @@ class Fitbit:
 	# Given a percentage (from WeConnect), updates the progress towards the step goal
 	def update(self, percent):
 		numSteps = int(percent * self.getDailyActivityGoals())
+		print("The number of steps I will send to Fitbit is " + numSteps)
 		self.logStepActivity(numSteps)
 
 	#-GET- DAILY ACTIVITY GOALS
 	def getDailyActivityGoals(self):
 		#summary of all goals
 		dailyGoalSummaryURL =  "activities/goals/daily.json"
-		urlStr = self.baseURL+dailyGoalSummaryURL
+		urlStr = self.baseURL + dailyGoalSummaryURL
 		dailyGoals = requests.get(urlStr, headers=self.authHeaders)
 		dailyGoalsJson = dailyGoals.json()
 		print dailyGoalsJson
@@ -61,7 +62,7 @@ class Fitbit:
 	#-POST- LOG A STEP ACTIVITY 
 	def logStepActivity(self, newStepCount):
 		activityURL = "activities.json"
-		urlStr = self.baseURL+activityURL
+		urlStr = self.baseURL + activityURL
 		params = {
 			"activityId" : '90013', #Walking (activityId=90013), Running (activityId=90009)
 			"activityName" : "wc_dummy",
@@ -71,9 +72,13 @@ class Fitbit:
 			"distance" : newStepCount,
 			"distanceUnit" : "steps"
 		}
-		loggedActivity = requests.post(urlStr, headers=self.authHeaders, params=params)
-		print(loggedActivity)
-		return loggedActivity
+		result = requests.post(urlStr, headers=self.authHeaders, params=params)
+		if self._isValid(result):
+			loggedActivity = result.json()
+			print(loggedActivity)
+			return True
+		else:
+			return False
 
 	#helper - returns current date as a string in YYYY-MM-dd format
 	def _getCurrentDate(self):
@@ -88,3 +93,10 @@ class Fitbit:
 			data = json.load(json_data)
 			fbTok = data["access_token"]
 
+	def _isValid(self, result):
+		if result.status_code != 200:
+			print("Request could not be completed:", str(result.status_code),
+					result.text)
+			return False
+		else:
+			return True
