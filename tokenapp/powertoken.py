@@ -79,9 +79,9 @@ class PowerToken:
 		wc = weconnect.WeConnect()
 		fb = fitbit.Fitbit()
 		while True:
-			time.sleep(60)
 			wcProgress = wc.poll() # wcProgress will be a percentage
 			fb.update(wcProgress)
+			time.sleep(60)
 
 
 
