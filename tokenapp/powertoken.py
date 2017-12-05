@@ -83,11 +83,15 @@ class PowerToken:
 		# like a million steps
 		fb.changeDailyStepGoal(1000000)
 
+		lastWcProgress = 0.0
+
 		# Starts an infinite loop that periodically polls WEconnect for changes
 		# and then updates Fitbit
 		while True:
 			wcProgress = wc.poll() # wcProgress will be a percentage
-			fb.update(wcProgress)
+			if wcProgress > lastWcProgress:
+				fb.update(wcProgress)
+			lastWcProgress = wcProgress
 			time.sleep(60)
 
 
