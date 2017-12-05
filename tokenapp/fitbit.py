@@ -22,7 +22,7 @@ class Fitbit:
 	# Given a percentage (from WeConnect), updates the progress towards the step goal
 	def update(self, percent):
 		numSteps = int(percent * self.getDailyActivityGoals())
-		print("The number of steps I will send to Fitbit is " + numSteps)
+		print(numSteps)
 		self.logStepActivity(numSteps)
 
 	#-GET- DAILY ACTIVITY GOALS
@@ -65,7 +65,6 @@ class Fitbit:
 		urlStr = self.baseURL + activityURL
 		params = {
 			"activityId" : '90013', #Walking (activityId=90013), Running (activityId=90009)
-			"activityName" : "wc_dummy",
 			"startTime" : "08:10:03", #HH:mm:ss
 			"durationMillis" : 360000, #60K ms = 1 min, 
 			"date" : "2017-11-02",
