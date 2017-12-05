@@ -32,13 +32,8 @@ class WeConnect:
 
 	# Polls WEconnect for percent of daily activities completed
 	def poll(self):
-		#temp = datetime.datetime(1977, 1, 1)
-		#d = temp.today()
-		#currentDate = str(d.year) + "-" + str(d.month) + "-" + str(d.day)
-		#currentTime = str(d.hour) + ":" + str(d.minute) + ":" + str(d.second)
-		#beginDate = currentDate + "T00:00:00"
-		#endDate = currentDate + "T" + currentTime
-		currentDate = self._getCurrentDate()
+		beginDate = self._getCurrentDate() + "T00:00:00"
+		endDate = self._getCurrentDate() + "T" + self._getCurrentTime()
 		percentProgress = self.getProgress(currentDate, currentDate)
 		if percentProgress == -1:
 			print("Something went wrong in sending the request...")
@@ -46,7 +41,7 @@ class WeConnect:
 		return percentProgress
 
 	# GET a list of progress for all activities
-	# Dates in format 'YYYY-MM-DD'
+	# Dates in format 'YYYY-MM-ddThh:mm:ss'
 	def getProgress(self, fromDate, toDate):
 		requestUrl = self.wcBaseUrl + "/People/" + self._wc_userId + \
 				"/activities/progress?access_token=" + self._wc_userToken + \
@@ -74,5 +69,10 @@ class WeConnect:
 	def _getCurrentDate(self):
 		now = datetime.datetime.now()
 		dateStr = format("%d-%02d-%02d" % (now.year, now.month, now.day))
+		return dateStr
+
+	def _getCurrentTime(self):
+		now = datetime.datetime.now()
+		timeStr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
 		return dateStr
 
