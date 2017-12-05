@@ -22,13 +22,6 @@ def login():
 		if powertoken.isLoggedIntoWc():
 			return render_template('home.html', wc_response="You are already logged into WEconnect.")
 
-		#INSERT LOGIN CODE HERE, & ADD received["token"] to dict
-		#with open('userID.json', 'w') as f:
-		#	json.dump(received, f, ensure_ascii=False)
-		#print (request)
-		#print (request.form["name"])
-		#print (request.form["psk"])
-
 		# Logs user into WEconnect if he/she isn't already
 		powertoken.loginToWc(request.form["name"], request.form["psk"])
 
@@ -52,32 +45,23 @@ def fb_login():
 @app.route('/result', methods=['GET', 'POST'])
 def result():
 	data = request.data
-	#print(data)
 	convData = data.decode('utf8')
 	datajs = json.loads(convData)
-	#print(datajs)
-	print(datajs["tok"])
 
 	# Stores access token in a JSON file
 	jsonStr = '{"userToken":"' + datajs["tok"] + '"}'
 	with open("data/fb.json", "w+") as file:
 		file.write(jsonStr)
-
-	print('Result achieved')
 	
 	return render_template('home.html', fb_response="Login successful")
 
 @app.route('/start', methods=['GET', 'POST'])
 def start():
-	#wc = weconnect.WeConnect()
-	#wc.listForWcChange()
 	powertoken.startExperiment()
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-	print('Post to test')
 	data = request.data
-	print(data)
 	return render_template('home.html')
 
 if __name__ == "__main__":

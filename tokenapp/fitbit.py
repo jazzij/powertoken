@@ -79,9 +79,9 @@ class Fitbit:
 	def _getCurrentDate(self):
 		now = datetime.datetime.now()
 		dateStr = format("%d-%02d-%02d" % (now.year, now.month, now.day))
-		return dateStr	
+		return dateStr
 	
-	#read the fitbit token you want to use from wherever its stored
+	#read the fitbit token you want to use from wherever it's stored
 	def _readFromFile(self):
 		global fbTok
 		with open('sampleProfile.json') as json_data:

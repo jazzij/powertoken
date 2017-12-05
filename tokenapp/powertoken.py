@@ -74,10 +74,17 @@ class PowerToken:
 		else:
 			return False
 
-	# TODO: Test this code
+	# TODO: Debug this code
 	def startExperiment(self):
 		wc = weconnect.WeConnect()
 		fb = fitbit.Fitbit()
+
+		# First, sets the Fitbit daily step goal to something ridiculous -
+		# like a million steps
+		fb.changeDailyStepGoal(1000000)
+
+		# Starts an infinite loop that periodically polls WEconnect for changes
+		# and then updates Fitbit
 		while True:
 			wcProgress = wc.poll() # wcProgress will be a percentage
 			fb.update(wcProgress)
