@@ -74,5 +74,5 @@ class WeConnect:
 	def _getCurrentTime(self):
 		now = datetime.datetime.now()
 		timeStr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
-		return dateStr
+		return timeStr
 
