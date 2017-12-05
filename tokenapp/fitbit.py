@@ -19,11 +19,17 @@ class Fitbit:
 		jsonObj = json.loads(rawJsonStr)
 		self._fbTok = jsonObj["userToken"]
 
-	# Given a percentage (from WeConnect), updates the progress towards the step goal
+	# Given a percentage increase (from WeConnect), updates the progress towards the step goal
 	def update(self, percent):
+		prevSteps = self.getCurrentSteps()
+		print("Previous step count:")
+		print(prevSteps)
 		numSteps = int(percent * self.getDailyActivityGoals())
+		print("Added steps:")
 		print(numSteps)
 		self.logStepActivity(numSteps)
+		print("New step count:")
+		print(prevSteps + numSteps)
 
 	#-GET- DAILY ACTIVITY GOALS
 	def getDailyActivityGoals(self):
@@ -32,7 +38,7 @@ class Fitbit:
 		urlStr = self.baseURL + dailyGoalSummaryURL
 		dailyGoals = requests.get(urlStr, headers=self.authHeaders)
 		dailyGoalsJson = dailyGoals.json()
-		print dailyGoalsJson
+		#print dailyGoalsJson
 		return dailyGoalsJson["goals"]["steps"]
 
 	#-GET- STEP COUNT BY DATE

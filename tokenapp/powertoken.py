@@ -90,7 +90,7 @@ class PowerToken:
 		while True:
 			wcProgress = wc.poll() # wcProgress will be a percentage
 			if wcProgress > lastWcProgress:
-				fb.update(wcProgress)
+				fb.update(wcProgress - lastWcProgress)
 			lastWcProgress = wcProgress
 			time.sleep(60)
 
