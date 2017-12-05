@@ -32,13 +32,14 @@ class WeConnect:
 
 	# Polls WEconnect for percent of daily activities completed
 	def poll(self):
-		temp = datetime.datetime(1977, 1, 1)
-		d = temp.today()
-		currentDate = str(d.year) + "-" + str(d.month) + "-" + str(d.day)
-		currentTime = str(d.hour) + ":" + str(d.minute) + ":" + str(d.second)
-		beginDate = currentDate + "T00:00:00"
-		endDate = currentDate + "T" + currentTime
-		percentProgress = self.getProgress(beginDate, endDate)
+		#temp = datetime.datetime(1977, 1, 1)
+		#d = temp.today()
+		#currentDate = str(d.year) + "-" + str(d.month) + "-" + str(d.day)
+		#currentTime = str(d.hour) + ":" + str(d.minute) + ":" + str(d.second)
+		#beginDate = currentDate + "T00:00:00"
+		#endDate = currentDate + "T" + currentTime
+		currentDate = self._getCurrentDate()
+		percentProgress = self.getProgress(currentDate, currentDate)
 		if percentProgress == -1:
 			print("Something went wrong in sending the request...")
 			return False
@@ -68,4 +69,10 @@ class WeConnect:
 			return False
 		else:
 			return True
+
+	#helper - returns current date as a string in YYYY-MM-dd format
+	def _getCurrentDate(self):
+		now = datetime.datetime.now()
+		dateStr = format("%d-%02d-%02d" % (now.year, now.month, now.day))
+		return dateStr
 
