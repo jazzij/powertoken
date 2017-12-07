@@ -79,8 +79,8 @@ class WeConnect:
 	def _getWeek(self):
 		today = datetime.date.today()
 		todayWeekday = (today.weekday() + 1) % 7	# SUN = 0, MON = 1, ... , SAT = 6
-		sun = today - datetime.timedelta(currentWeekday)
-		sat = today + datetime.timedelta(6 - currentWeekday)
+		sun = today - datetime.timedelta(todayWeekday)
+		sat = today + datetime.timedelta(6 - todayWeekday)
 		sunStr = format("%d-%02d-%02d" % (sun.year, sun.month, sun.day))
 		satStr = format("%d-%02d-%02d" % (sat.year, sat.month, sat.day))
 		return sunStr, satStr
