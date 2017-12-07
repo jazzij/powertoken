@@ -54,6 +54,7 @@ class PowerToken:
 	def isLoggedIntoFb(self):
 		text = ""
 		if os.path.isfile(self.fbAccessFile):
+			print("fb.json exists")
 			with open(self.fbAccessFile, "r") as file:
 				file.seek(0)
 				text = file.read()
@@ -68,10 +69,12 @@ class PowerToken:
 
 			# fb.json is empty or doesn't contain valid JSON
 			except:
+				print("but fb.json is empty or contains invalid JSON")
 				return False
 
 		# fb.json doesn't exist
 		else:
+			print("fb.json doesn't exist")
 			return False
 
 	# TODO: Debug this code
