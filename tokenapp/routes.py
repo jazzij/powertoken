@@ -13,7 +13,7 @@ powertoken = powertoken.PowerToken()
 def home():
 	# First things first, creates the data/ folder if it doesn't exist
 	if not os.path.isdir('/data'):
-		os.mkdirs('/data')
+		os.mkdir('/data')
 
 	return render_template('home.html')
 
