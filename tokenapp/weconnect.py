@@ -31,7 +31,7 @@ class WeConnect:
 			self.poll()
 
 	# Polls WEconnect for percent of daily activities completed
-	def poll(self):
+	def poll_old(self):
 		beginDate = self._getCurrentDate() + "T00:00:00"
 		endDate = self._getCurrentDate() + "T" + self._getCurrentTime()
 		percentProgress = self.getProgress(beginDate, endDate)
@@ -40,8 +40,16 @@ class WeConnect:
 			return False
 		return percentProgress
 
+	def poll(self):
+		sun, sat = self._getWeek()
+		percentProgress = self.getProgress(sun, sat)
+		if percentProgress == -1:
+			print("Something went terribly wrong in sending the request.")
+			return -1
+		return percentProgress
+
 	# GET a list of progress for all activities
-	# Dates in format 'YYYY-MM-ddThh:mm:ss'
+	# Dates in format 'YYYY-MM-dd'
 	def getProgress(self, fromDate, toDate):
 		requestUrl = self.wcBaseUrl + "/People/" + self._wc_userId + \
 				"/activities/progress?access_token=" + self._wc_userToken + \
@@ -65,6 +73,17 @@ class WeConnect:
 			return False
 		else:
 			return True
+
+	# Returns two formatted strings representing the date of the past Sunday and the
+	# upcoming Saturday (for countries where Sunday is the first day of the week)
+	def _getWeek(self):
+		today = datetime.date.today()
+		todayWeekday = (today.weekday() + 1) % 7	# SUN = 0, MON = 1, ... , SAT = 6
+		sun = today - datetime.timedelta(currentWeekday)
+		sat = today + datetime.timedelta(6 - currentWeekday)
+		sunStr = format("%d-%02d-%02d" % (sun.year, sun.month, sun.day))
+		satStr = format("%d-%02d-%02d" % (sat.year, sat.month, sat.day))
+		return sunStr, satStr
 
 	#helper - returns current date as a string in YYYY-MM-dd format
 	def _getCurrentDate(self):

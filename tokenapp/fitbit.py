@@ -31,6 +31,17 @@ class Fitbit:
 		print("New step count:")
 		print(prevSteps + numSteps)
 
+	#-GET- TRACKERS
+	def getDevices(self):
+		#summary of all goals
+		devicesURL =  "devices.json"
+		urlStr = self.baseURL + devicesURL
+		devicesRaw = requests.get(urlStr, headers=self.authHeaders)
+		devices = dailyGoals.json()
+		for device in devices:
+			print(device["deviceVersion"] + " is a " + device["type"])
+		return devices
+
 	#-GET- DAILY ACTIVITY GOALS
 	def getDailyActivityGoals(self):
 		#summary of all goals
@@ -58,6 +69,19 @@ class Fitbit:
 		urlStr = self.baseURL+goalURL
 		params = {
 			"period" : "daily",
+			"type" : "steps",
+			"value" : newStepGoal
+		}
+		changeGoal = requests.post(urlStr, headers=self.authHeaders, params=params)
+		#print (changeGoal.json())
+		return changeGoal.json()
+
+	#-POST- CHANGE WEEKLY ACTIVITY STEP GOAL
+	def changeWeeklyStepGoal(self, newStepGoal):
+		goalURL = "activities/goals/weekly.json"
+		urlStr = self.baseURL + goalURL
+		params = {
+			"period" : "weekly",
 			"type" : "steps",
 			"value" : newStepGoal
 		}
