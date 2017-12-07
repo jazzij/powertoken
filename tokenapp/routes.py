@@ -1,5 +1,6 @@
 # might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
+import os
 import powertoken, weconnect
 
 app = Flask(__name__)
@@ -10,6 +11,10 @@ powertoken = powertoken.PowerToken()
 @app.route('/')
 @app.route('/home')
 def home():
+	# First things first, creates the data/ folder if it doesn't exist
+	if not os.isdir('/data'):
+		os.mkdirs('/data')
+
 	return render_template('home.html')
 
 #WECONNECT FORM SUBMIT, FITBIT REDIRECT
