@@ -11,10 +11,6 @@ powertoken = powertoken.PowerToken()
 @app.route('/')
 @app.route('/home')
 def home():
-	# First things first, creates the data/ folder if it doesn't exist
-	if not os.path.isdir('/data'):
-		os.mkdir('/data')
-
 	return render_template('home.html')
 
 #WECONNECT FORM SUBMIT, FITBIT REDIRECT
