@@ -37,7 +37,7 @@ class Fitbit:
 		devicesURL =  "devices.json"
 		urlStr = self.baseURL + devicesURL
 		devicesRaw = requests.get(urlStr, headers=self.authHeaders)
-		devices = dailyGoals.json()
+		devices = devicesRaw.json()
 		for device in devices:
 			print(device["deviceVersion"] + " is a " + device["type"])
 		return devices
