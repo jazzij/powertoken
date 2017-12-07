@@ -13,7 +13,7 @@ var clientID = '228N2H';
 console.log('clientID = ' + clientID);
 
 homeURL = '';
-if (usingCsServer) {`
+if (usingCsServer) {
 	homeURL = 'https://powertoken.grouplens.org';
 } else {
 	homeURL = 'http://localhost:5000';
