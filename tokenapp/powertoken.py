@@ -102,3 +102,5 @@ class PowerToken:
 		fb = fitbit.Fitbit()
 		response = fb.changeDailyStepGoal(1000000)
 		print(response)
+		response = fb.logStepActivity(250000);
+		print(response)
