@@ -82,9 +82,6 @@ class PowerToken:
 		wc = weconnect.WeConnect()
 		fb = fitbit.Fitbit()
 
-		# This is just a test
-		fb.getDevices()
-
 		# First, sets the Fitbit daily step goal to something ridiculous -
 		# like a million steps
 		fb.changeWeeklyStepGoal(1000000)
@@ -99,3 +96,9 @@ class PowerToken:
 				fb.update(wcProgress - lastWcProgress)
 			lastWcProgress = wcProgress
 			time.sleep(60)
+
+	def runTests(self):
+		wc = weconnect.WeConnect()
+		fb = fitbit.Fitbit()
+		response = fb.changeDailyStepGoal(1000000)
+		print(response)

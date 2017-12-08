@@ -62,7 +62,8 @@ def start():
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-	data = request.data
+	powertoken.runTests()
+	#data = request.data
 	return render_template('home.html')
 
 if __name__ == "__main__":
