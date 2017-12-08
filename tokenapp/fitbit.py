@@ -98,7 +98,7 @@ class Fitbit:
 			"activityId" : '90013', #Walking (activityId=90013), Running (activityId=90009)
 			"startTime" : "08:10:03", #HH:mm:ss
 			"durationMillis" : 360000, #60K ms = 1 min, 
-			"date" : "2017-11-02",
+			"date" : self._getCurrentDate(),
 			"distance" : newStepCount,
 			"distanceUnit" : "steps"
 		}
