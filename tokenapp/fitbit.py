@@ -46,8 +46,6 @@ class Fitbit:
 	def getDailyStepActivities(self):
 		activityListUrl = "activities/date/"+self._getCurrentDate()+".json"
 		urlStr = self.baseURL + activityListUrl
-		#midnight = self._getCurrentDate() + "T00:00:00"
-		#urlStr = self.baseURL + activityListUrl + "?afterDate=" + midnight + "&sort=asc&limit=20&offset=0"
 		print(urlStr)
 		response = requests.get(urlStr, headers=self.authHeaders)
 		activityListJson = response.json()

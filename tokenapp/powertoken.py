@@ -121,7 +121,7 @@ class PowerToken:
 	def runTests(self):
 		wc = weconnect.WeConnect()
 		fb = fitbit.Fitbit()
-		response = fb.getDailyStepActivities()
+		response = fb.resetAndUpdate(0.5)
 		#response = fb.changeDailyStepGoal(1000000)
 		#print(response)
 		#response = fb.logStepActivity(250000);
