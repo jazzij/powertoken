@@ -50,8 +50,9 @@ class Fitbit:
 			"offset" : 0
 		}
 		activityListRaw = requests.get(urlStr, headers=self.authHeaders, params=params)
-		activityListJson = activityListRaw.json()
-		print(activityListJson)
+		print(activityListRaw)
+		#activityListJson = activityListRaw.json()
+		#print(activityListJson)
 
 	#-GET- TRACKERS
 	def getDevices(self):
