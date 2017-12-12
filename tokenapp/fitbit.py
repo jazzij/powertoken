@@ -45,8 +45,9 @@ class Fitbit:
 		#midnight = self._getCurrentDate() + "T00:00:00"
 		#urlStr = self.baseURL + activityListUrl + "?afterDate=" + midnight + "&sort=asc&limit=20&offset=0"
 		print(urlStr)
-		activityListRaw = requests.get(urlStr, headers=self.authHeaders)
-		print(activityListRaw)
+		response = requests.get(urlStr, headers=self.authHeaders)
+		activityListJson = response.data.json()
+		print(activityListJson)
 		#activityListJson = activityListRaw.json()
 		#print(activityListJson)
 
