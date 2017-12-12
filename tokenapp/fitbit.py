@@ -57,8 +57,8 @@ class Fitbit:
 	# DELETE - Activity
 	# Returns True if Activity successfully deleted
 	def deleteActivity(self, logId):
-		deleteActivityUrl = "activities/" + logId + ".json"
-		urlStr = self.baseURL = deleteActivityUrl
+		deleteActivityUrl = "activities/" + str(logId) + ".json"
+		urlStr = self.baseURL + deleteActivityUrl
 		print(urlStr)
 		response = requests.delete(urlStr, headers=self.authHeaders)
 		if response.status_code == 204:
@@ -152,8 +152,8 @@ class Fitbit:
 		return dateStr
 
 	def _getCurrentTime(self):
-		now = datetime.time.now()
-		timestr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
+		now = datetime.datetime.now()
+		timeStr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
 		return timeStr
 	
 	#read the fitbit token you want to use from wherever it's stored
