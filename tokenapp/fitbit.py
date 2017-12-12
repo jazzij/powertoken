@@ -124,7 +124,7 @@ class Fitbit:
 			fbTok = data["access_token"]
 
 	def _isValid(self, result):
-		if result.status_code != 200:
+		if result.status_code >= 300:
 			print("Request could not be completed:", str(result.status_code),
 					result.text)
 			return False
