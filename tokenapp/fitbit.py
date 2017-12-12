@@ -95,9 +95,9 @@ class Fitbit:
 		activityURL = "activities.json"
 		urlStr = self.baseURL + activityURL
 		params = {
-			"activityId" : '17151', #Walking (activityId=90013), Running (activityId=90009)
+			"activityId" : '90013', #Walking (activityId=90013), Running (activityId=90009)
 			"startTime" : "05:00:00", #HH:mm:ss
-			"durationMillis" : 360000, #60K ms = 1 min, 
+			"durationMillis" : 3600000, #60K ms = 1 min, 
 			"date" : self._getCurrentDate(),
 			"distance" : newStepCount,
 			"distanceUnit" : "steps"
