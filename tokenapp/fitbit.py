@@ -31,6 +31,28 @@ class Fitbit:
 		print("New step count:")
 		print(prevSteps + numSteps)
 
+	# Used if WeConnect progress decreased
+	def resetAndUpdate(self, percent):
+		# Deletes all Fitbit step activities for the day
+		self.getDailyStepActivities()
+
+		# Updates Fitbit with the new percentage
+		self.update(percent)
+
+	def getDailyStepActivities():
+		activityListUrl = "https://api.fitbit.com/1/user/-/activities/list.json"
+		midnight = self._getCurrentDate() + "T00:00:00"
+		urlStr = self.baseURL + activityListUrl
+		params = {
+			"afterDate": midnight,
+			"sort" : "asc",
+			"limit" : 20,
+			"offset" : 0
+		}
+		activityListRaw = requests.get(urlStr, headers=self.authHeaders, params=params)
+		activityListJson = activityListRaw.json()
+		print(activityListJson)
+
 	#-GET- TRACKERS
 	def getDevices(self):
 		#summary of all goals
@@ -96,7 +118,7 @@ class Fitbit:
 		urlStr = self.baseURL + activityURL
 		params = {
 			"activityId" : '90013', #Walking (activityId=90013), Running (activityId=90009)
-			"startTime" : "05:00:00", #HH:mm:ss
+			"startTime" : self._getCurrentTime(), #HH:mm:ss
 			"durationMillis" : 3600000, #60K ms = 1 min, 
 			"date" : self._getCurrentDate(),
 			"distance" : newStepCount,
@@ -115,6 +137,11 @@ class Fitbit:
 		now = datetime.datetime.now()
 		dateStr = format("%d-%02d-%02d" % (now.year, now.month, now.day))
 		return dateStr
+
+	def _getCurrentTime(self):
+		now = datetime.time.now()
+		timestr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
+		return timeStr
 	
 	#read the fitbit token you want to use from wherever it's stored
 	def _readFromFile(self):

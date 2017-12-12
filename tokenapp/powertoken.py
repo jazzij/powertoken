@@ -111,15 +111,18 @@ class PowerToken:
 		# and then updates Fitbit
 		while True:
 			wcProgress = wc.poll() # wcProgress will be a percentage
-			if wcProgress != lastWcProgress:
+			if wcProgress > lastWcProgress:
 				fb.update(wcProgress - lastWcProgress)
+			elif wcProgress < lastWcProgress:
+				fb.resetAndUpdate(wcProgress)
 			lastWcProgress = wcProgress
 			time.sleep(60)
 
 	def runTests(self):
 		wc = weconnect.WeConnect()
 		fb = fitbit.Fitbit()
-		response = fb.changeDailyStepGoal(1000000)
-		print(response)
-		response = fb.logStepActivity(250000);
-		print(response)
+		response = fb.getDailyStepActivities()
+		#response = fb.changeDailyStepGoal(1000000)
+		#print(response)
+		#response = fb.logStepActivity(250000);
+		#print(response)
