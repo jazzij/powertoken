@@ -39,7 +39,7 @@ class Fitbit:
 		# Updates Fitbit with the new percentage
 		self.update(percent)
 
-	def getDailyStepActivities():
+	def getDailyStepActivities(self):
 		activityListUrl = "https://api.fitbit.com/1/user/-/activities/list.json"
 		midnight = self._getCurrentDate() + "T00:00:00"
 		urlStr = self.baseURL + activityListUrl
