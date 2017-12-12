@@ -41,8 +41,9 @@ class WeConnect:
 		return percentProgress
 
 	def poll(self):
-		sun, sat = self._getWeek()
-		percentProgress = self.getProgress(sun, sat)
+		#sun, sat = self._getWeek()
+		start, end = self._getToday()
+		percentProgress = self.getProgress(start, end)
 		if percentProgress == -1:
 			print("Something went terribly wrong in sending the request.")
 			return -1
@@ -90,6 +91,12 @@ class WeConnect:
 		now = datetime.datetime.now()
 		dateStr = format("%d-%02d-%02d" % (now.year, now.month, now.day))
 		return dateStr
+
+	def _getToday(self):
+		today = datetime.datetime.now()
+		start = format("%d-%02d-%02dT%02d:%02d:%02d", today.year, today.month, today.day, 0, 0, 0)
+		end = format("%d-%02d-%02dT%02d:%02d:%02d", today.year, today.month, today.day, 23, 59, 59)
+		return start, end
 
 	def _getCurrentTime(self):
 		now = datetime.datetime.now()

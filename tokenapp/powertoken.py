@@ -78,13 +78,32 @@ class PowerToken:
 			return False
 
 	# TODO: Debug this code
-	def startExperiment(self):
+	def startExperiment_old(self):
 		wc = weconnect.WeConnect()
 		fb = fitbit.Fitbit()
 
 		# First, sets the Fitbit daily step goal to something ridiculous -
 		# like a million steps
 		fb.changeWeeklyStepGoal(1000000)
+
+		lastWcProgress = 0.0
+
+		# Starts an infinite loop that periodically polls WEconnect for changes
+		# and then updates Fitbit
+		while True:
+			wcProgress = wc.poll() # wcProgress will be a percentage
+			if wcProgress != lastWcProgress:
+				fb.update(wcProgress - lastWcProgress)
+			lastWcProgress = wcProgress
+			time.sleep(60)
+
+	def startExperiment(self):
+		wc = weconnect.WeConnect()
+		fb = fitbit.Fitbit()
+
+		# First, sets the Fitbit daily step goal to something ridiculous -
+		# like a million steps
+		fb.changeDailyStepGoal(1000000)
 
 		lastWcProgress = 0.0
 
