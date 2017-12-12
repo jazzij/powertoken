@@ -42,14 +42,8 @@ class Fitbit:
 	def getDailyStepActivities(self):
 		activityListUrl = "https://api.fitbit.com/1/user/-/activities/list.json"
 		midnight = self._getCurrentDate() + "T00:00:00"
-		urlStr = self.baseURL + activityListUrl
-		params = {
-			"afterDate": midnight,
-			"sort" : "asc",
-			"limit" : 20,
-			"offset" : 0
-		}
-		activityListRaw = requests.get(urlStr, headers=self.authHeaders, params=params)
+		urlStr = self.baseURL + activityListUrl + "?afterDate=" + midnight + "&sort=asc&limit=20&offset=0"
+		activityListRaw = requests.get(urlStr, headers=self.authHeaders)
 		print(activityListRaw)
 		#activityListJson = activityListRaw.json()
 		#print(activityListJson)
