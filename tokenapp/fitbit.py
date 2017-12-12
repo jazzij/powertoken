@@ -34,7 +34,11 @@ class Fitbit:
 	# Used if WeConnect progress decreased
 	def resetAndUpdate(self, percent):
 		# Deletes all Fitbit step activities for the day
-		self.getDailyStepActivities()
+		dailyActivities = self.getDailyStepActivities()
+		for activity in dailyActivities:
+			logId = activity["logId"]
+			print(logId)
+			self.deleteActivity(logId)
 
 		# Updates Fitbit with the new percentage
 		self.update(percent)
@@ -46,10 +50,23 @@ class Fitbit:
 		#urlStr = self.baseURL + activityListUrl + "?afterDate=" + midnight + "&sort=asc&limit=20&offset=0"
 		print(urlStr)
 		response = requests.get(urlStr, headers=self.authHeaders)
-		activityListJson = response.data.json()
+		activityListJson = response.json()
 		print(activityListJson)
-		#activityListJson = activityListRaw.json()
-		#print(activityListJson)
+		activityList = activityListJson["activities"]
+		print(len(activityList))
+		return activityList
+
+	# DELETE - Activity
+	# Returns True if Activity successfully deleted
+	def deleteActivity(self, logId):
+		deleteActivityUrl = "activities/" + logId + ".json"
+		urlStr = self.baseURL = deleteActivityUrl
+		print(urlStr)
+		response = requests.delete(urlStr, headers=self.authHeaders)
+		if response.status_code == 204:
+			return True
+		else:
+			return False
 
 	#-GET- TRACKERS
 	def getDevices(self):
