@@ -40,9 +40,11 @@ class Fitbit:
 		self.update(percent)
 
 	def getDailyStepActivities(self):
-		activityListUrl = "https://api.fitbit.com/1/user/-/activities/list.json"
-		midnight = self._getCurrentDate() + "T00:00:00"
-		urlStr = self.baseURL + activityListUrl + "?afterDate=" + midnight + "&sort=asc&limit=20&offset=0"
+		activityListUrl = "activities/date/"+self._getCurrentDate()+".json"
+		urlStr = self.baseURL = activityListUrl
+		#midnight = self._getCurrentDate() + "T00:00:00"
+		#urlStr = self.baseURL + activityListUrl + "?afterDate=" + midnight + "&sort=asc&limit=20&offset=0"
+		print(urlStr)
 		activityListRaw = requests.get(urlStr, headers=self.authHeaders)
 		print(activityListRaw)
 		#activityListJson = activityListRaw.json()
