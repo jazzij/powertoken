@@ -94,8 +94,8 @@ class WeConnect:
 
 	def _getToday(self):
 		today = datetime.datetime.now()
-		start = format("%d-%02d-%02dT%02d:%02d:%02d", today.year, today.month, today.day, 0, 0, 0)
-		end = format("%d-%02d-%02dT%02d:%02d:%02d", today.year, today.month, today.day, 23, 59, 59)
+		start = format("%d-%02d-%02dT%02d:%02d:%02d" % (today.year, today.month, today.day, 0, 0, 0))
+		end = format("%d-%02d-%02dT%02d:%02d:%02d" % (today.year, today.month, today.day, 23, 59, 59))
 		return start, end
 
 	def _getCurrentTime(self):
