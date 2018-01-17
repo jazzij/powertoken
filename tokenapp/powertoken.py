@@ -2,14 +2,17 @@
 # Contains the necessary functions for interfacing between WEconnect and Fitbit
 
 import json, os, requests, time, fitbit, weconnect
+from tinydb import TinyDB, Query
 
 class PowerToken:
 	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
 	wcAccessFile = "data/wc.json"
 	fbAccessFile = "data/fb.json"
+	dbPath = "data/db.json"
+	db = TinyDB(dbPath)
 
 	# Logs user into WEconnect and produces an access token that will last 90 days
-	def loginToWc(self, email, password):
+	def loginToWc_old(self, email, password):
 		result = requests.post(self.wcLoginUrl, data={"email":email, "password":password})
 		if result.status_code != 200:
 			print("Login error")
@@ -24,9 +27,23 @@ class PowerToken:
 		with open(self.wcAccessFile, "w+") as file:
 			file.write(jsonStr)
 
+	# New version of the function that makes use of tinydb
+	def loginToWc(self, email, password):
+		result = requests.post(self.wcLoginUrl, data={"email":email, "password":password})
+		if result.status_code != 200:
+			print("Login error")
+			exit()
+		jres = result.json()
+		userId = str(jres["accessToken"]["userId"])
+		userToken = str(jres["accessToken"]["id"])
+		print("Logged into WEconnect system.")
+
+		# Stores user's WEconnect-related data in the tinydb
+		self.db.insert({"email":email, "wcUserId":userId, "wcAccessToken":userToken, "fbAccessToken":""})
+
 	# Returns a boolean value signifying that the user is or isn't logged into 
 	# WEconnect
-	def isLoggedIntoWc(self):
+	def isLoggedIntoWc_old(self, email):
 		text = ""
 		if os.path.isfile(self.wcAccessFile):
 			with open(self.wcAccessFile, "r") as file:
@@ -36,7 +53,7 @@ class PowerToken:
 				loginInfo = json.loads(text)
 
 				# Only returns True if userId and userToken fields are filled
-				if not loginInfo["userId"] or not loginInfo["userToken"]:
+				if not loginInfo["wcUserId"] or not loginInfo["wcUserToken"]:
 					return False
 				else:
 					return True
@@ -49,9 +66,23 @@ class PowerToken:
 		else:
 			return False
 
+	# New version that makes use of tinydb
+	def isLoggedIntoWc(self, email):
+		user = Query()
+		result = db.search(user.email == email)
+		# Makes sure there exists a user with that email
+		if len(result) != 1:
+			return False
+		else:
+			# Only returns True if both WEconnect fields are filled
+			if not result[0]["wcUserId"] or not result[0]["wcAccessToken"]:
+				return False;
+			else:
+				return True
+
 	# Returns a boolean value signifying that the user is or isn't logged into
 	# Fitbit.
-	def isLoggedIntoFb(self):
+	def isLoggedIntoFb_old(self):
 		text = ""
 		if os.path.isfile(self.fbAccessFile):
 			print("fb.json exists")
@@ -77,10 +108,29 @@ class PowerToken:
 			print("fb.json doesn't exist")
 			return False
 
+	# New version that uses TinyDB
+	def isLoggedIntoFb(self, email):
+		user = Query()
+		result = db.search(user.email == email)
+		# Makes sure there exists a user with that email
+		if len(result) != 1:
+			return False
+		else:
+			# Only returns True if the Fitbit access token field is filled
+			if not result[0]["fbAccessToken"]:
+				return False;
+			else:
+				return True
+
+	def completeFbLogin(self, email, accessToken):
+		user = Query()
+		db.update({"fbAccessToken": accessToken}, user.email == email)
+		return
+
 	# TODO: Debug this code
 	def startExperiment_old(self):
-		wc = weconnect.WeConnect()
-		fb = fitbit.Fitbit()
+		wc = weconnect.WeConnect(email)
+		fb = fitbit.Fitbit(email)
 
 		# First, sets the Fitbit daily step goal to something ridiculous -
 		# like a million steps

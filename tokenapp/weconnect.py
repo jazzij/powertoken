@@ -1,11 +1,12 @@
 import datetime, json, requests, sys, time
+from tinydb import TinyDB, Query
 
 class WeConnect:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"
 	wcAccessFile = "data/wc.json"
 	fbAccessFile = "data/fb.json"
-	_userEmail = ""
-	_userPwd = ""
+	dbPath = "data/db.json"
+	db = TinyDB(self.dbPath)
 	_wc_userId = ""
 	_wc_userToken = ""
 	_fb_userId = ""
@@ -13,15 +14,22 @@ class WeConnect:
 
 	dailyStepGoal = 1000000
     
-	def __init__(self):
-		self._loadAccessInfo()
+	def __init__(self, email):
+		self._loadAccessInfo(email)
 
-	def _loadAccessInfo(self):
+	def _loadAccessInfo_old(self):
 		with open(self.wcAccessFile, "r") as file:
 			rawJsonStr = file.read()
 			jsonObj = json.loads(rawJsonStr)
 			self._wc_userId = jsonObj["userId"]
 			self._wc_userToken = jsonObj["userToken"]
+
+	# TODO: new function that uses tinydb
+	def _loadAccessInfo(self, email):
+		user = Query()
+		userInfo = db.search(user.email == email)[0]
+		self._wc_userId = userInfo["wcUserId"]
+		self._wc_userToken = userInfo["wcAccessToken"]
 
 	# Will probably spawn off a new thread to do the busy waiting
 	def listenForWcChange(self):

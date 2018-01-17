@@ -3,21 +3,29 @@
 import requests, sys, datetime, json
 
 class Fitbit:
+	dbPath = "data/db.json"
+	db = TinyDB(self.dbPath)
 	_fbTok = ''
 	authHeaders = {}
 	baseURL = 'https://api.fitbit.com/1/user/-/'
 
-	def __init__(self):
-		self._loadAccessInfo()
+	def __init__(self, email):
+		self._loadAccessInfo(email)
 		self.authHeaders = {'Authorization': 'Bearer ' + self._fbTok}
 
 	# Reads user's token from file
-	def _loadAccessInfo(self):
+	def _loadAccessInfo_old(self):
 		rawJsonStr = ""
 		with open("data/fb.json", "r") as file:
 			rawJsonStr = file.read()
 		jsonObj = json.loads(rawJsonStr)
 		self._fbTok = jsonObj["userToken"]
+
+	# Gets user's access token from tinydb
+	def _loadAccessInfo(self, email):
+		user = Query()
+		userInfo = db.search(user.email == email)[0]
+		self._fbTok = userInfo["fbAccessToken"]
 
 	# Given a percentage increase (from WeConnect), updates the progress towards the step goal
 	def update(self, percent):

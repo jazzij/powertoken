@@ -3,46 +3,54 @@ from flask import Flask, render_template, request, json
 import os
 import powertoken, weconnect
 
+# Creates a new Flask server application
 app = Flask(__name__)
 
+# We will use the powertoken object to access the core PowerToken functions.
 powertoken = powertoken.PowerToken()
 
-#THE LANDING PAGE
+# Stores the user's email (for referencing the tinydb) across the session
+
+# THE LANDING PAGE
 @app.route('/')
 @app.route('/home')
 def home():
 	return render_template('home.html')
 
-#WECONNECT FORM SUBMIT, FITBIT REDIRECT
+# WECONNECT FORM SUBMIT, FITBIT REDIRECT
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+	# WEconnect form submit uses POST
 	if request.method == 'POST':
 		received = request.form
 
 		# If user is already logged in, tells him/her so
-		if powertoken.isLoggedIntoWc():
+		if powertoken.isLoggedIntoWc(request.form["name"]):
 			return render_template('home.html', wc_response="You are already logged into WEconnect.")
 
 		# Logs user into WEconnect if he/she isn't already
 		powertoken.loginToWc(request.form["name"], request.form["psk"])
+		email = request.form["name"]
 
 		return render_template('home.html', wc_response="Login successful")
 
+	# Fitbit redirect uses GET
 	elif request.method == 'GET':
 		return render_template('login.html')
 
-#THE CALLBACK for FITBIT API (http://host-url/fb_login). 
-#Note: login.html contains javascript
+# The callback for Fitbit API (http://host-url/fb_login). 
+# Note: login.html contains JavaScript
 @app.route('/fb_login', methods=['GET'])
 def fb_login():
-	# First, sees if the user is already logged in to Fitbit
-	if powertoken.isLoggedIntoFb():
+	# First, sees if the user is already logged into Fitbit
+	if powertoken.isLoggedIntoFb(email):
 		return render_template('home.html', fb_response="You are already logged into Fitbit.")
+
 	# If not, logs in and stores access token
 	else:
 		return render_template('login.html')
 
-#WHEN FITBIT is all setup, login.html sends 
+# When Fitbit is all setup, login.html redirects to here
 @app.route('/result', methods=['GET', 'POST'])
 def result():
 	data = request.data
@@ -50,9 +58,11 @@ def result():
 	datajs = json.loads(convData)
 
 	# Stores access token in a JSON file
-	jsonStr = '{"userToken":"' + datajs["tok"] + '"}'
-	with open("data/fb.json", "w+") as file:
-		file.write(jsonStr)
+	#jsonStr = '{"userToken":"' + datajs["tok"] + '"}'
+	#with open("data/fb.json", "w+") as file:
+	#	file.write(jsonStr)
+
+	powertoken.completeFbLogin(email, datajs["tok"])
 	
 	return render_template('home.html', fb_response="Login successful")
 
