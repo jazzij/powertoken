@@ -1,6 +1,7 @@
 #This class contains many of the API calls to Fitbit
 
 import requests, sys, datetime, json
+from tinydb import TinyDB, Query
 
 class Fitbit:
 	dbPath = "data/db.json"
