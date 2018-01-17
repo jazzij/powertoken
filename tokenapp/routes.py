@@ -10,6 +10,7 @@ app = Flask(__name__)
 powertoken = powertoken.PowerToken()
 
 # Stores the user's email (for referencing the tinydb) across the session
+email = ""
 
 # THE LANDING PAGE
 @app.route('/')
