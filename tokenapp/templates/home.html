@@ -1,5 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
+
+<h2>If you have previously entered your information, enter your WEconnect username (probably your email) and click NEXT.</h2>
+<div class="container">
+	<form id="start_form" action={{url_for('start')}} method="post">
+		<input type="text" id="email" name="email">
+		<input type="submit" value="NEXT">
+	</form>
+</div>
+
 <h2>Enter login details...</h2>
 <div class=container>
 <h3> ... for WeConnect </h3>
