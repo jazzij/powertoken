@@ -5,7 +5,7 @@ from tinydb import TinyDB, Query
 
 class Fitbit:
 	dbPath = "data/db.json"
-	db = TinyDB(self.dbPath)
+	db = TinyDB(dbPath)
 	_fbTok = ''
 	authHeaders = {}
 	baseURL = 'https://api.fitbit.com/1/user/-/'

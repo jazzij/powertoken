@@ -6,7 +6,7 @@ class WeConnect:
 	wcAccessFile = "data/wc.json"
 	fbAccessFile = "data/fb.json"
 	dbPath = "data/db.json"
-	db = TinyDB(self.dbPath)
+	db = TinyDB(dbPath)
 	_wc_userId = ""
 	_wc_userToken = ""
 	_fb_userId = ""
