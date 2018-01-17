@@ -129,8 +129,8 @@ class PowerToken:
 
 	# TODO: Debug this code
 	def startExperiment_old(self):
-		wc = weconnect.WeConnect(email)
-		fb = fitbit.Fitbit(email)
+		wc = weconnect.WeConnect()
+		fb = fitbit.Fitbit()
 
 		# First, sets the Fitbit daily step goal to something ridiculous -
 		# like a million steps
@@ -147,9 +147,9 @@ class PowerToken:
 			lastWcProgress = wcProgress
 			time.sleep(60)
 
-	def startExperiment(self):
-		wc = weconnect.WeConnect()
-		fb = fitbit.Fitbit()
+	def startExperiment(self, email):
+		wc = weconnect.WeConnect(email)
+		fb = fitbit.Fitbit(email)
 
 		# First, sets the Fitbit daily step goal to something ridiculous -
 		# like a million steps

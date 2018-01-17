@@ -69,7 +69,7 @@ def result():
 
 @app.route('/start', methods=['GET', 'POST'])
 def start():
-	powertoken.startExperiment()
+	powertoken.startExperiment(email)
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
