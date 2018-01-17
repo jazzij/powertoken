@@ -25,7 +25,7 @@ class Fitbit:
 	# Gets user's access token from tinydb
 	def _loadAccessInfo(self, email):
 		user = Query()
-		userInfo = db.search(user.email == email)[0]
+		userInfo = self.db.search(user.email == email)[0]
 		self._fbTok = userInfo["fbAccessToken"]
 
 	# Given a percentage increase (from WeConnect), updates the progress towards the step goal

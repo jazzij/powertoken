@@ -111,7 +111,7 @@ class PowerToken:
 	# New version that uses TinyDB
 	def isLoggedIntoFb(self, email):
 		user = Query()
-		result = db.search(user.email == email)
+		result = self.db.search(user.email == email)
 		# Makes sure there exists a user with that email
 		if len(result) != 1:
 			return False
@@ -124,7 +124,7 @@ class PowerToken:
 
 	def completeFbLogin(self, email, accessToken):
 		user = Query()
-		db.update({"fbAccessToken": accessToken}, user.email == email)
+		self.db.update({"fbAccessToken": accessToken}, user.email == email)
 		return
 
 	# TODO: Debug this code

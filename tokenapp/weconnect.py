@@ -27,7 +27,7 @@ class WeConnect:
 	# TODO: new function that uses tinydb
 	def _loadAccessInfo(self, email):
 		user = Query()
-		userInfo = db.search(user.email == email)[0]
+		userInfo = self.db.search(user.email == email)[0]
 		self._wc_userId = userInfo["wcUserId"]
 		self._wc_userToken = userInfo["wcAccessToken"]
 
