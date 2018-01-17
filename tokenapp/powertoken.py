@@ -69,7 +69,7 @@ class PowerToken:
 	# New version that makes use of tinydb
 	def isLoggedIntoWc(self, email):
 		user = Query()
-		result = db.search(user.email == email)
+		result = self.db.search(user.email == email)
 		# Makes sure there exists a user with that email
 		if len(result) != 1:
 			return False
