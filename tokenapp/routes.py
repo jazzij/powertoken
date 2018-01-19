@@ -74,7 +74,7 @@ def start():
 		thisEmail = email
 	elif request.method == 'POST':
 		thisEmail = request.form["email"]
-	thread.start_new_thread(displayRunningScreen, ()) 
+	#thread.start_new_thread(displayRunningScreen, ()) 
 	thread.start_new_thread(powertoken.startExperiment, (thisEmail,)) # the comma is NOT an error
 
 def displayRunningScreen():
