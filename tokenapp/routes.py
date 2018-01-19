@@ -1,6 +1,6 @@
 # might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
-import os
+import os, thread
 import powertoken, weconnect
 
 # Creates a new Flask server application
@@ -69,10 +69,13 @@ def result():
 
 @app.route('/start', methods=['GET', 'POST'])
 def start():
+	thisEmail = ""
 	if request.method == 'GET':
-		powertoken.startExperiment(email)
+		thisEmail = email
 	elif request.method == 'POST':
-		powertoken.startExperiment(request.form["email"])
+		thisEmail = request.form["email"]
+	thread.start_new_thread(render_template, ('running.html'))
+	thread.start_new_thread(powertoken.startExperiment, (thisEmail))
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():

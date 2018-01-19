@@ -1,8 +1,9 @@
 # powertoken.py
 # Contains the necessary functions for interfacing between WEconnect and Fitbit
 
-import json, os, requests, time, fitbit, weconnect
+import json, os, requests, time
 from tinydb import TinyDB, Query
+import fitbit, weconnect
 
 class PowerToken:
 	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
