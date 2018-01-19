@@ -74,8 +74,8 @@ def start():
 		thisEmail = email
 	elif request.method == 'POST':
 		thisEmail = request.form["email"]
-	thread.start_new_thread(render_template, ('running.html'))
-	thread.start_new_thread(powertoken.startExperiment, (thisEmail))
+	thread.start_new_thread(render_template, ('running.html',)) # the comma is NOT an error
+	thread.start_new_thread(powertoken.startExperiment, (thisEmail,))
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
