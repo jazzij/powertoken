@@ -1,7 +1,7 @@
 # might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
-import os, thread
-import powertoken, weconnect
+import os
+import powertoken
 
 # Creates a new Flask server application
 app = Flask(__name__)
@@ -74,11 +74,7 @@ def start():
 		thisEmail = email
 	elif request.method == 'POST':
 		thisEmail = request.form["email"]
-	#thread.start_new_thread(displayRunningScreen, ()) 
-	thread.start_new_thread(powertoken.startExperiment, (thisEmail,)) # the comma is NOT an error
-
-def displayRunningScreen():
-	return render_template("running.html")
+	powertoken.startExperiment(thisEmail)
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
