@@ -151,7 +151,7 @@ class PowerToken:
 		wc = weconnect.WeConnect(email)
 		fb = fitbit.Fitbit(email)
 
-		# First, sets the Fitbit daily step goal to something ridiculous -
+		# First, sets the Fitbit daily step goal to something ridiculous,
 		# like a million steps
 		fb.changeDailyStepGoal(1000000)
 

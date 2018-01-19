@@ -111,15 +111,15 @@ class Fitbit:
 	#-POST- CHANGE DAILY ACTIVITY STEP GOAL
 	def changeDailyStepGoal(self, newStepGoal):
 		goalURL = "activities/goals/daily.json"
-		urlStr = self.baseURL+goalURL
+		urlStr = self.baseURL + goalURL
 		params = {
 			"period" : "daily",
 			"type" : "steps",
 			"value" : newStepGoal
 		}
 		changeGoal = requests.post(urlStr, headers=self.authHeaders, params=params)
-		#print (changeGoal.json())
-		return changeGoal.json()
+		print(changeGoal)
+		return changeGoal
 
 	#-POST- CHANGE WEEKLY ACTIVITY STEP GOAL
 	def changeWeeklyStepGoal(self, newStepGoal):
