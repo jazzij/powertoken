@@ -64,13 +64,13 @@ class WeConnect:
 				"/activities/progress?access_token=" + self._wc_userToken + \
 				"&from=" + fromDate + "&to=" + toDate
 		print(requestUrl)
-		result = requests.get(requestUrl)
-		if self._isValid(result):
-			progress = result.json()
-			print("Total vs Completed Events in ", fromDate, "to ", toDate, ": ",
-					progress["events"]["completed"],"/", progress["events"]["total"])
+		response = requests.get(requestUrl)
+		if self._isValid(response):
+			progress = response.json()
+			print("Total vs Completed Events from %s to %s: %d / %d" % (fromDate, toDate,
+					progress["events"]["completed"], progress["events"]["total"],))
 			percent = int(progress["events"]["completed"]) / int(progress["events"]["total"])
-			print(percent)
+			print("As a percentage, thats %4.2f %" % (percent * 100,))
 			return percent
 		else:
 			return -1

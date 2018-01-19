@@ -117,9 +117,14 @@ class Fitbit:
 			"type" : "steps",
 			"value" : newStepGoal
 		}
-		changeGoal = requests.post(urlStr, headers=self.authHeaders, params=params)
-		print(changeGoal)
-		return changeGoal
+		response = requests.post(urlStr, headers=self.authHeaders, params=params)
+		if self._isValid(response):
+			newGoal = response.json()["goals"]["steps"]
+			print("New daily step goal: %d" % (newGoal,))
+			return newGoal
+		else:
+			print("Error changing daily step goal: %d" % (response.status_code,))
+			return -1
 
 	#-POST- CHANGE WEEKLY ACTIVITY STEP GOAL
 	def changeWeeklyStepGoal(self, newStepGoal):
@@ -130,9 +135,11 @@ class Fitbit:
 			"type" : "steps",
 			"value" : newStepGoal
 		}
-		changeGoal = requests.post(urlStr, headers=self.authHeaders, params=params)
+		result = requests.post(urlStr, headers=self.authHeaders, params=params)
+		if self._isValid(result):
+			print(result.json())
 		#print (changeGoal.json())
-		return changeGoal.json()
+		return result.json()
 		
 	#-POST- LOG A STEP ACTIVITY 
 	def logStepActivity(self, newStepCount):
@@ -146,12 +153,13 @@ class Fitbit:
 			"distance" : newStepCount,
 			"distanceUnit" : "steps"
 		}
-		result = requests.post(urlStr, headers=self.authHeaders, params=params)
-		if self._isValid(result):
-			loggedActivity = result.json()
+		response = requests.post(urlStr, headers=self.authHeaders, params=params)
+		if self._isValid(response):
+			loggedActivity = response.json()
 			print(loggedActivity)
 			return True
 		else:
+			print("Error logging step activity: %d" % (response.status_code,))
 			return False
 
 	#helper - returns current date as a string in YYYY-MM-dd format
