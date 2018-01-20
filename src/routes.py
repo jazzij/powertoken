@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, json
+from flask import Flask, redirect, render_template, request, json
 import os
 
 # Creates a new Flask server application
