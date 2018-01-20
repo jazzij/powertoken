@@ -1,114 +1,18 @@
-#This class contains many of the API calls to Fitbit
+# fitbit.py
+# This class contains the API calls to Fitbit (excpt for the login).
+# Created by: Abigail Franz
+# Last modified by: Abigail Franz on 1/20/2018
 
 import requests, sys, datetime, json
-from tinydb import TinyDB, Query
 
 class Fitbit:
-	dbPath = "data/db.json"
-	db = TinyDB(dbPath)
-	_fbTok = ''
-	authHeaders = {}
 	baseURL = 'https://api.fitbit.com/1/user/-/'
+	_authHeaders = {}
 
-	def __init__(self, email):
-		self._loadAccessInfo(email)
-		self.authHeaders = {'Authorization': 'Bearer ' + self._fbTok}
+	def __init__(self, fbAccessToken):
+		self._authHeaders = {'Authorization': 'Bearer ' + fbAccessToken}
 
-	# Reads user's token from file
-	def _loadAccessInfo_old(self):
-		rawJsonStr = ""
-		with open("data/fb.json", "r") as file:
-			rawJsonStr = file.read()
-		jsonObj = json.loads(rawJsonStr)
-		self._fbTok = jsonObj["userToken"]
-
-	# Gets user's access token from tinydb
-	def _loadAccessInfo(self, email):
-		user = Query()
-		userInfo = self.db.search(user.email == email)[0]
-		self._fbTok = userInfo["fbAccessToken"]
-
-	# Given a percentage increase (from WeConnect), updates the progress towards the step goal
-	def update(self, percent):
-		prevSteps = self.getCurrentSteps()
-		print("Previous step count:")
-		print(prevSteps)
-		numSteps = int(percent * self.getDailyActivityGoals())
-		print("Added steps:")
-		print(numSteps)
-		self.logStepActivity(numSteps)
-		print("New step count:")
-		print(prevSteps + numSteps)
-
-	# Used if WeConnect progress decreased
-	def resetAndUpdate(self, percent):
-		# Deletes all Fitbit step activities for the day
-		dailyActivities = self.getDailyStepActivities()
-		for activity in dailyActivities:
-			logId = activity["logId"]
-			print(logId)
-			self.deleteActivity(logId)
-
-		# Updates Fitbit with the new percentage
-		self.update(percent)
-
-	def getDailyStepActivities(self):
-		activityListUrl = "activities/date/"+self._getCurrentDate()+".json"
-		urlStr = self.baseURL + activityListUrl
-		print(urlStr)
-		response = requests.get(urlStr, headers=self.authHeaders)
-		activityListJson = response.json()
-		print(activityListJson)
-		activityList = activityListJson["activities"]
-		print(len(activityList))
-		return activityList
-
-	# DELETE - Activity
-	# Returns True if Activity successfully deleted
-	def deleteActivity(self, logId):
-		deleteActivityUrl = "activities/" + str(logId) + ".json"
-		urlStr = self.baseURL + deleteActivityUrl
-		print(urlStr)
-		response = requests.delete(urlStr, headers=self.authHeaders)
-		if response.status_code == 204:
-			return True
-		else:
-			return False
-
-	#-GET- TRACKERS
-	def getDevices(self):
-		#summary of all goals
-		devicesURL =  "devices.json"
-		urlStr = self.baseURL + devicesURL
-		devicesRaw = requests.get(urlStr, headers=self.authHeaders)
-		devices = devicesRaw.json()
-		print(devices)
-		#for i in range(0, devices.length):
-		#	print(devices[i]["deviceVersion"] + " is a " + devices[i]["type"])
-		return devices
-
-	#-GET- DAILY ACTIVITY GOALS
-	def getDailyActivityGoals(self):
-		#summary of all goals
-		dailyGoalSummaryURL =  "activities/goals/daily.json"
-		urlStr = self.baseURL + dailyGoalSummaryURL
-		dailyGoals = requests.get(urlStr, headers=self.authHeaders)
-		dailyGoalsJson = dailyGoals.json()
-		#print dailyGoalsJson
-		return dailyGoalsJson["goals"]["steps"]
-
-	#-GET- STEP COUNT BY DATE
-	def getCurrentSteps(self): 
-		#by date - default to current date
-		date = self._getCurrentDate()
-		dateActivityURL = "activities/date/"+date+'.json'
-		urlStr = self.baseURL+dateActivityURL
-		dateActivity = requests.get(urlStr, headers=self.authHeaders)
-		activities = dateActivity.json()
-		#print (activities["summary"]["steps"])
-		return activities["summary"]["steps"]
-	
-	#-POST- CHANGE DAILY ACTIVITY STEP GOAL
+	# Changes the daily step goal to newStepGoal and returns True if successful
 	def changeDailyStepGoal(self, newStepGoal):
 		goalURL = "activities/goals/daily.json"
 		urlStr = self.baseURL + goalURL
@@ -117,17 +21,80 @@ class Fitbit:
 			"type" : "steps",
 			"value" : newStepGoal
 		}
-		response = requests.post(urlStr, headers=self.authHeaders, params=params)
+		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			newGoal = response.json()["goals"]["steps"]
 			print("New daily step goal: %d" % (newGoal,))
-			return newGoal
+			return True
 		else:
 			print("Error changing daily step goal: %d" % (response.status_code,))
+			return False
+
+	# Given a percentage increase (from WEconnect), updates the progress
+	# towards the step goal
+	def update(self, percent):
+		prevSteps = self._getCurrentSteps()
+		print("Previous step count: %d" % (prevSteps,))
+		numSteps = int(percent * self._getDailyActivityGoals())
+		self._logStepActivity(numSteps)
+		print("Added steps: %d" % (numSteps,))
+		print("New step count: %d" % (prevSteps + numSteps,))
+
+	# Used if WeConnect progress decreased
+	def resetAndUpdate(self, percent):
+		# Deletes all Fitbit step activities for the day
+		dailyActivities = self._getDailyStepGoal()
+		for activity in dailyActivities:
+			logId = activity["logId"]
+			self._deleteActivity(logId)
+
+		# Updates Fitbit with the new percentage
+		self.update(percent)
+
+	# Helper - returns a list of all the activities the user has completed today
+	def _getDailyStepActivities(self):
+		activityListUrl = "activities/date/" + self._getCurrentDate() + ".json"
+		urlStr = self.baseURL + activityListUrl
+		response = requests.get(urlStr, headers=self._authHeaders)
+		activityListJson = response.json()
+		activityList = activityListJson["activities"]
+		return activityList
+
+	# Deletes an activity and returns True if successful
+	def _deleteActivity(self, logId):
+		deleteActivityUrl = "activities/" + str(logId) + ".json"
+		urlStr = self.baseURL + deleteActivityUrl
+		response = requests.delete(urlStr, headers=self._authHeaders)
+		if response.status_code == 204:
+			return True
+		else:
+			print("Activity %d was not successfully deleted." % (logId,))
+			return False
+
+	# Gets the user's daily step goal
+	def _getDailyStepGoal(self):
+		dailyGoalSummaryURL =  "activities/goals/daily.json"
+		urlStr = self.baseURL + dailyGoalSummaryURL
+		response = requests.get(urlStr, headers=self._authHeaders)
+		if self._isValid(response):
+			return response.json()["goals"]["steps"]
+		else:
+			return response.status_code
+
+	# Gets today's current step count
+	def _getCurrentSteps(self): 
+		date = self._getCurrentDate()
+		dateActivityURL = "activities/date/" + date + '.json'
+		urlStr = self.baseURL + dateActivityURL
+		response = requests.get(urlStr, headers=self._authHeaders)
+		if self._isValid(response):
+			return response.json()["summary"]["steps"]
+		else:
+			print("Couldn't get today's step count. Error %d: %s" % (response.status_code, response.text))
 			return -1
 
-	#-POST- CHANGE WEEKLY ACTIVITY STEP GOAL
-	def changeWeeklyStepGoal(self, newStepGoal):
+	# Changes the weekly step goal to newStepGoal and returns True if successful
+	def _changeWeeklyStepGoal(self, newStepGoal):
 		goalURL = "activities/goals/weekly.json"
 		urlStr = self.baseURL + goalURL
 		params = {
@@ -135,55 +102,50 @@ class Fitbit:
 			"type" : "steps",
 			"value" : newStepGoal
 		}
-		result = requests.post(urlStr, headers=self.authHeaders, params=params)
+		result = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(result):
 			print(result.json())
-		#print (changeGoal.json())
-		return result.json()
+			return True
+		else:
+			return False
 		
-	#-POST- LOG A STEP ACTIVITY 
-	def logStepActivity(self, newStepCount):
+	# Logs an activity containing the number of steps specified in newStepCount
+	# Returns True if successful
+	def _logStepActivity(self, newStepCount):
 		activityURL = "activities.json"
 		urlStr = self.baseURL + activityURL
 		params = {
-			"activityId" : '90013', #Walking (activityId=90013), Running (activityId=90009)
-			"startTime" : self._getCurrentTime(), #HH:mm:ss
-			"durationMillis" : 3600000, #60K ms = 1 min, 
+			"activityId" : '90013', # Walking (activityId=90013), Running (activityId=90009)
+			"startTime" : self._getCurrentTime(), # HH:mm:ss
+			"durationMillis" : 3600000, # 60K ms = 1 min, 
 			"date" : self._getCurrentDate(),
 			"distance" : newStepCount,
 			"distanceUnit" : "steps"
 		}
-		response = requests.post(urlStr, headers=self.authHeaders, params=params)
+		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			loggedActivity = response.json()
 			print(loggedActivity)
 			return True
 		else:
-			print("Error logging step activity: %d" % (response.status_code,))
+			print("Couldn't log step activity. Error %d: %s" % (response.status_code, response.text))
 			return False
 
-	#helper - returns current date as a string in YYYY-MM-dd format
+	# Helper - returns current date as a string in YYYY-MM-dd format
 	def _getCurrentDate(self):
 		now = datetime.datetime.now()
 		dateStr = format("%d-%02d-%02d" % (now.year, now.month, now.day))
 		return dateStr
 
+	# Helper - returns current time as a string in HH:mm:ss format
 	def _getCurrentTime(self):
 		now = datetime.datetime.now()
 		timeStr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
 		return timeStr
-	
-	#read the fitbit token you want to use from wherever it's stored
-	def _readFromFile(self):
-		global fbTok
-		with open('sampleProfile.json') as json_data:
-			data = json.load(json_data)
-			fbTok = data["access_token"]
 
+	# Helper - makes sure HTTP requests are successful
 	def _isValid(self, result):
 		if result.status_code >= 300:
-			print("Request could not be completed:", str(result.status_code),
-					result.text)
 			return False
 		else:
 			return True

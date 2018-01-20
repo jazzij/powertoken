@@ -4,7 +4,7 @@
 <h2>If you have previously entered your information, enter your WEconnect username (probably your email) and click NEXT.</h2>
 <div class="container">
 	<form id="start_form" action={{url_for('start')}} method="post">
-		<input type="text" id="email" name="email">
+		<input type="text" id="email" name="email" required>
 		<input type="submit" value="NEXT">
 	</form>
 </div>
@@ -14,12 +14,12 @@
 <h3> ... for WeConnect </h3>
 <form id='wc_form' action={{url_for('login')}} method="post">
         <label for="name">Name:</label>
-        <input id="name" type="text" name="name">
+        <input id="name" type="text" name="name" required>
         <label for="psk">Password:</label>
-        <input id="psk" type="text" name="psk">
+        <input id="psk" type="text" name="psk" required>
         <input type="submit" value="Login">
 </form>
-<p> {{ wc_response }}</p>
+<p>{{ wc_response }}</p>
 </div>
 <div class=container>
 <h3>...and now for Fitbit</h3>

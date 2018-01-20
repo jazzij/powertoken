@@ -1,4 +1,10 @@
-# might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
+# routes.py
+# Python Flask main application. Handles form processing and routing.
+# To run this application, type "python routes.py" at the command line.
+# Created by: Jasmine Jones
+# Last modified by: Abigail Franz on 1/20/2018
+
+# Might need to look at this sometime: http://markjberger.com/flask-with-virtualenv-uwsgi-nginx/
 from flask import Flask, render_template, request, json
 import os
 import powertoken
@@ -12,13 +18,20 @@ powertoken = powertoken.PowerToken()
 # Stores the user's email (for referencing the tinydb) across the session
 email = ""
 
-# THE LANDING PAGE
+# The landing page
 @app.route('/')
 @app.route('/home')
 def home():
 	return render_template('home.html')
 
-# WECONNECT FORM SUBMIT, FITBIT REDIRECT
+# Clears all logins! Don't do this unless you really know what you're doing.
+# We will probably remove this option altogether in a production environment.
+@app.route('/reset')
+def reset():
+	powertoken.resetLogins()
+	return render_template('home.html')
+
+# WEconnect form submit, Fitbit redirect
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	# WEconnect form submit uses POST
@@ -51,18 +64,14 @@ def fb_login():
 	else:
 		return render_template('login.html')
 
-# When Fitbit is all setup, login.html redirects to here
+# When Fitbit is all set up, login.html redirects to here
 @app.route('/result', methods=['GET', 'POST'])
 def result():
+	# Converts the response into the correct format and passes it to a function
+	# that stores the user's access token in the TinyDB
 	data = request.data
 	convData = data.decode('utf8')
 	datajs = json.loads(convData)
-
-	# Stores access token in a JSON file
-	#jsonStr = '{"userToken":"' + datajs["tok"] + '"}'
-	#with open("data/fb.json", "w+") as file:
-	#	file.write(jsonStr)
-
 	powertoken.completeFbLogin(email, datajs["tok"])
 	
 	return render_template('home.html', fb_response="Login successful")
@@ -70,17 +79,23 @@ def result():
 @app.route('/start', methods=['GET', 'POST'])
 def start():
 	thisEmail = ""
+
+	# If the user just logged in for the first time
 	if request.method == 'GET':
 		thisEmail = email
+
+	# If this is a returning user
 	elif request.method == 'POST':
 		thisEmail = request.form["email"]
+
 	powertoken.startExperiment(thisEmail)
 
+# Runs unit tests. For testing only, not production.
 @app.route('/test', methods=['GET', 'POST'])
 def test():
 	powertoken.runTests()
-	#data = request.data
 	return render_template('home.html')
 
+# In production, debug will probably be set to False.
 if __name__ == "__main__":
-	app.run(debug=False)
+	app.run(debug=True)

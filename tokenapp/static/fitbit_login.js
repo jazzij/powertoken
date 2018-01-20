@@ -1,3 +1,9 @@
+/*
+ * Script that handles the Fitbit login process
+ * Created by: Jasmine Jones
+ * Last modified by: Abigail Franz on 1/19/2018
+ */
+
 var fbTok;
 
 // If this boolean is set to false, the callback will just be localhost
@@ -5,11 +11,6 @@ var usingCsServer = true;
 var isJasmine = false;
 
 var clientID = '228N2H';
-//if (isJasmine) {
-//	clientID = '228N3P';
-//} else {
-//	clientId = '228N2H'; // Abigail
-//}
 console.log('clientID = ' + clientID);
 
 homeURL = '';
@@ -26,7 +27,8 @@ var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
 // CHECK for returned code i.e. url#code, if no hash there, then redirect to auth site
 if (!window.location.hash) {
-	window.location.replace(authURI+'?response_type=token&client_id='+clientID+'&redirect_uri='+callback+'&scope=activity%20weight');
+	window.location.replace(authURI+'?response_type=token&client_id='+clientID+'&redirect_uri='+callback
+		+'&scope=activity%20nutrition%20heartrate%20location%20nutrition%20profile%20settings%20sleep%20social%20weight');
 } else {
 	var fragmentQueryParameters = {};
 	window.location.hash.slice(1).replace(
@@ -55,6 +57,4 @@ if (fbTok) {
 	   body: JSON.stringify({tok: fbTok})
     })
     .then(processResponse)
-    //.then( function(response){ if (response.ok) { return response.json()} })
-    //.then(function(data){ window.location.replace('') })
 }
