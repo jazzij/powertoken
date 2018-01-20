@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="block-1">
+	Choose a username. It can be a nickname or whatever you like. Other PowerToken users will not see your username; it is your anonymous identity, seen only by the researchers. If you've already signed up, enter the username you chose. Make sure to remember your username.
+</div>
+
+<div class="block-2">
+	<form id="pt_login_form" action={{url_for('pt_login')}} method="post">
+		<label for="username">Username:</label>
+		<input type="text" id="username" name="username" required>
+		<input type="submit" value="NEXT">
+	</form>
+
+	<!-- Error message displays if someone else has chosen the same username -->
+	{{error_not_unique}}
+</div>
+
+{% endblock %}

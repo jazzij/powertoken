@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="block-1">
+	Now enter your WEconnect info. Your information will not be stored or seen by the researchers.
+</div>
+
+<div class="block-2">
+	<form id="wc_login_form" action={{url_for('wc_login')}} method="post">
+		<label for="username">Email:</label>
+		<input type="text" id="email" name="email" required>
+		<label for="password">Password:</label>
+		<input type="password" id="password" name="password" required>
+		<input type="submit" value="NEXT">
+	</form>
+
+	{{ error_login_failure }}
+</div>
+
+{% endblock %}
