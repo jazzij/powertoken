@@ -122,7 +122,7 @@ class PowerToken:
 	def _loadFbAccessInfo(self, email):
 		q = Query()
 		userInfo = self._db.search(q.email == email)[0]
-		return = userInfo["fbAccessToken"]
+		return userInfo["fbAccessToken"]
 
 	# Runs unit tests
 	def runTests(self):
