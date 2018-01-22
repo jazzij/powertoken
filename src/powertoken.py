@@ -96,6 +96,8 @@ class PowerToken:
 	def completeFbLogin(self, username, accessToken):
 		q = Query()
 		self._db.update({"fbAccessToken": accessToken}, q.username == username)
+		result = self._db.search(q.username == username)
+		print(result)
 
 	# The program loop - runs until killed with Ctrl+C
 	def startExperiment(self, email):
