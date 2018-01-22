@@ -15,6 +15,7 @@ username = ""
 @app.route("/")
 @app.route("/home")
 def home():
+	print("home: username = %s" % (username,))
 	welcome = ""
 	if username:
 		welcome = "Welcome, %s!" % (username,)
@@ -33,6 +34,7 @@ def pt_login():
 		return render_template("pt_login.html")
 	elif request.method == "POST":
 		username = request.form["username"]
+		print("pt_login [POST]: username = %s" % (username,))
 		if not powertoken.isUsernameUnique(username):
 			errorMessage = "Sorry. Someone else has already chosen that username."
 			return render_template("pt_login.html", error_not_unique=errorMessage)
@@ -45,10 +47,12 @@ def pt_login():
 def wc_login():
 	# User is redirected here after choosing a PowerToken username
 	if request.method == "GET":
+		print("wc_login [GET]: username = %s" % (username,))
 		return render_template("wc_login.html")
 
 	# wc_login.html form submit uses POST
 	elif request.method == "POST":
+		print("wc_login [POST]: username = %s" % (username,))
 		# Logs user into WEconnect
 		email = request.form["email"]
 		password = request.form["password"]
@@ -64,11 +68,12 @@ def wc_login():
 def fb_login():
 	# The user is redirected here after a successful WEconnect login.
 	if request.method == "GET":
+		print("fb_login [GET]: username = %s" % (username,))
 		return render_template("fb_login.html")
 
 	# When Fitbit is all setup, fb_login.js redirects here.
 	elif request.method == "POST":
-		print("Called the POST section of fb_login()")
+		print("fb_login [POST]: username = %s" % (username,))
 		# Converts the response into the correct format and passes it to a function
 		# that stores the user's access token in the TinyDB
 		data = request.data
