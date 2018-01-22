@@ -14,9 +14,11 @@ var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
 // CHECK for returned code i.e. url#code, if no hash there, then redirect to auth site
 if (!window.location.hash) {
+	console.log("Not logged into Fitbit")
 	window.location.replace(authURI+'?response_type=token&client_id='+clientID+'&redirect_uri='+callback
 		+'&scope=activity%20location%20profile%20settings');
 } else {
+	console.log("Logged into Fitbit")
 	var fragmentQueryParameters = {};
 	window.location.hash.slice(1).replace(
 		new RegExp("([^?=&]+)(=([^&]*))?", "g"),
@@ -36,7 +38,7 @@ var processResponse = function(response) {
 
 // SEND token to server
 if (fbTok) {
-    console.log("redirecting back to app")
+    console.log("fbTok = " + fbTok)
     fetch(homeURL + '/fb_login', {
     	method: 'POST', 
 		mode: 'no-cors',

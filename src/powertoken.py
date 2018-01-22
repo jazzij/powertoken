@@ -94,6 +94,7 @@ class PowerToken:
 
 	# Stores the Fitbit access token in the TinyDB
 	def completeFbLogin(self, username, accessToken):
+		print("Inside of powertoken.completeFbLogin: username = %s and accessToken = %s" % (username, accessToken))
 		q = Query()
 		self._db.update({"fbAccessToken": accessToken}, q.username == username)
 		result = self._db.search(q.username == username)
