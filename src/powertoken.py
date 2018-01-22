@@ -16,25 +16,25 @@ class PowerToken:
 	def resetLogins(self):
 		self._db.purge()
 
-    # Makes sure a user doesn't choose a name that's already taken
-    def isUsernameUnique(self, username):
-        q = Query()
-        result = self._db.search(q.username == username)
-        if len(result) == 0:
-            return True
-        else:
-            return False
+	# Makes sure a user doesn't choose a name that's already taken
+	def isUsernameUnique(self, username):
+		q = Query()
+		result = self._db.search(q.username == username)
+		if len(result) == 0:
+			return True
+		else:
+			return False
 
-    # Adds a new PowerToken user to the TinyDB. This user will be referenced by
-    # a chosen username.
-    def createUser(self, username):
-        newUser = {
-            "username": username,
-            "wcUserId": "",
-            "wcAccessToken": "",
-            "fbAccessToken": ""
-        }
-        self._db.insert(newUser)
+	# Adds a new PowerToken user to the TinyDB. This user will be referenced by
+	# a chosen username.
+	def createUser(self, username):
+		newUser = {
+			"username": username,
+			"wcUserId": "",
+			"wcAccessToken": "",
+			"fbAccessToken": ""
+		}
+		self._db.insert(newUser)
 
 	# Logs user into WEconnect, produces an ID and access token that will last
 	# 90 days, and stores the token and ID in the TinyDB
@@ -50,15 +50,15 @@ class PowerToken:
 		jres = result.json()
 		userId = str(jres["accessToken"]["userId"])
 		userToken = str(jres["accessToken"]["id"])
-
+		
 		# Stores user's WEconnect-related data in the TinyDb
 		userInfo = {
 			"wcUserId": userId,
 			"wcAccessToken": userToken
 		}
-        q = Query()
+		q = Query()
 		self._db.update(userInfo, q.username == username)
-        return True
+		return True
 
 	# Returns a boolean value signifying that the user is or isn't logged into 
 	# WEconnect
