@@ -8,7 +8,7 @@ app = Flask(__name__)
 # We will use the powertoken object to access the core PowerToken functions.
 powertoken = powertoken.PowerToken()
 
-# Stores the username (for referencing the tinydb) across the session
+# Stores the username (for referencing the TinyDB) across the session
 session = { "username": "" }
 
 # The landing page
@@ -36,8 +36,8 @@ def pt_login():
 		session["username"] = request.form["username"]
 		print("pt_login [POST]: username = %s" % (session["username"],))
 		if not powertoken.isUsernameUnique(session["username"]):
-			errorMessage = "Sorry. Someone else has already chosen that username."
-			return render_template("pt_login.html", error_not_unique=errorMessage)
+			if powertoken.isLoggedIntoWc(session["username"]):
+				return redirect(url_for("fb_login"))
 		else:
 			# Adds a new user to the TinyDB and redirects to /wc_login
 			powertoken.createUser(session["username"])
