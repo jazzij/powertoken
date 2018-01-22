@@ -1,13 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
 
-{{welcome}}
-
-<div class="block-1">
-	<a href={{url_for('pt_login')}}>SIGN UP / SIGN IN</a>
+<div class="block">
+	{{ welcome }}
 </div>
 
-<div class="block-2">
+<div class="block">
+	<a href={{ url_for('pt_login') }}>
+		SIGN UP / SIGN IN
+	</a>
+</div>
+
+<div class="block">
 </div>
 
 {% endblock %}
