@@ -1,8 +1,15 @@
 from flask import Flask, json, redirect, render_template, request, url_for
 import requests
+import powertoken
 
 # Creates a new Flask server application
 app = Flask(__name__)
+
+# We will use the powertoken object to access the core PowerToken functions.
+powertoken = powertoken.PowerToken()
+
+# Stores the username (for referencing the tinydb) across the session
+username = ""
 
 # The landing page
 @app.route("/")
@@ -15,51 +22,49 @@ def pt_login():
 	if request.method == "GET":
 		return render_template("pt_login.html")
 	elif request.method == "POST":
-		# Process PT info and redirect to /wc_login
-		return redirect(url_for("wc_login"))
+		username = request.form["username"]
+		if not powertoken.isUsernameUnique(username):
+			errorMessage = "Sorry. Someone else has already chosen that username."
+			return render_template("pt_login.html", error_not_unique=errorMessage)
+		else:
+			# Adds a new user to the TinyDB and redirects to /wc_login
+			powertoken.createUser(username)
+			return redirect(url_for("wc_login"))
 
 @app.route("/wc_login", methods=["GET", "POST"])
 def wc_login():
+	# User is redirected here after choosing a PowerToken username
 	if request.method == "GET":
 		return render_template("wc_login.html")
+
+	# wc_login.html form submit uses POST
 	elif request.method == "POST":
-		# Process WC info and redirect to /fb_login
-		data = {
-			"email": request.form["email"],
-			"password": request.form["password"]
-		}
-		result = requests.post("https://palalinq.herokuapp.com/api/People/login", data=data)
-		if result.status_code != 200:
-			print("Login error")
-			exit()
-		jres = result.json()
-		userId = str(jres["accessToken"]["userId"])
-		userToken = str(jres["accessToken"]["id"])
-		print("Received ID and token from WEconnect: %s, %s" % (userId, userToken))
+		# Logs user into WEconnect
+		email = request.form["email"]
+		password = request.form["password"]
+		loginSuccessful = powertoken.loginToWc(username, email, password)
+		if not loginSuccessful:
+			errorMessage = "Login failed. Try again."
+			return render_template("wc_login.html", login_error=errorMessage)
+
+		# Redirects to Fitbit login page
 		return redirect(url_for("fb_login"))
 
 @app.route("/fb_login", methods=["GET", "POST"])
 def fb_login():
+	# The user is redirected here after a successful WEconnect login.
 	if request.method == "GET":
 		return render_template("fb_login.html")
-	elif request.method == "POST":
-		dataRaw = request.data.decode("utf-8")
-		dataJson = json.loads(dataRaw)
-		print("The token received from Fitbit: %s" % (dataJson["tok"],))
-		return render_template("home.html")
 
-# When Fitbit is all set up, fb_login.js redirects to here
-@app.route("/fb_response", methods=["GET", "POST"])
-def fb_response():
-	# Converts the response into the correct format and passes it to a function
-	# that stores the user's access token in the TinyDB
-	data = request.data
-	convData = data.decode("utf8")
-	datajs = json.loads(convData)
-	#powertoken.completeFbLogin(email, datajs["tok"])
-	print("The token received from Fitbit: %s" % (datajs["tok"],))
-	
-	return render_template("home.html")
+	# When Fitbit is all setup, fb_login.js redirects here.
+	elif request.method == "POST":
+		# Converts the response into the correct format and passes it to a function
+		# that stores the user's access token in the TinyDB
+		data = request.data
+		convData = data.decode('utf8')
+		datajs = json.loads(convData)
+		powertoken.completeFbLogin(username, datajs["tok"])
+		return render_template("home.html", display_name=username)
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":
