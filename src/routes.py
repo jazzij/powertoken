@@ -15,6 +15,16 @@ username = ""
 @app.route("/")
 @app.route("/home")
 def home():
+	welcome = ""
+	if username:
+		welcome = "Welcome, %s!" % (username,)
+	return render_template("home.html", welcome=welcome)
+
+# Clears all logins! Don't do this unless you really know what you're doing.
+# We will probably remove this option altogether in a production environment.
+@app.route('/reset')
+def reset():
+	powertoken.resetLogins()
 	return render_template("home.html")
 
 @app.route("/pt_login", methods=["GET", "POST"])
@@ -64,7 +74,9 @@ def fb_login():
 		convData = data.decode('utf8')
 		datajs = json.loads(convData)
 		powertoken.completeFbLogin(username, datajs["tok"])
-		return render_template("home.html", display_name=username)
+
+		# This line is insignificant but must be here
+		return render_template("home.html")
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":

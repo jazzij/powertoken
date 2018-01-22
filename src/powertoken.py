@@ -9,7 +9,7 @@ import fitbit, weconnect
 
 class PowerToken:
 	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
-	_dbPath = "data/db.json"
+	_dbPath = "db.json"
 	_db = TinyDB(_dbPath)
 
 	# This will clear all user info and should only be called if you know what you're doing!
