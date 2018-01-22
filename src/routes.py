@@ -45,7 +45,7 @@ def fb_login():
 	elif request.method == "POST":
 		dataRaw = request.data.decode("utf-8")
 		dataJson = json.loads(dataRaw)
-		print("The token received from Fitbit: %s" % (datajs["tok"],))
+		print("The token received from Fitbit: %s" % (dataJson["tok"],))
 		return redirect(url_for("home"))
 
 # When Fitbit is all set up, fb_login.js redirects to here
