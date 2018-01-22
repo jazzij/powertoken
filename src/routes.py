@@ -1,5 +1,5 @@
 from flask import Flask, json, redirect, render_template, request, url_for
-import requests
+import requests, shelve
 import powertoken
 
 # Creates a new Flask server application
@@ -9,16 +9,16 @@ app = Flask(__name__)
 powertoken = powertoken.PowerToken()
 
 # Stores the username (for referencing the tinydb) across the session
-username = ""
+session = { "username": "" }
 
 # The landing page
 @app.route("/")
 @app.route("/home")
 def home():
-	print("home: username = %s" % (username,))
+	print("home: username = %s" % (session["username"],))
 	welcome = ""
-	if username:
-		welcome = "Welcome, %s!" % (username,)
+	if session["username"]:
+		welcome = "Welcome, %s!" % (session["username"],)
 	return render_template("home.html", welcome=welcome)
 
 # Clears all logins! Don't do this unless you really know what you're doing.
@@ -33,30 +33,30 @@ def pt_login():
 	if request.method == "GET":
 		return render_template("pt_login.html")
 	elif request.method == "POST":
-		username = request.form["username"]
-		print("pt_login [POST]: username = %s" % (username,))
-		if not powertoken.isUsernameUnique(username):
+		session["username"] = request.form["username"]
+		print("pt_login [POST]: username = %s" % (session["username"],))
+		if not powertoken.isUsernameUnique(session["username"]):
 			errorMessage = "Sorry. Someone else has already chosen that username."
 			return render_template("pt_login.html", error_not_unique=errorMessage)
 		else:
 			# Adds a new user to the TinyDB and redirects to /wc_login
-			powertoken.createUser(username)
+			powertoken.createUser(session["username"])
 			return redirect(url_for("wc_login"))
 
 @app.route("/wc_login", methods=["GET", "POST"])
 def wc_login():
 	# User is redirected here after choosing a PowerToken username
 	if request.method == "GET":
-		print("wc_login [GET]: username = %s" % (username,))
+		print("wc_login [GET]: username = %s" % (session["username"],))
 		return render_template("wc_login.html")
 
 	# wc_login.html form submit uses POST
 	elif request.method == "POST":
-		print("wc_login [POST]: username = %s" % (username,))
+		print("wc_login [POST]: username = %s" % (session["username"],))
 		# Logs user into WEconnect
 		email = request.form["email"]
 		password = request.form["password"]
-		loginSuccessful = powertoken.loginToWc(username, email, password)
+		loginSuccessful = powertoken.loginToWc(session["username"], email, password)
 		if not loginSuccessful:
 			errorMessage = "Login failed. Try again."
 			return render_template("wc_login.html", login_error=errorMessage)
@@ -68,18 +68,18 @@ def wc_login():
 def fb_login():
 	# The user is redirected here after a successful WEconnect login.
 	if request.method == "GET":
-		print("fb_login [GET]: username = %s" % (username,))
+		print("fb_login [GET]: username = %s" % (session["username"],))
 		return render_template("fb_login.html")
 
 	# When Fitbit is all setup, fb_login.js redirects here.
 	elif request.method == "POST":
-		print("fb_login [POST]: username = %s" % (username,))
+		print("fb_login [POST]: username = %s" % (session["username"],))
 		# Converts the response into the correct format and passes it to a function
 		# that stores the user's access token in the TinyDB
 		data = request.data
 		convData = data.decode('utf8')
 		datajs = json.loads(convData)
-		powertoken.completeFbLogin(username, datajs["tok"])
+		powertoken.completeFbLogin(session["username"], datajs["tok"])
 
 		# This line is insignificant but must be here
 		return render_template("home.html")
