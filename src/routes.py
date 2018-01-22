@@ -68,6 +68,7 @@ def fb_login():
 
 	# When Fitbit is all setup, fb_login.js redirects here.
 	elif request.method == "POST":
+		print("Called the POST section of fb_login()")
 		# Converts the response into the correct format and passes it to a function
 		# that stores the user's access token in the TinyDB
 		data = request.data
