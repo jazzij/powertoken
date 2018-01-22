@@ -24,7 +24,7 @@ def wc_login():
 	elif request.method == "POST":
 		# Process WC info and redirect to /fb_login
 		data = {
-			"email": request.form["username"],
+			"email": request.form["email"],
 			"password": request.form["password"]
 		}
 		result = requests.post("https://palalinq.herokuapp.com/api/People/login", data=data)
