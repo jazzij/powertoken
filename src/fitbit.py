@@ -1,12 +1,12 @@
 # fitbit.py
 # This class contains the API calls to Fitbit (excpt for the login).
 # Created by: Abigail Franz
-# Last modified by: Abigail Franz on 1/20/2018
+# Last modified by: Abigail Franz on 1/24/2018
 
-import requests, sys, datetime, json
+import datetime, json, requests
 
 class Fitbit:
-	baseURL = 'https://api.fitbit.com/1/user/-/'
+	fbBaseUrl = 'https://api.fitbit.com/1/user/-/'
 	_authHeaders = {}
 
 	def __init__(self, fbAccessToken):
@@ -14,8 +14,8 @@ class Fitbit:
 
 	# Changes the daily step goal to newStepGoal and returns True if successful
 	def changeDailyStepGoal(self, newStepGoal):
-		goalURL = "activities/goals/daily.json"
-		urlStr = self.baseURL + goalURL
+		goalUrl = "activities/goals/daily.json"
+		urlStr = self.fbBaseUrl + goalUrl
 		params = {
 			"period" : "daily",
 			"type" : "steps",
@@ -24,23 +24,21 @@ class Fitbit:
 		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			newGoal = response.json()["goals"]["steps"]
-			print("New daily step goal: %d" % (newGoal,))
+			print("Changed the daily step goal to %d" % (newGoal,))
 			return True
 		else:
-			print("Error changing daily step goal: %d" % (response.status_code,))
 			return False
 
 	# Given a percentage increase (from WEconnect), updates the progress
 	# towards the step goal
 	def update(self, percent):
 		prevSteps = self._getCurrentSteps()
-		print("Previous step count: %d" % (prevSteps,))
-		numSteps = int(percent * self._getDailyStepGoal())
-		self._logStepActivity(numSteps)
-		print("Added steps: %d" % (numSteps,))
-		print("New step count: %d" % (prevSteps + numSteps,))
+		newSteps = int(percent * self._getDailyStepGoal())
+		logSuccessful = self._logStepActivity(newSteps)
+		if logSuccessful:
+			print("Changed the step count from %d to %d" % (prevSteps, newSteps))
 
-	# Used if WEconnect progress decreased
+	# Resets Fitbit to receive new step activities
 	def resetAndUpdate(self, percent):
 		# Deletes all Fitbit step activities for the day
 		dailyActivities = self._getDailyStepActivities()
@@ -52,18 +50,22 @@ class Fitbit:
 		self.update(percent)
 
 	# Helper - returns a list of all the activities the user has completed today
+	# If the request is unsuccessful, returns an empty list
 	def _getDailyStepActivities(self):
 		activityListUrl = "activities/date/" + self._getCurrentDate() + ".json"
-		urlStr = self.baseURL + activityListUrl
+		urlStr = self.fbBaseUrl + activityListUrl
 		response = requests.get(urlStr, headers=self._authHeaders)
-		activityListJson = response.json()
-		activityList = activityListJson["activities"]
-		return activityList
+		if self._isValid(response):
+			activityListJson = response.json()
+			activityList = activityListJson["activities"]
+			return activityList
+		else:
+			return []
 
-	# Deletes an activity and returns True if successful
+	# Helper - deletes an activity and returns True if successful
 	def _deleteActivity(self, logId):
 		deleteActivityUrl = "activities/" + str(logId) + ".json"
-		urlStr = self.baseURL + deleteActivityUrl
+		urlStr = self.fbBaseUrl + deleteActivityUrl
 		response = requests.delete(urlStr, headers=self._authHeaders)
 		if response.status_code == 204:
 			return True
@@ -71,32 +73,34 @@ class Fitbit:
 			print("Activity %d was not successfully deleted." % (logId,))
 			return False
 
-	# Gets the user's daily step goal
+	# Helper - gets the user's daily step goal. If the request is unsuccessful,
+	# returns a default value of 1 million.
 	def _getDailyStepGoal(self):
-		dailyGoalSummaryURL =  "activities/goals/daily.json"
-		urlStr = self.baseURL + dailyGoalSummaryURL
+		dailyGoalSummaryUrl =  "activities/goals/daily.json"
+		urlStr = self.fbBaseUrl + dailyGoalSummaryUrl
 		response = requests.get(urlStr, headers=self._authHeaders)
 		if self._isValid(response):
 			return response.json()["goals"]["steps"]
 		else:
-			return response.status_code
+			return 1000000
 
-	# Gets today's current step count
+	# Helper - gets today's current step count. If the request is unsuccessful,
+	# returns -1.
 	def _getCurrentSteps(self): 
 		date = self._getCurrentDate()
-		dateActivityURL = "activities/date/" + date + '.json'
-		urlStr = self.baseURL + dateActivityURL
+		dateActivityUrl = "activities/date/" + date + '.json'
+		urlStr = self.fbBaseUrl + dateActivityUrl
 		response = requests.get(urlStr, headers=self._authHeaders)
 		if self._isValid(response):
 			return response.json()["summary"]["steps"]
 		else:
-			print("Couldn't get today's step count. Error %d: %s" % (response.status_code, response.text))
 			return -1
 
-	# Changes the weekly step goal to newStepGoal and returns True if successful
+	# Helper - changes the weekly step goal to newStepGoal and returns True if 
+	# successful
 	def _changeWeeklyStepGoal(self, newStepGoal):
-		goalURL = "activities/goals/weekly.json"
-		urlStr = self.baseURL + goalURL
+		goalUrl = "activities/goals/weekly.json"
+		urlStr = self.fbBaseUrl + goalUrl
 		params = {
 			"period" : "weekly",
 			"type" : "steps",
@@ -109,11 +113,11 @@ class Fitbit:
 		else:
 			return False
 		
-	# Logs an activity containing the number of steps specified in newStepCount
-	# Returns True if successful
+	# Helper - logs an activity containing the number of steps specified in 
+	# newStepCount, and returns True if successful
 	def _logStepActivity(self, newStepCount):
-		activityURL = "activities.json"
-		urlStr = self.baseURL + activityURL
+		activityUrl = "activities.json"
+		urlStr = self.fbBaseUrl + activityUrl
 		params = {
 			"activityId" : '90013', # Walking (activityId=90013), Running (activityId=90009)
 			"startTime" : self._getCurrentTime(), # HH:mm:ss
@@ -125,10 +129,8 @@ class Fitbit:
 		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			loggedActivity = response.json()
-			print(loggedActivity)
 			return True
 		else:
-			print("Couldn't log step activity. Error %d: %s" % (response.status_code, response.text))
 			return False
 
 	# Helper - returns current date as a string in YYYY-MM-dd format
@@ -144,8 +146,9 @@ class Fitbit:
 		return timeStr
 
 	# Helper - makes sure HTTP requests are successful
-	def _isValid(self, result):
-		if result.status_code >= 300:
+	def _isValid(self, response):
+		if response.status_code >= 300:
+			print("Request could not be completed. Error: %d %s" % (response.status_code, response.text))
 			return False
 		else:
 			return True

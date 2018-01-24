@@ -1,9 +1,9 @@
 # powertoken.py
 # Contains the functionality for interfacing between WEconnect and Fitbit
 # Created by: Abigail Franz
-# Last modified by: Abigail Franz on 1/22/2018
+# Last modified by: Abigail Franz on 1/24/2018
 
-import json, os, requests, time
+import json, requests, time
 from tinydb import TinyDB, Query
 import fitbit, weconnect
 
@@ -13,6 +13,7 @@ class PowerToken:
 	_db = TinyDB(_dbPath)
 
 	# This will clear all user info and should only be called if you know what you're doing!
+	# We will remove this function eventually.
 	def resetLogins(self):
 		self._db.purge()
 
@@ -46,7 +47,6 @@ class PowerToken:
 		result = requests.post(self.wcLoginUrl, data=data)
 		if result.status_code != 200:
 			return False
-			exit()
 		jres = result.json()
 		userId = str(jres["accessToken"]["userId"])
 		userToken = str(jres["accessToken"]["id"])
@@ -65,6 +65,7 @@ class PowerToken:
 	def isLoggedIntoWc(self, username):
 		q = Query()
 		result = self._db.search(q.username == username)
+
 		# Makes sure there exists a user with that username
 		if len(result) != 1:
 			return False
@@ -81,6 +82,7 @@ class PowerToken:
 	def isLoggedIntoFb(self, username):
 		q = Query()
 		result = self._db.search(q.username == username)
+
 		# Makes sure there exists a user with that username
 		if len(result) != 1:
 			return False
@@ -94,11 +96,9 @@ class PowerToken:
 
 	# Stores the Fitbit access token in the TinyDB
 	def completeFbLogin(self, username, accessToken):
-		print("Inside of powertoken.completeFbLogin: username = %s and accessToken = %s" % (username, accessToken))
 		q = Query()
 		self._db.update({"fbAccessToken": accessToken}, q.username == username)
 		result = self._db.search(q.username == username)
-		print(result)
 
 	# The program loop - runs until killed with Ctrl+C
 	def startExperiment_old(self, username):
@@ -152,14 +152,17 @@ class PowerToken:
 		while True:
 			wcProgress = wc.poll()
 
-			# If progress differs from last poll, updates Fitbit
-			if wcProgress != lastWcProgress:
-				fb.resetAndUpdate(wcProgress)
+			# Makes sure the poll request succeeded
+			if wcProgress != -1:
+				# If progress differs from last poll, updates Fitbit
+				if wcProgress != lastWcProgress:
+					fb.resetAndUpdate(wcProgress)
+				lastWcProgress = wcProgress
 
-			lastWcProgress = wcProgress
+			# Delays a minute
 			time.sleep(60)
 
-	# Retrieves user's WEconnect and Fitbit access info from the TinyDB
+	# Helper - retrieves user's WEconnect and Fitbit access info from the TinyDB
 	def _loadAccessInfo(self, username):
 		q = Query()
 		userInfo = self._db.search(q.username == username)[0]

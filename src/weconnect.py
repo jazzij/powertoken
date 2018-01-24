@@ -1,9 +1,9 @@
 # weconnect.py
-# This class contains the API calls to WEconnect.
+# This class contains the API calls to WEconnect (except for the login).
 # Created by: Abigail Franz
-# Last modified by: Abigail Franz on 1/20/2018
+# Last modified by: Abigail Franz on 1/24/2018
 
-import datetime, json, requests, sys, time
+import datetime, json, requests
 
 class WeConnect:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"
@@ -16,14 +16,10 @@ class WeConnect:
 		self._wcAccessToken = wcAccessToken
 
 	# Polls WEconnect for changes in progress
+	# -1 denotes a failed request
 	def poll(self):
-		#sun, sat = self._getWeek()
 		start, end = self._getToday()
-		percentProgress = self._getProgress(start, end)
-		if percentProgress == -1:
-			print("Something went terribly wrong in sending the request.")
-			return -1
-		return percentProgress
+		return self._getProgress(start, end)
 
 	# Helper - gets a list of progress for all activities within a specified
 	# time range. Dates in format "YYYY-MM-dd"
@@ -34,9 +30,10 @@ class WeConnect:
 		response = requests.get(requestUrl)
 		if self._isValid(response):
 			progress = response.json()
-			print("Total vs Completed Events today: %d / %d" % 
-				(progress["events"]["completed"], progress["events"]["total"],))
-			percent = float(progress["events"]["completed"]) / float(progress["events"]["total"])
+			completed = progress["events"]["completed"]
+			total = progress["events"]["total"]
+			percent = float(completed) / float(total)
+			print("Progress: %d / %d = %f" % (completed, total, percent))
 			return percent
 		else:
 			return -1
@@ -64,7 +61,7 @@ class WeConnect:
 	# Helper - makes sure HTTP requests are successful
 	def _isValid(self, response):
 		if response.status_code >= 300:
-			print("Request could not be completed. Error: %d %s" % (response.status_code, response.text,))
+			print("Request could not be completed. Error: %d %s" % (response.status_code, response.text))
 			return False
 		else:
 			return True
