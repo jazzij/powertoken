@@ -1,4 +1,4 @@
-from flask import Flask, json, redirect, render_template, request, url_for
+from flask import Flask, json, Markup, redirect, render_template, request, url_for
 import requests, shelve
 import powertoken
 
@@ -16,12 +16,10 @@ session = { "username": "" }
 @app.route("/home")
 def home():
 	print("home: username = %s" % (session["username"],))
-	welcome = ""
-	start_code = ""
 	if session["username"]:
-		welcome = "Welcome, %s!" % (session["username"],)
-		start_code = "<a href={{url_for('start')}} class='btn'>START</a>"
-	return render_template("home.html", welcome=welcome, start_code=start_code)
+		return render_template("home.html", username=session["username"])
+	else:
+		return render_template("home.html")
 
 # Clears all logins! Don't do this unless you really know what you're doing.
 # We will probably remove this option altogether in a production environment.
