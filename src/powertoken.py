@@ -16,11 +16,11 @@ class PowerToken:
 	def resetLogins(self):
 		self._db.purge()
 
-	# Makes sure a user doesn't choose a name that's already taken
-	def isUsernameUnique(self, username):
+	# Returns True if the user has already been created
+	def isCurrentUser(self, username):
 		q = Query()
 		result = self._db.search(q.username == username)
-		if len(result) == 0:
+		if len(result) == 1:
 			return True
 		else:
 			return False
@@ -101,12 +101,11 @@ class PowerToken:
 		print(result)
 
 	# The program loop - runs until killed with Ctrl+C
-	def startExperiment(self, email):
+	def startExperiment(self, username):
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
-		wcUserId, wcAccessToken = self._loadWcAccessInfo(email)
+		wcUserId, wcAccessToken, fbAccessToken = self._loadAccessInfo(username)
 		wc = weconnect.WeConnect(wcUserId, wcAccessToken)
-		fbAccessToken = self._loadFbAccessInfo(email)
 		fb = fitbit.Fitbit(fbAccessToken)
 
 		# First, sets the Fitbit daily step goal to something ridiculous,
@@ -133,24 +132,8 @@ class PowerToken:
 			lastWcProgress = wcProgress
 			time.sleep(60)
 
-	# Retrieves user's WEconnect access info from the TinyDB
-	def _loadWcAccessInfo(self, email):
+	# Retrieves user's WEconnect and Fitbit access info from the TinyDB
+	def _loadAccessInfo(self, username):
 		q = Query()
-		userInfo = self._db.search(q.email == email)[0]
-		return userInfo["wcUserId"], userInfo["wcAccessToken"]
-
-	# Retrieves user's Fitbit access info from the TinyDB
-	def _loadFbAccessInfo(self, email):
-		q = Query()
-		userInfo = self._db.search(q.email == email)[0]
-		return userInfo["fbAccessToken"]
-
-	# Runs unit tests
-	def runTests(self):
-		wc = weconnect.WeConnect()
-		fb = fitbit.Fitbit()
-		response = fb.resetAndUpdate(0.5)
-		#response = fb.changeDailyStepGoal(1000000)
-		#print(response)
-		#response = fb.logStepActivity(250000);
-		#print(response)
+		userInfo = self._db.search(q.username == username)[0]
+		return userInfo["wcUserId"], userInfo["wcAccessToken"], userInfo["fbAccessToken"]

@@ -17,9 +17,11 @@ session = { "username": "" }
 def home():
 	print("home: username = %s" % (session["username"],))
 	welcome = ""
+	start_code = ""
 	if session["username"]:
 		welcome = "Welcome, %s!" % (session["username"],)
-	return render_template("home.html", welcome=welcome)
+		start_code = "<a href={{url_for('start')}} class='btn'>START</a>"
+	return render_template("home.html", welcome=welcome, start_code=start_code)
 
 # Clears all logins! Don't do this unless you really know what you're doing.
 # We will probably remove this option altogether in a production environment.
@@ -35,11 +37,23 @@ def pt_login():
 	elif request.method == "POST":
 		session["username"] = request.form["username"]
 		print("pt_login [POST]: username = %s" % (session["username"],))
-		if not powertoken.isUsernameUnique(session["username"]):
-			if powertoken.isLoggedIntoWc(session["username"]):
-				return redirect(url_for("fb_login"))
+
+		# Checks if the user already exists in the TinyDB
+		if powertoken.isCurrentUser(session["username"]):
+
+			# If the user is already logged into WEconnect and Python, he/she is
+			# redirected to the home page
+			if (powertoken.isLoggedIntoWc(session["username"]) and 
+				powertoken.isLoggedIntoFb(session["username"])):
+				return redirect(url_for("home"))
+
+			# Otherwise, the user is sent right to the WEconnect login
+			else:
+				return redirect(url_for("wc_login"))
+
+		# If this is a new user, adds him/her to the TinyDB and redirects to the
+		# WEconnect login
 		else:
-			# Adds a new user to the TinyDB and redirects to /wc_login
 			powertoken.createUser(session["username"])
 			return redirect(url_for("wc_login"))
 
@@ -81,8 +95,15 @@ def fb_login():
 		datajs = json.loads(convData)
 		powertoken.completeFbLogin(session["username"], datajs["tok"])
 
-		# This line is insignificant but must be here
+		# This code will never be called but must be here
 		return render_template("home.html")
+
+@app.route("/start", methods=["GET"])
+def start():
+	powertoken.startExperiment(session["username"])
+
+	# This code will never be called
+	return render_template("home.html")
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":
