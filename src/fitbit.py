@@ -40,10 +40,10 @@ class Fitbit:
 		print("Added steps: %d" % (numSteps,))
 		print("New step count: %d" % (prevSteps + numSteps,))
 
-	# Used if WeConnect progress decreased
+	# Used if WEconnect progress decreased
 	def resetAndUpdate(self, percent):
 		# Deletes all Fitbit step activities for the day
-		dailyActivities = self._getDailyStepGoal()
+		dailyActivities = self._getDailyStepActivities()
 		for activity in dailyActivities:
 			logId = activity["logId"]
 			self._deleteActivity(logId)
