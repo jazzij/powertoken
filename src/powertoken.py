@@ -101,7 +101,7 @@ class PowerToken:
 		print(result)
 
 	# The program loop - runs until killed with Ctrl+C
-	def startExperiment(self, username):
+	def startExperiment_old(self, username):
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
 		wcUserId, wcAccessToken, fbAccessToken = self._loadAccessInfo(username)
@@ -127,6 +127,33 @@ class PowerToken:
 			# If the user's progress has decreased (i.e. by adding more
 			# activities), subtracts from the Fitbit step count
 			elif wcProgress < lastWcProgress:
+				fb.resetAndUpdate(wcProgress)
+
+			lastWcProgress = wcProgress
+			time.sleep(60)
+
+	# The program loop - runs until killed with Ctrl+C
+	def startExperiment(self, username):
+		# Sets up the objects that will perform the WEconnect and Fitbit API
+		# calls
+		wcUserId, wcAccessToken, fbAccessToken = self._loadAccessInfo(username)
+		wc = weconnect.WeConnect(wcUserId, wcAccessToken)
+		fb = fitbit.Fitbit(fbAccessToken)
+
+		# First, sets the Fitbit daily step goal to something ridiculous,
+		# like a million steps
+		fb.changeDailyStepGoal(1000000)
+
+		# This will hold the progress from the last time WEconnect was polled.
+		lastWcProgress = 0.0
+
+		# Starts an infinite loop that periodically polls WEconnect for changes
+		# and then updates Fitbit. Progress will be a decimal percentage.
+		while True:
+			wcProgress = wc.poll()
+
+			# If progress differs from last poll, updates Fitbit
+			if wcProgress != lastWcProgress:
 				fb.resetAndUpdate(wcProgress)
 
 			lastWcProgress = wcProgress
