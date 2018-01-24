@@ -34,10 +34,10 @@ class WeConnect:
 		response = requests.get(requestUrl)
 		if self._isValid(response):
 			progress = response.json()
-			print("Total vs Completed Events from %s to %s: %d / %d" % (fromDate, toDate,
-					progress["events"]["completed"], progress["events"]["total"],))
-			percent = int(progress["events"]["completed"]) / int(progress["events"]["total"])
-			print("As a decimal, thats %.2f" % (percent,))
+			print("Total vs Completed Events today: %d / %d" % 
+				(progress["events"]["completed"], progress["events"]["total"],))
+			percent = float(progress["events"]["completed"]) / float(progress["events"]["total"])
+			print(percent)
 			return percent
 		else:
 			return -1
