@@ -1,15 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
 	<div class="card">
-		<p>Welcome {{username}}!</p>
-		<hr />
-		<a href="{{url_for('pt_login')}}" class="btn">
-			SIGN UP / SIGN IN
-		</a>
+		{% if username is defined %}
+			<p>Welcome {{username}}!</p>
+			<hr />
+			<a href="{{url_for('start')}}" class="btn">
+				START
+			</a>
+		{% else %}
+			<a href="{{url_for('pt_login')}}" class="btn">
+				SIGN UP / SIGN IN
+			</a>
+		{% endif %}
 	</div>
-	{% if username is defined %}
-	<div class="card">
-		<a href="{{url_for('start')}}" class="btn">START</a>
-	</div>
-	{% endif %}
 {% endblock %}

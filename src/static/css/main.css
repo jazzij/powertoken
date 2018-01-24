@@ -54,14 +54,19 @@ header .h1 {
     font-variant: small-caps;
     font-weight: bolder;
     text-shadow: 0.1em;
+    text-decoration: none;
+    text-align: center;
 }
 .btn:hover, .btn:active {
     outline: none;
-    background: linear-gradient(to bottom, #00ff99, #0099ff) no-repeat;
+    background: linear-gradient(to bottom, #00ff99, #0099ff);
+    background-repeat: no-repeat;
 }
 
 hr {
-    color: #0099ff;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+    border-color: #0099ff;
 }
 
 .warning {
