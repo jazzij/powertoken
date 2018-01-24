@@ -35,7 +35,7 @@ class Fitbit:
 	def update(self, percent):
 		prevSteps = self._getCurrentSteps()
 		print("Previous step count: %d" % (prevSteps,))
-		numSteps = int(percent * self._getDailyActivityGoals())
+		numSteps = int(percent * self._getDailyStepGoal())
 		self._logStepActivity(numSteps)
 		print("Added steps: %d" % (numSteps,))
 		print("New step count: %d" % (prevSteps + numSteps,))

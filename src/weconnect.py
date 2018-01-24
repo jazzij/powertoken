@@ -37,7 +37,6 @@ class WeConnect:
 			print("Total vs Completed Events today: %d / %d" % 
 				(progress["events"]["completed"], progress["events"]["total"],))
 			percent = float(progress["events"]["completed"]) / float(progress["events"]["total"])
-			print(percent)
 			return percent
 		else:
 			return -1
