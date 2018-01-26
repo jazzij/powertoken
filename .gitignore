@@ -1,0 +1,5 @@
+__pycache__/*
+threadtest/*
+src/__pycache__/*
+src/db.json
+*.pyc
