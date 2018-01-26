@@ -41,3 +41,5 @@ The information entered by the user is not saved, only the access tokens and IDs
 It's best to use a virtualenv to setup Flask; see the Flask documentation for details.
 
 Using the Fitbit API requires additional setup--if you don't have an account and app set up, see the Web API quickstart. This app uses implicit OATH flow (implemented with JavaScript / HTML), saves the access token to a JSON-based database on the server, and completes all subsequent API calls in Python.
+
+You may want to keep the Flask server running even when you close your SSH session. In this case, the command `nohup python routes.py &` should do the trick. Should you want to kill the process, you will have to do so manually.
