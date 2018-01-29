@@ -67,8 +67,7 @@ class Fitbit:
 	# Helper - returns a list of all the activities the user has completed this
 	# week. If the request is unsuccessful, returns an empty list
 	def _getWeeklyStepActivities(self):
-		activityListUrl = "activities/steps/date/" + self._getSunday() + "/"
-				+ self._getCurrentDate() + ".json"
+		activityListUrl = format("activities/steps/date/%s/%s.json" % (self._getSunday(), self._getCurrentDate()))
 		urlStr = self.fbBaseUrl + activityListUrl
 		response = requests.get(urlStr, headers=self._authHeaders)
 		if self._isValid(response):
