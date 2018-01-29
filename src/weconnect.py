@@ -1,7 +1,7 @@
 # weconnect.py
 # This class contains the API calls to WEconnect (except for the login).
-# Created by: Abigail Franz
-# Last modified by: Abigail Franz on 1/24/2018
+# Created by Abigail Franz
+# Last modified by Abigail Franz on 1/29/2018
 
 import datetime, json, logging, requests
 
@@ -10,13 +10,12 @@ class WeConnect:
 	_wcUserId = ""
 	_wcAccessToken = ""
 	_goalPeriod = ""
-	dailyStepGoal = 1000000
     
 	def __init__(self, wcUserId, wcAccessToken, goalPeriod):
 		self._wcUserId = wcUserId
 		self._wcAccessToken = wcAccessToken
 		self._goalPeriod = goalPeriod
-		logging.basicConfig(filename="logs/powertoken.log", level=logging.DEBUG)
+		logging.basicConfig(filename="logs/powertoken.log", level=logging.INFO)
 
 	# Polls WEconnect for changes in progress
 	# -1 denotes a failed request
@@ -31,16 +30,15 @@ class WeConnect:
 	# Helper - gets a list of progress for all activities within a specified
 	# time range. Dates in format "YYYY-MM-dd"
 	def _getProgress(self, fromDate, toDate):
-		requestUrl = self.wcBaseUrl + "/People/" + self._wcUserId + \
-				"/activities/progress?access_token=" + self._wcAccessToken + \
-				"&from=" + fromDate + "&to=" + toDate
+		requestUrl = format("%s/People/%s/activities/progress?access_token=%s&from=%s&to=%s"
+				% (self.wcBaseUrl, self._wcUserId, self._wcAccessToken, fromDate, toDate))
 		response = requests.get(requestUrl)
 		if self._isValid(response):
 			progress = response.json()
 			completed = progress["events"]["completed"]
 			total = progress["events"]["total"]
 			percent = float(completed) / float(total)
-			logging.info(format("Progress: %d / %d = %f" % (completed, total, percent)))
+			logging.info(format(" Progress: %d / %d = %f" % (completed, total, percent)))
 			return percent
 		else:
 			return -1
@@ -68,7 +66,7 @@ class WeConnect:
 	# Helper - makes sure HTTP requests are successful
 	def _isValid(self, response):
 		if response.status_code >= 300:
-			logging.error(format("Request could not be completed. Error: %d %s" 
+			logging.error(format(" Request could not be completed. Error: %d %s" 
 					% (response.status_code, response.text)))
 			return False
 		else:

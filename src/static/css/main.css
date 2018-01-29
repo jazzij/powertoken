@@ -1,3 +1,10 @@
+/*
+ * main.css
+ * Contains the styles for the PowerToken web application
+ * Created by Abigail Franz
+ * Last modified by Abigail Franz on 1/29/2018
+ */
+
 body {
     background: linear-gradient(to bottom, #0099ff 0%, #00ff99 52%);
     background-repeat: no-repeat;

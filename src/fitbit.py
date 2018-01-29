@@ -1,7 +1,7 @@
 # fitbit.py
 # This class contains the API calls to Fitbit (excpt for the login).
-# Created by: Abigail Franz
-# Last modified by: Abigail Franz on 1/24/2018
+# Created by Abigail Franz
+# Last modified by Abigail Franz on 1/29/2018
 
 import datetime, json, logging, requests
 
@@ -13,7 +13,7 @@ class Fitbit:
 	def __init__(self, fbAccessToken, goalPeriod):
 		self._authHeaders = {'Authorization': 'Bearer ' + fbAccessToken}
 		self._goalPeriod = goalPeriod
-		logging.basicConfig(filename="logs/powertoken.log", level=logging.DEBUG)
+		logging.basicConfig(filename="logs/powertoken.log", level=logging.INFO)
 
 	# Changes the daily step goal to newStepGoal and returns True if successful
 	def changeStepGoal(self, newStepGoal):
@@ -27,7 +27,8 @@ class Fitbit:
 		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			newGoal = response.json()["goals"]["steps"]
-			logging.info(format("Changed the %s step goal to %d" % (self._goalPeriod, newGoal)))
+			logging.info(format(" Changed the %s step goal to %d" 
+					% (self._goalPeriod, newGoal)))
 			return True
 		else:
 			return False
@@ -39,7 +40,8 @@ class Fitbit:
 		newSteps = int(percent * self._getStepGoal())
 		logSuccessful = self._logStepActivity(newSteps)
 		if logSuccessful:
-			logging.info(format("Changed the step count from %d to %d" % (prevSteps, newSteps)))
+			logging.info(format(" Changed the step count from %d to %d" 
+					% (prevSteps, newSteps)))
 
 	# Resets Fitbit to receive new step activities
 	def resetAndUpdate(self, percent):
@@ -81,13 +83,13 @@ class Fitbit:
 
 	# Helper - deletes an activity and returns True if successful
 	def _deleteActivity(self, logId):
-		deleteActivityUrl = "activities/" + str(logId) + ".json"
+		deleteActivityUrl = format("activities/%s.json" % (str(logId),))
 		urlStr = self.fbBaseUrl + deleteActivityUrl
 		response = requests.delete(urlStr, headers=self._authHeaders)
 		if response.status_code == 204:
 			return True
 		else:
-			print("Activity %d was not successfully deleted." % (logId,))
+			logging.error(format(" Activity %d was not successfully deleted." % (logId,)))
 			return False
 
 	# Helper - gets the user's step goal. If the request is unsuccessful,
@@ -119,10 +121,10 @@ class Fitbit:
 		activityUrl = "activities.json"
 		urlStr = self.fbBaseUrl + activityUrl
 		params = {
-			"activityId" : '90013', # Walking (activityId=90013), Running (activityId=90009)
+			"activityId" : '90013', # Walking (activityId=90013)
 			"startTime" : self._getCurrentTime(), # HH:mm:ss
-			"durationMillis" : 3600000, # 60K ms = 1 min, 
-			"date" : self._getCurrentDate(),
+			"durationMillis" : 3600000, # 3,600,000 ms = 1 hr
+			"date" : self._getCurrentDate(), # YYYY-MM-dd
 			"distance" : newStepCount,
 			"distanceUnit" : "steps"
 		}
@@ -145,6 +147,7 @@ class Fitbit:
 		timeStr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
 		return timeStr
 
+	# Helper - returns the past Sunday in YYYY-MM-dd format
 	def _getSunday(self):
 		today = datetime.date.today()
 		todayWeekday = (today.weekday() + 1) % 7	# SUN = 0, MON = 1, ... , SAT = 6
@@ -155,7 +158,7 @@ class Fitbit:
 	# Helper - makes sure HTTP requests are successful
 	def _isValid(self, response):
 		if response.status_code >= 300:
-			logging.error(format("Request could not be completed. Error: %d %s" 
+			logging.error(format(" Request could not be completed. Error: %d %s" 
 					% (response.status_code, response.text)))
 			return False
 		else:
