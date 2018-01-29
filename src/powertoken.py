@@ -142,7 +142,7 @@ class PowerToken:
 		userInfo = self._loadAccessInfo(username)
 		wc = weconnect.WeConnect(userInfo["wcUserId"], userInfo["wcAccessToken"],
 				userInfo["goalPeriod"])
-		fb = fitbit.Fitbit(fbAccessToken, userInfo["goalPeriod"])
+		fb = fitbit.Fitbit(userInfo["fbAccessToken"], userInfo["goalPeriod"])
 
 		# First, sets the Fitbit step goal to something ridiculous,
 		# like a million steps
