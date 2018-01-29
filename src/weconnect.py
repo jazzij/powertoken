@@ -9,16 +9,22 @@ class WeConnect:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"
 	_wcUserId = ""
 	_wcAccessToken = ""
+	_goalPeriod = ""
 	dailyStepGoal = 1000000
     
-	def __init__(self, wcUserId, wcAccessToken):
+	def __init__(self, wcUserId, wcAccessToken, goalPeriod):
 		self._wcUserId = wcUserId
 		self._wcAccessToken = wcAccessToken
+		self._goalPeriod = goalPeriod
 
 	# Polls WEconnect for changes in progress
 	# -1 denotes a failed request
 	def poll(self):
-		start, end = self._getToday()
+		start, end = ""
+		if self._goalPeriod == "daily":
+			start, end = self._getToday()
+		elif self._goalPeriod == "weekly":
+			start, end = self._getWeek()
 		return self._getProgress(start, end)
 
 	# Helper - gets a list of progress for all activities within a specified

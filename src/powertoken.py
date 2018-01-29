@@ -31,6 +31,7 @@ class PowerToken:
 	def createUser(self, username):
 		newUser = {
 			"username": username,
+			"goalPeriod": "",
 			"wcUserId": "",
 			"wcAccessToken": "",
 			"fbAccessToken": ""
@@ -38,8 +39,9 @@ class PowerToken:
 		self._db.insert(newUser)
 
 	# Logs user into WEconnect, produces an ID and access token that will last
-	# 90 days, and stores the token and ID in the TinyDB
-	def loginToWc(self, username, email, password):
+	# 90 days, and stores the token and ID in the TinyDB. Also stores the goal
+	# period. Returns True if the login is successful, false otherwise.
+	def loginToWc(self, username, email, password, goalPeriod):
 		data = {
 			"email": email,
 			"password": password
@@ -53,6 +55,7 @@ class PowerToken:
 		
 		# Stores user's WEconnect-related data in the TinyDb
 		userInfo = {
+			"goalPeriod": goalPeriod,
 			"wcUserId": userId,
 			"wcAccessToken": userToken
 		}
@@ -136,13 +139,14 @@ class PowerToken:
 	def startExperiment(self, username):
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
-		wcUserId, wcAccessToken, fbAccessToken = self._loadAccessInfo(username)
-		wc = weconnect.WeConnect(wcUserId, wcAccessToken)
-		fb = fitbit.Fitbit(fbAccessToken)
+		userInfo = self._loadAccessInfo(username)
+		wc = weconnect.WeConnect(userInfo["wcUserId"], userInfo["wcAccessToken"],
+				userInfo["goalPeriod"])
+		fb = fitbit.Fitbit(fbAccessToken, userInfo["goalPeriod"])
 
-		# First, sets the Fitbit daily step goal to something ridiculous,
+		# First, sets the Fitbit step goal to something ridiculous,
 		# like a million steps
-		fb.changeDailyStepGoal(1000000)
+		fb.changeStepGoal(1000000)
 
 		# This will hold the progress from the last time WEconnect was polled.
 		lastWcProgress = 0.0
@@ -162,8 +166,7 @@ class PowerToken:
 			# Delays a minute
 			time.sleep(60)
 
-	# Helper - retrieves user's WEconnect and Fitbit access info from the TinyDB
+	# Helper - retrieves user's info from the TinyDB
 	def _loadAccessInfo(self, username):
 		q = Query()
-		userInfo = self._db.search(q.username == username)[0]
-		return userInfo["wcUserId"], userInfo["wcAccessToken"], userInfo["fbAccessToken"]
+		return self._db.search(q.username == username)[0]

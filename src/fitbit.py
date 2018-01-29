@@ -8,23 +8,25 @@ import datetime, json, requests
 class Fitbit:
 	fbBaseUrl = 'https://api.fitbit.com/1/user/-/'
 	_authHeaders = {}
+	_goalPeriod = ""
 
-	def __init__(self, fbAccessToken):
+	def __init__(self, fbAccessToken, goalPeriod):
 		self._authHeaders = {'Authorization': 'Bearer ' + fbAccessToken}
+		self._goalPeriod = goalPeriod
 
 	# Changes the daily step goal to newStepGoal and returns True if successful
-	def changeDailyStepGoal(self, newStepGoal):
-		goalUrl = "activities/goals/daily.json"
+	def changeStepGoal(self, newStepGoal):
+		goalUrl = "activities/goals/" + self._goalPeriod + ".json"
 		urlStr = self.fbBaseUrl + goalUrl
 		params = {
-			"period" : "daily",
+			"period" : self._goalPeriod,
 			"type" : "steps",
 			"value" : newStepGoal
 		}
 		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			newGoal = response.json()["goals"]["steps"]
-			print("Changed the daily step goal to %d" % (newGoal,))
+			print("Changed the %s step goal to %d" % (self._goalPeriod, newGoal))
 			return True
 		else:
 			return False
@@ -33,7 +35,7 @@ class Fitbit:
 	# towards the step goal
 	def update(self, percent):
 		prevSteps = self._getCurrentSteps()
-		newSteps = int(percent * self._getDailyStepGoal())
+		newSteps = int(percent * self._getStepGoal())
 		logSuccessful = self._logStepActivity(newSteps)
 		if logSuccessful:
 			print("Changed the step count from %d to %d" % (prevSteps, newSteps))
@@ -62,6 +64,20 @@ class Fitbit:
 		else:
 			return []
 
+	# Helper - returns a list of all the activities the user has completed this
+	# week. If the request is unsuccessful, returns an empty list
+	def _getWeeklyStepActivities(self):
+		activityListUrl = "activities/steps/date/" + self._getSunday() + "/"
+				+ self._getCurrentDate() + ".json"
+		urlStr = self.fbBaseUrl + activityListUrl
+		response = requests.get(urlStr, headers=self._authHeaders)
+		if self._isValid(response):
+			activityListJson = response.json()
+			activityList = activityListJson["activities-log-steps"]
+			return activityList
+		else:
+			return []
+
 	# Helper - deletes an activity and returns True if successful
 	def _deleteActivity(self, logId):
 		deleteActivityUrl = "activities/" + str(logId) + ".json"
@@ -73,11 +89,11 @@ class Fitbit:
 			print("Activity %d was not successfully deleted." % (logId,))
 			return False
 
-	# Helper - gets the user's daily step goal. If the request is unsuccessful,
+	# Helper - gets the user's step goal. If the request is unsuccessful,
 	# returns a default value of 1 million.
-	def _getDailyStepGoal(self):
-		dailyGoalSummaryUrl =  "activities/goals/daily.json"
-		urlStr = self.fbBaseUrl + dailyGoalSummaryUrl
+	def _getStepGoal(self):
+		goalSummaryUrl =  "activities/goals/" + self._goalPeriod + ".json"
+		urlStr = self.fbBaseUrl + goalSummaryUrl
 		response = requests.get(urlStr, headers=self._authHeaders)
 		if self._isValid(response):
 			return response.json()["goals"]["steps"]
@@ -95,23 +111,6 @@ class Fitbit:
 			return response.json()["summary"]["steps"]
 		else:
 			return -1
-
-	# Helper - changes the weekly step goal to newStepGoal and returns True if 
-	# successful
-	def _changeWeeklyStepGoal(self, newStepGoal):
-		goalUrl = "activities/goals/weekly.json"
-		urlStr = self.fbBaseUrl + goalUrl
-		params = {
-			"period" : "weekly",
-			"type" : "steps",
-			"value" : newStepGoal
-		}
-		result = requests.post(urlStr, headers=self._authHeaders, params=params)
-		if self._isValid(result):
-			print(result.json())
-			return True
-		else:
-			return False
 		
 	# Helper - logs an activity containing the number of steps specified in 
 	# newStepCount, and returns True if successful
@@ -144,6 +143,13 @@ class Fitbit:
 		now = datetime.datetime.now()
 		timeStr = format("%02d:%02d:%02d" % (now.hour, now.minute, now.second))
 		return timeStr
+
+	def _getSunday(self):
+		today = datetime.date.today()
+		todayWeekday = (today.weekday() + 1) % 7	# SUN = 0, MON = 1, ... , SAT = 6
+		sun = today - datetime.timedelta(todayWeekday)
+		sunStr = format("%d-%02d-%02d" % (sun.year, sun.month, sun.day))
+		return sunStr
 
 	# Helper - makes sure HTTP requests are successful
 	def _isValid(self, response):

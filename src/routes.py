@@ -77,7 +77,9 @@ def wc_login():
 		# Logs user into WEconnect
 		email = request.form["email"]
 		password = request.form["password"]
-		loginSuccessful = powertoken.loginToWc(session["username"], email, password)
+		goalPeriod = request.form["goalPeriod"]
+		loginSuccessful = powertoken.loginToWc(session["username"], email, 
+				password, goalPeriod)
 
 		# If the login failed, reloads the page with an error message
 		if not loginSuccessful:
@@ -102,7 +104,7 @@ def fb_login():
 		datajs = json.loads(convData)
 		powertoken.completeFbLogin(session["username"], datajs["tok"])
 
-		# This code will never be called but must be here
+		# This code will never be called but must be present
 		return render_template("home.html")
 
 @app.route("/start", methods=["GET"])
