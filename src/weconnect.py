@@ -20,7 +20,7 @@ class WeConnect:
 	# Polls WEconnect for changes in progress
 	# -1 denotes a failed request
 	def poll(self):
-		start, end = ""
+		start, end = "", ""
 		if self._goalPeriod == "daily":
 			start, end = self._getToday()
 		elif self._goalPeriod == "weekly":
