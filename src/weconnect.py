@@ -3,7 +3,7 @@
 # Created by: Abigail Franz
 # Last modified by: Abigail Franz on 1/24/2018
 
-import datetime, json, requests
+import datetime, json, logging, requests
 
 class WeConnect:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"
@@ -16,6 +16,7 @@ class WeConnect:
 		self._wcUserId = wcUserId
 		self._wcAccessToken = wcAccessToken
 		self._goalPeriod = goalPeriod
+		logging.basicConfig(filename="logs/powertoken.log", level=logging.DEBUG)
 
 	# Polls WEconnect for changes in progress
 	# -1 denotes a failed request
@@ -39,7 +40,7 @@ class WeConnect:
 			completed = progress["events"]["completed"]
 			total = progress["events"]["total"]
 			percent = float(completed) / float(total)
-			print("Progress: %d / %d = %f" % (completed, total, percent))
+			logging.info(format("Progress: %d / %d = %f" % (completed, total, percent)))
 			return percent
 		else:
 			return -1
@@ -67,7 +68,8 @@ class WeConnect:
 	# Helper - makes sure HTTP requests are successful
 	def _isValid(self, response):
 		if response.status_code >= 300:
-			print("Request could not be completed. Error: %d %s" % (response.status_code, response.text))
+			logging.error(format("Request could not be completed. Error: %d %s" 
+					% (response.status_code, response.text)))
 			return False
 		else:
 			return True
