@@ -23,7 +23,6 @@ session = { "username": "" }
 @app.route("/index")
 @app.route("/default")
 def home():
-	print("home: username = %s" % (session["username"],))
 	if session["username"]:
 		return render_template("home.html", username=session["username"])
 	else:
@@ -45,7 +44,6 @@ def pt_login():
 	# POST: processes the PowerToken login form
 	elif request.method == "POST":
 		session["username"] = request.form["username"]
-		print("pt_login [POST]: username = %s" % (session["username"],))
 
 		# Checks if the user already exists in the TinyDB
 		if powertoken.isCurrentUser(session["username"]):
@@ -109,7 +107,13 @@ def fb_login():
 
 @app.route("/start", methods=["GET"])
 def start():
-	# Begins the program loop, which will run until stopped
+	# Start page redirects to the /running route, but running.html is the
+	# document that is displayed
+	return render_template("running.html")
+
+@app.route("/running", methods=["GET"])
+def running():
+	# Begins the program loop, which will run until killed
 	powertoken.startExperiment(session["username"])
 
 	# This code will never be called
