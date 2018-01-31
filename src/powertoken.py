@@ -144,7 +144,7 @@ class PowerToken:
 					"username": username,
 					"wcProgress": wcProgress,
 					"fbStepCount": fbStepCount,
-					"timestamp": datetime.now().strftime("%Y-%02m-%02dT%02H:%02M:%02S")
+					"timestamp": datetime.utcnow().strftime("%Y-%02m-%02dT%02H:%02M:%02S")
 				}
 				self._log.insert(logEntry)
 
