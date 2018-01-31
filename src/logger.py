@@ -1,4 +1,5 @@
 import logging
+from pythonjsonlogger import jsonlogger
 
 # System logger
 systemLogFormat = '%(asctime)-15s: %(message)s'
@@ -7,7 +8,7 @@ systemLogger = logging.getLogger("powertoken.system")
 systemLogger.setLevel(logging.INFO)
 systemLoggerFileHandler = logging.FileHandler(systemLogPath)
 systemLoggerFileHandler.setLevel(logging.INFO)
-systemLoggerFileHandler.setFormatter(logging.Formatter(systemLogFormat))
+systemLoggerFileHandler.setFormatter(jsonlogger.JsonFormatter())
 systemLogger.addHandler(systemLoggerFileHandler)
 		
 # Output logger
@@ -17,5 +18,5 @@ outputLogger = logging.getLogger("powertoken.output")
 outputLogger.setLevel(logging.INFO)
 outputLoggerFileHandler = logging.FileHandler(systemLogPath)
 outputLoggerFileHandler.setLevel(logging.INFO)
-outputLoggerFileHandler.setFormatter(logging.Formatter(systemLogFormat))
+outputLoggerFileHandler.setFormatter(jsonlogger.JsonFormatter())
 outputLogger.addHandler(systemLoggerFileHandler)

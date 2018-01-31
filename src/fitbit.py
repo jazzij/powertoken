@@ -28,8 +28,7 @@ class Fitbit:
 		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			newGoal = response.json()["goals"]["steps"]
-			outputLogger.log(format(" Changed the %s step goal to %d" 
-					% (self._goalPeriod, newGoal)))
+			outputLogger.info(format(" Changed the %s step goal to %d" % (self._goalPeriod, newGoal)))
 			return True
 		else:
 			return False
@@ -41,7 +40,7 @@ class Fitbit:
 		newSteps = int(percent * self._getStepGoal())
 		logSuccessful = self._logStepActivity(newSteps)
 		if logSuccessful:
-			outputLogger.log(format(" Changed the step count from %d to %d" 
+			outputLogger.info(format(" Changed the step count from %d to %d" 
 					% (prevSteps, newSteps)))
 
 	# Resets Fitbit to receive new step activities
