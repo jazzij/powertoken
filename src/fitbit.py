@@ -42,8 +42,12 @@ class Fitbit:
 		if logSuccessful:
 			outputLogger.info(format(" Changed the step count from %d to %d" 
 					% (prevSteps, newSteps)))
+			return newSteps
+		else:
+			return -1
 
-	# Resets Fitbit to receive new step activities
+	# Resets Fitbit to receive new step activities and returns the number of steps
+	# added.
 	def resetAndUpdate(self, percent):
 		# Deletes all Fitbit step activities for the day
 		dailyActivities = self._getDailyStepActivities()
@@ -52,7 +56,7 @@ class Fitbit:
 			self._deleteActivity(logId)
 
 		# Updates Fitbit with the new percentage
-		self.update(percent)
+		return self.update(percent)
 
 	# Helper - returns a list of all the activities the user has completed today
 	# If the request is unsuccessful, returns an empty list

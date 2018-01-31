@@ -3,7 +3,7 @@
 # Created by Abigail Franz
 # Last modified by Abigail Franz on 1/29/2018
 
-import json, logging, requests, time
+import datetime, json, logging, requests, time
 from tinydb import TinyDB, Query
 import fitbit, weconnect
 from logger import systemLogger, outputLogger
@@ -11,9 +11,11 @@ from logger import systemLogger, outputLogger
 class PowerToken:
 	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
 	_dbPath = "db.json"
+	_logPath = "log.json"
 
 	def __init__(self):
-		self._db = TinyDB(self._dbPath)		
+		self._db = TinyDB(self._dbPath)
+		self._log = TinyDB(self._logPath)
 
 	# This will clear all user info and should only be called if you know what
 	# you're doing! We will remove this function eventually.
@@ -58,7 +60,7 @@ class PowerToken:
 		userId = str(jres["accessToken"]["userId"])
 		userToken = str(jres["accessToken"]["id"])
 		
-		# Stores user's WEconnect-related data in the TinyDb
+		# Stores user's WEconnect-related data in the TinyDB
 		userInfo = {
 			"goalPeriod": goalPeriod,
 			"wcUserId": userId,
@@ -135,8 +137,16 @@ class PowerToken:
 			if wcProgress != -1:
 				# If progress differs from last poll, updates Fitbit
 				if wcProgress != lastWcProgress:
-					fb.resetAndUpdate(wcProgress)
+					fbStepCount = fb.resetAndUpdate(wcProgress)
 				lastWcProgress = wcProgress
+				
+				logEntry = {
+					"username": username,
+					"wcProgress": wcProgress,
+					"fbStepCount": fbStepCount,
+					"timestamp": datetime.now().strftime("%Y-%02m-%02dT%02H:%02M:%02S")
+				}
+				self._log.insert(logEntry)
 
 			# Delays a minute
 			time.sleep(60)
