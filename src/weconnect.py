@@ -39,7 +39,7 @@ class WeConnect:
 			completed = progress["events"]["completed"]
 			total = progress["events"]["total"]
 			percent = float(completed) / float(total)
-			outputLogger.log(format(" Progress: %d / %d = %f" % (completed, total, percent)))
+			outputLogger.info(format(" Progress: %d / %d = %f" % (completed, total, percent)))
 			return percent
 		else:
 			return -1
