@@ -6,20 +6,20 @@
 import json, logging, requests, time
 from tinydb import TinyDB, Query
 import fitbit, weconnect
+from logger import systemLogger, outputLogger
 
 class PowerToken:
 	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
 	_dbPath = "db.json"
 
 	def __init__(self):
-		self._db = TinyDB(self._dbPath)
-		logging.basicConfig(filename="logs/powertoken.log", level=logging.INFO)
+		self._db = TinyDB(self._dbPath)		
 
 	# This will clear all user info and should only be called if you know what
 	# you're doing! We will remove this function eventually.
 	def resetLogins(self):
 		self._db.purge()
-		logging.info(" The TinyDB was reset.")
+		outputLogger.info(" The TinyDB was reset.")
 
 	# Returns True if the user has already been created
 	def isCurrentUser(self, username):
@@ -41,7 +41,7 @@ class PowerToken:
 			"fbAccessToken": ""
 		}
 		self._db.insert(newUser)
-		logging.info(format(" A new user with name %s was created." % (username,)))
+		outputLogger.log(format("A new user with name %s was created." % (username,)))
 
 	# Logs user into WEconnect, produces an ID and access token that will last
 	# 90 days, and stores the token and ID in the TinyDB. Also stores the goal
@@ -66,7 +66,7 @@ class PowerToken:
 		}
 		q = Query()
 		self._db.update(userInfo, q.username == username)
-		logging.info(format(" The user %s was just logged into WEconnect." % (username,)))
+		outputLogger.log(format(" The user %s was just logged into WEconnect." % (username,)))
 		return True
 
 	# Returns a boolean value signifying that the user is or isn't logged into 
@@ -107,7 +107,7 @@ class PowerToken:
 	def completeFbLogin(self, username, accessToken):
 		q = Query()
 		self._db.update({"fbAccessToken": accessToken}, q.username == username)
-		logging.info(format(" The user %s was just logged into Fitbit." % (username,)))
+		outputLogger.log(format(" The user %s was just logged into Fitbit." % (username,)))
 		result = self._db.search(q.username == username)
 
 	# The program loop - runs until killed with Ctrl+C

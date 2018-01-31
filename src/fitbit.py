@@ -1,9 +1,10 @@
 # fitbit.py
-# This class contains the API calls to Fitbit (excpt for the login).
+# This class contains the API calls to Fitbit (except for the login).
 # Created by Abigail Franz
 # Last modified by Abigail Franz on 1/29/2018
 
 import datetime, json, logging, requests
+from logger import systemLogger, outputLogger
 
 class Fitbit:
 	fbBaseUrl = 'https://api.fitbit.com/1/user/-/'
@@ -13,7 +14,7 @@ class Fitbit:
 	def __init__(self, fbAccessToken, goalPeriod):
 		self._authHeaders = {'Authorization': 'Bearer ' + fbAccessToken}
 		self._goalPeriod = goalPeriod
-		logging.basicConfig(filename="logs/powertoken.log", level=logging.INFO)
+		#logging.basicConfig(filename="logs/powertoken.log", level=logging.INFO)
 
 	# Changes the daily step goal to newStepGoal and returns True if successful
 	def changeStepGoal(self, newStepGoal):
@@ -27,7 +28,7 @@ class Fitbit:
 		response = requests.post(urlStr, headers=self._authHeaders, params=params)
 		if self._isValid(response):
 			newGoal = response.json()["goals"]["steps"]
-			logging.info(format(" Changed the %s step goal to %d" 
+			outputLogger.log(format(" Changed the %s step goal to %d" 
 					% (self._goalPeriod, newGoal)))
 			return True
 		else:
@@ -40,7 +41,7 @@ class Fitbit:
 		newSteps = int(percent * self._getStepGoal())
 		logSuccessful = self._logStepActivity(newSteps)
 		if logSuccessful:
-			logging.info(format(" Changed the step count from %d to %d" 
+			outputLogger.log(format(" Changed the step count from %d to %d" 
 					% (prevSteps, newSteps)))
 
 	# Resets Fitbit to receive new step activities
@@ -158,7 +159,7 @@ class Fitbit:
 	# Helper - makes sure HTTP requests are successful
 	def _isValid(self, response):
 		if response.status_code >= 300:
-			logging.error(format(" Request could not be completed. Error: %d %s" 
+			systemLogger.error(format(" Request could not be completed. Error: %d %s" 
 					% (response.status_code, response.text)))
 			return False
 		else:
