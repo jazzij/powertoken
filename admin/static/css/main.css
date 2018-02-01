@@ -11,13 +11,15 @@
 
 body {
     height: 100vh;
-    background: linear-gradient(to bottom, #0099ff 0%, #00ff99 50%) no-repeat;
+	margin: 0;
+	background: white;
     font-family: Verdana, sans-serif;
 }
 
 header {
     position: relative;
     width: 100%;
+	height: 15vh;
     top: 0;
 	left: 0;
     background: transparent;
@@ -25,33 +27,75 @@ header {
     text-align: center;
 }
 
-header .h1 {
-    font-size: xx-large;
+header h1 {
+    font-size: xxx-large;
+	background: -webkit-linear-gradient(#0099FF, #00FF99);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+header h1 sub {
+	font-size: x-large;
+}
+
+header h3 {
+	background: -webkit-linear-gradient(#0099FF, #00FF99);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.bar {
+	position: relative;
+	width: 100%;
+	height: 2em;
+	top: 0;
+	left: 0;
+	margin: 0;
+	background: linear-gradient(to right, #0099FF 15%, #00FF99);
 }
 
 nav {
-	position: fixed;
-	width: 200px;
-	height: 80vh;
-	top: 20%;
-	bottom: 20%;
+	position: relative;
+	width: 15%;
+	height: 85vh;
+	top: 0;
+	bottom: 0;
 	left: 0;
-	background: teal;
+	padding-top: 0.3em;
+	float: left;
+	background: linear-gradient(to bottom, #0099FF, #00FF99);
 }
 
-nav li {
+nav a {
 	display: block;
+	position: relative;
 	width: 100%;
-	margin: 1em;
+	height: 3em;
+	padding-top: 1em;
+	padding-bottom: 1em;
+	padding-left: 2em;
+	padding-right: 2em;
+	color: white;
+	text-decoration: none;
+}
+nav a:first-child {
+	border-top: 2px solid white;
+	border-bottom: 2px solid white;
+}
+nav a:not(:first-child) {
+	border-bottom: 2px solid white;
+}
+nav a:hover, nav a:active {
+	background-color: rgba(255, 255, 255, 0.2);
 }
 
 .content  {
     position: relative;
-    width: 100%;
-	margin-left: 5%;
-	margin-right: 5%;
+    width: 85%;
+	min-height: 700px;
+	top: 0;
+	float: left;
 	padding: 1em;
-	background: white;
+	background: transparent;
 }
 
 .card {
