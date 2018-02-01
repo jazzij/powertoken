@@ -3,4 +3,20 @@
 <p>
 	This is the manage page.
 </p>
+<table>
+	<tr>
+		<th>Username</th>
+		<th>Date of registration</th>
+		<th>WEconnect login status</th>
+		<th>Fitbit login status</th>
+	</tr>
+	{% for user in pt_users %}
+		<tr>
+			<td>{{user.username}}</td>
+			<td>{{user.registration_date}}</td>
+			<td>{{user.wc_login_status}}</td>
+			<td>{{user.fb_login_status}}</td>
+		</tr>
+	{% endfor %}
+</table>
 {% endblock %}

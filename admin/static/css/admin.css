@@ -14,6 +14,7 @@ body {
 	margin: 0;
 	background: white;
     font-family: Verdana, sans-serif;
+	color: #222222;
 }
 
 header {
@@ -32,6 +33,7 @@ header h1 {
 	background: -webkit-linear-gradient(#0099FF, #00FF99);
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
+	text-decoration: none;
 }
 header h1 sub {
 	font-size: x-large;
@@ -96,6 +98,20 @@ nav a:hover, nav a:active {
 	float: left;
 	padding: 1em;
 	background: transparent;
+}
+
+table {
+	border: 2px solid #0099FF;
+	border-collapse: collapse;
+	background-color: white;
+	box-shadow: 0 0 0.06em #00FF99;
+}
+tr, th, td {
+	border: 2px solid #0099FF;
+}
+th, td {
+	width: 25%;
+	padding: 0.5em;
 }
 
 .card {

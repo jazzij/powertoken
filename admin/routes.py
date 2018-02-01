@@ -15,7 +15,11 @@ def home():
 	
 @app.route("/manage")
 def manage():
-	return render_template("manage.html")
+	pt_users = [
+		{ username: "Norbert", registration_date: "01-27-2018 08:30:00", wc_login_status: "Current", fb_login_status: "Current" },
+		{ username: "DaraS", registration_date: "01-27-2018 08:40:00", wc_login_status: "Current", fb_login_status: "Current" }
+	]
+	return render_template("manage.html", pt_users=pt_users)
 	
 @app.route("/stats")
 def stats():
