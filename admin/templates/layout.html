@@ -4,14 +4,22 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
 		<title>PowerToken</title>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kaushan+Script&text=PowerToken" />
-		<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+		<link href="https://fonts.googleapis.com/css?family=Kaushan+Script&text=PowerToken" rel="stylesheet">
+		<link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
 	</head>
 	<body>
 		<header>
-			<h1 style="font-family: 'Kaushan Script', cursive">PowerToken</h1>
+			<a href="{{url_for('home')}}">
+				<h1 style="font-family: 'Kaushan Script', cursive">PowerToken <sub>Admin</sub></h1>
+			</a>
 			<h3>Promoting recovery through social connection</h3>
+			<div class="bar"></div>
 		</header>
+		<nav>
+			<a href="{{url_for('manage')}}">Manage</a>
+			<a href="{{url_for('stats')}}">Stats</a>
+			<a href="{{url_for('docs')}}">Docs</a>
+		</nav>
 		<div class="content">
 			{% block content %}
 			{% endblock %}
