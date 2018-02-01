@@ -4,3 +4,7 @@ class PtUser:
 		self.registration_time = registration_time
 		self.wc_login_status = wc_login_status
 		self.fb_login_status = fb_login_status
+		
+class PtUserManager:
+	def __init__(self):
+		self._db = TinyDB("log.json")
