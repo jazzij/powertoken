@@ -1,7 +1,7 @@
 /*
  * Script that handles the Fitbit login process
- * Created by Jasmine Jones
- * Last modified by Abigail Franz on 1/19/2018
+ * Created by: Jasmine Jones
+ * Last modified by: Abigail Franz on 1/19/2018
  */
 
 var fbTok;

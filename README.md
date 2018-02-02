@@ -4,7 +4,7 @@ This project is part of the "Wearables for Recovery" project conducted by
 researchers at the University of Minnesota.
 
 ### Brief Intro
-This project uses the Fitbit Web API and the WeConnect (in alpha) API to transform data collected on
+This project uses the Fitbit Web API and the WEconnect (in alpha) API to transform data collected on
 social interactions into a wearable progress display. This project enables us to study new forms of 
 technology for supporting and enhancing people's recovery experience.
 
