@@ -4,7 +4,6 @@
 # Last modified by Abigail Franz on 1/29/2018
 
 import datetime, json, logging, requests
-from logger import systemLogger, outputLogger
 
 class WeConnect:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"

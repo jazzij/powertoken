@@ -6,7 +6,6 @@
 import datetime, json, logging, requests, time
 from tinydb import TinyDB, Query
 import fitbit, weconnect
-from logger import systemLogger, outputLogger
 
 class PowerToken:
 	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
