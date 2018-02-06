@@ -3,22 +3,32 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>PowerToken</title>
 		<link href="https://fonts.googleapis.com/css?family=Kaushan+Script&text=PowerTokenAdmi" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" href="../static/css/admin.css">
 	</head>
 	<body>
-		<header>
-			<h1 style="font-family: 'Kaushan Script', cursive">PowerToken <sub>Admin</sub></h1>
+		<div class="nav-menu" id="nav-menu">
+			<nav id="nav">
+				<a href="#" class="current">Manage Users</a>
+				<a href="#">View Stats</a>
+				<a href="#">Documentation</a>
+				<a href="#">Log Out</a>
+			</nav>
+			<div class="nav-expand">
+				<a class="i-container" id="nav-expand-btn">
+					<i id="nav-expand-arrow" class="fa fa-chevron-left"></i>
+				</a>
+			</div>
+		</div>
+		<header id="header">
+			<h1 style="font-family: 'Kaushan Script', cursive">PowerToken <sub>/Admin</sub></h1>
 			<h3>Promoting recovery through social connection</h3>
 			<div class="bar"></div>
 		</header>
-		<nav>
-			<a href="#">Stats</a>
-			<a href="#">Manage</a>
-			<a href="#">Docs</a>
-		</nav>
-		<div class="content">
+		<div class="content" id="content">
 			<table>
 				<tr>
 					<th>Username</th>
@@ -40,5 +50,6 @@
 				</tr>
 			</table>
 		</div>
+		<script src="../static/expand.js"></script>
 	</body>
 </html>

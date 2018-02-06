@@ -4,7 +4,6 @@
 # Last modified by Abigail Franz on 1/29/2018
 
 import datetime, json, logging, requests
-from logger import systemLogger, outputLogger
 
 class WeConnect:
 	wcBaseUrl = "https://palalinq.herokuapp.com/api"
@@ -39,7 +38,7 @@ class WeConnect:
 			completed = progress["events"]["completed"]
 			total = progress["events"]["total"]
 			percent = float(completed) / float(total)
-			outputLogger.info(format(" Progress: %d / %d = %f" % (completed, total, percent)))
+			#outputLogger.info(format(" Progress: %d / %d = %f" % (completed, total, percent)))
 			return percent
 		else:
 			return -1
