@@ -3,3 +3,4 @@ src/__pycache__/*
 src/db.json
 tests/*
 *.pyc
+powertoken.wsgi
