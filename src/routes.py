@@ -14,7 +14,7 @@ app = Flask(__name__)
 # We will use the powertoken object to access the core PowerToken functionality
 powertoken = powertoken.PowerToken()
 
-# Stores the username (for referencing the TinyDB) across the session
+# Stores the username (for referencing the database) across the session
 session = { "username": "" }
 
 # The landing page
@@ -38,22 +38,26 @@ def pt_login():
 	elif request.method == "POST":
 		session["username"] = request.form["username"]
 
-		# Checks if the user already exists in the TinyDB
+		# Checks if the user already exists in the database
 		if powertoken.is_current_user(session["username"]):
+			print("User already exists in db.")
 
 			# If the user is already logged into WEconnect and Fitbit, he/she is
 			# redirected to the home page
 			if (powertoken.is_logged_into_wc(session["username"]) and 
 				powertoken.is_logged_into_fb(session["username"])):
+				print("User is already logged into wc and fb.")
 				return redirect(url_for("home"))
 
 			# Otherwise, the user is sent right to the WEconnect login
 			else:
+				print("User isn't logged into wc and fb")
 				return redirect(url_for("wc_login"))
 
-		# If this is a new user, adds him/her to the TinyDB and redirects to the
+		# If this is a new user, adds him/her to the database and redirects to the
 		# WEconnect login
 		else:
+			print("User does not exist in db.")
 			powertoken.create_user(session["username"])
 			return redirect(url_for("wc_login"))
 

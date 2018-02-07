@@ -27,13 +27,17 @@ class PowerToken:
 	# Adds a new PowerToken user to the TinyDB. This user will be referenced by
 	# a chosen username.
 	def create_user(self, username):
-		query = ''' INSERT INTO users(username, registered_on) VALUES(?, ?) '''
+		query = '''INSERT INTO users(username, registered_on) VALUES(?, ?)'''
 		registered_on = datetime.datetime.now()
 		db = sqlite3.connect(self._db_path)
 		cursor = db.cursor()
-		cursor.execute(query, (username, registered_on))
-		db.commit()
-		db.close()
+		try:
+			cursor.execute(query, (username, registered_on))
+			db.commit()
+		except expression as e:
+			print("Error " + e)
+		finally:
+			db.close()
 
 	# Logs user into WEconnect, produces an ID and access token that will last
 	# 90 days, and stores the token and ID in the TinyDB. Also stores the goal
