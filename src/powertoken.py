@@ -26,7 +26,7 @@ class PowerToken:
 				return True
 		except Exception as e:
 			print(format("Couldn't determine if user exists. Message: %s" % (e,)))
-			raise(e)
+			#raise(e)
 		finally:
 			db.close()
 
@@ -43,7 +43,7 @@ class PowerToken:
 		except Exception as e:
 			db.rollback()
 			print(format("Could not add user to the db. Message: %s" % (str(e),)))
-			raise(e)
+			#raise(e)
 		finally:
 			db.close()
 
@@ -74,7 +74,7 @@ class PowerToken:
 			db.rollback()
 			print("Could not add wc info")
 			#print(format("Could not add wc info to user's record. Message: %s" % (str(e),)))
-			raise(e)
+			#raise(e)
 		finally:
 			db.close()
 
@@ -83,24 +83,21 @@ class PowerToken:
 	def is_logged_into_wc(self, username):
 		try:
 			db = sqlite3.connect(self._db_path)
+			db.row_factory = sqlite3.Row
 			cursor = db.cursor()
-			query = '''SELECT wc_id, wc_token FROM users WHERE username=? LIMIT 1'''
+			query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
-			print("user = " + user)
-
-			# Makes sure there exists a user with that username
-			if user == None:
-				return False
 			
 			# Only returns True if both WEconnect fields are filled
-			if not user[0] or not user[1]:
+			if (user["wc_id"] == None) or (user["wc_token"] == None):
+				print("User is not logged into WEconnect")
 				return False
 			else:
-				print(format("User is logged into WEconnect"))
+				print("User is logged into WEconnect")
 				return True
 		except Exception as e:
-			print("Exception!")
+			print("Couldn't find user's wc login status")
 			#print(format("Couldn't find user's wc login status. Message: " % (str(e),)))
 			#raise(e)
 		finally:
@@ -111,21 +108,18 @@ class PowerToken:
 	def is_logged_into_fb(self, username):
 		try:
 			db = sqlite3.connect(self._db_path)
+			db.row_factory = sqlite3.Row
 			cursor = db.cursor()
 			query = '''SELECT fb_token FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
-			results = cursor.fetchall()
-
-			# Makes sure there exists a user with that username
-			print("results = " + results)
-			if len(results) != 1:
-				return False
+			user = cursor.fetchone()
 			
 			# Only returns True if the Fitbit access token field is filled
-			user = results[0]
-			if not user[0]:
+			if user["fb_token"] == None:
+				print("User is not logged into Fitbit")
 				return False
 			else:
+				print("User is logged into Fitbit")
 				return True
 		except Exception as e:
 			print("Couldn't find user's fb login status. Message: " % (e,))
@@ -145,7 +139,7 @@ class PowerToken:
 		except Exception as e:
 			db.rollback()
 			print(format("Couldn't add Fitbit token to the db. Message: %s" % (e,)))
-			raise(e)
+			#raise(e)
 		finally:
 			db.close()
 
@@ -207,7 +201,7 @@ class PowerToken:
 		except Exception as e:
 			db.rollback()
 			print(format("Couldn't create table users. Message: %s" % (e,)))
-			raise(e)
+			#raise(e)
 		finally:
 			db.close()
 
@@ -223,6 +217,6 @@ class PowerToken:
 			return user
 		except Exception as e:
 			print(format("Couldn't load user info. Message: %s" % (e,)))
-			raise(e)
+			#raise(e)
 		finally:
 			db.close()
