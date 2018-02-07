@@ -74,7 +74,7 @@ def wc_login():
 		password = request.form["password"]
 		goal_period = request.form["goalPeriod"]
 		success = powertoken.login_to_wc(session["username"], email, password, 
-				goalPeriod)
+				goal_period)
 
 		# If the login failed, reloads the page with an error message
 		if not success:
