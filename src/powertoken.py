@@ -174,7 +174,7 @@ class PowerToken:
 			# Delays a minute
 			time.sleep(60)
 
-	# Helper - creates a table to store the users in the database, provided one
+	# Helper - Creates a table to store the users in the database, provided one
 	# does not already exist.
 	def _create_table(self):
 		query = '''CREATE TABLE IF NOT EXISTS users(

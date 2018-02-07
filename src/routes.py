@@ -97,7 +97,7 @@ def fb_login():
 		#data = request.data
 		#convData = data.decode('utf8')
 		data = json.loads(request.data.decode("utf-8"))
-		powertoken.completeFbLogin(session["username"], data["tok"])
+		powertoken.complete_fb_login(session["username"], data["tok"])
 
 		# This code will never be called but must be present
 		return render_template("home.html")
