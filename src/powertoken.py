@@ -17,7 +17,8 @@ class PowerToken:
 	# Returns True if the user has already been created
 	def is_current_user(self, username):
 		query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
-		if self._cursor.execute(query) == 1:
+		cursor = self._db.cursor()
+		if cursor.execute(query) == 1:
 			return True
 		else:
 			return False
