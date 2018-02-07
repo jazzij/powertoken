@@ -72,7 +72,8 @@ class PowerToken:
 			return True
 		except Exception as e:
 			db.rollback()
-			print(format("Could not add wc info to user's record. Message: %s" % (str(e),)))
+			print("Could not add wc info")
+			#print(format("Could not add wc info to user's record. Message: %s" % (str(e),)))
 			raise(e)
 		finally:
 			db.close()
@@ -99,8 +100,9 @@ class PowerToken:
 				print(format("User is logged into WEconnect"))
 				return True
 		except Exception as e:
-			print(format("Couldn't find user's wc login status. Message: " % (str(e),)))
-			raise(e)
+			print("Exception!")
+			#print(format("Couldn't find user's wc login status. Message: " % (str(e),)))
+			#raise(e)
 		finally:
 			db.close()
 
