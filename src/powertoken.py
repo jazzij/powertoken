@@ -19,7 +19,7 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			if cursor.execute(query, (username,)) == 1:
+			if cursor.execute(query, (username,)):
 				is_user = True
 			else:
 				is_user = False
