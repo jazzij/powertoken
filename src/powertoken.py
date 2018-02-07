@@ -40,9 +40,6 @@ class PowerToken:
 			registered_on = datetime.datetime.now()
 			cursor.execute(query, (username, registered_on))
 			db.commit()
-			query = "SELECT * FROM users ORDER BY id DESC LIMIT 1"
-			cursor.execute(query)
-			print("User just inserted: " + cursor.fetchone())
 		except Exception as e:
 			db.rollback()
 			print(format("Could not add user to the db. Message: %s" % (e,)))
