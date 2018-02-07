@@ -17,7 +17,7 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = "SELECT * FROM users WHERE username=? LIMIT 1"
+			query = '''SELECT * FROM users WHERE username=? LIMIT 1'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
 			if user == None:
@@ -36,13 +36,13 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = "INSERT INTO users(username, registered_on) VALUES(?, ?)"
+			query = '''INSERT INTO users(username, registered_on) VALUES(?, ?)'''
 			registered_on = str(datetime.datetime.now())
 			cursor.execute(query, (username, registered_on))
 			db.commit()
 		except Exception as e:
 			db.rollback()
-			print(format("Could not add user to the db. Message: %s" % (e,)))
+			print(format("Could not add user to the db. Message: %s" % (str(e),)))
 			raise(e)
 		finally:
 			db.close()
@@ -72,7 +72,7 @@ class PowerToken:
 			return True
 		except Exception as e:
 			db.rollback()
-			print(format("Could not add wc info to user's record. Message: %s" % (e,)))
+			print(format("Could not add wc info to user's record. Message: %s" % (str(e),)))
 			raise(e)
 		finally:
 			db.close()
@@ -83,7 +83,7 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = "SELECT wc_id, wc_token FROM users WHERE username=? LIMIT 1"
+			query = '''SELECT wc_id, wc_token FROM users WHERE username=? LIMIT 1'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
 			print("user = " + user)
@@ -99,7 +99,7 @@ class PowerToken:
 				print(format("User is logged into WEconnect"))
 				return True
 		except Exception as e:
-			print("Couldn't find user's wc login status. Message: " % (e,))
+			print(format("Couldn't find user's wc login status. Message: " % (str(e),)))
 			raise(e)
 		finally:
 			db.close()
@@ -110,7 +110,7 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = '''SELECT fb_token FROM users WHERE username=?;'''
+			query = '''SELECT fb_token FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			results = cursor.fetchall()
 
@@ -195,7 +195,7 @@ class PowerToken:
 					goal_period TEXT NOT NULL DEFAULT "daily",
 					wc_id TEXT,
 					wc_token TEXT,
-					fb_token TEXT);'''
+					fb_token TEXT)'''
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
