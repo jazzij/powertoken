@@ -35,9 +35,14 @@ class WeConnect:
 		response = requests.get(url)
 		if self._is_valid(response):
 			progress = response.json()
-			completed = progress["events"]["completed"]
-			total = progress["events"]["total"]
-			percent = float(completed) / float(total)
+			completed = float(progress["events"]["completed"])
+			total = float(progress["events"]["total"])
+
+			# Handles the case where total = 0
+			if total == 0:
+				return 0
+
+			percent = completed / total
 			#outputLogger.info(format(" Progress: %d / %d = %f" % (completed, total, percent)))
 			return percent
 		else:
