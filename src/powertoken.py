@@ -17,12 +17,13 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
-			is_current = cursor.execute(query, (username,))
-			if is_current:
-				return True
-			else:
+			query = "SELECT * FROM users WHERE username=? LIMIT 1"
+			cursor.execute(query, (username,))
+			user = cursor.fetchone()
+			if user == None:
 				return False
+			else:
+				return True
 		except Exception as e:
 			print(format("Couldn't determine if user exists. Message: %s" % (e,)))
 			raise(e)
