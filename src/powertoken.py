@@ -3,154 +3,155 @@
 # Created by Abigail Franz
 # Last modified by Abigail Franz on 1/29/2018
 
-import datetime, json, logging, requests, time
-from tinydb import TinyDB, Query
+import datetime, json, requests, sqlite3, time
 import fitbit, weconnect
 
 class PowerToken:
-	wcLoginUrl = "https://palalinq.herokuapp.com/api/People/login"
-	_dbPath = "db.json"
-	_logPath = "log.json"
+	_db_path = "data/ptdb"
 
 	def __init__(self):
-		self._db = TinyDB(self._dbPath)
-		self._log = TinyDB(self._logPath)
-
-	# This will clear all user info and should only be called if you know what
-	# you're doing! We will remove this function eventually.
-	def resetLogins(self):
-		self._db.purge()
-		#outputLogger.info(" The TinyDB was reset.")
+		self._db = sqlite3.connect(self._db_path)
+		self._cursor = self._db.cursor()
+		self._create_table()
 
 	# Returns True if the user has already been created
-	def isCurrentUser(self, username):
-		q = Query()
-		result = self._db.search(q.username == username)
-		if len(result) == 1:
+	def is_current_user(self, username):
+		query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
+		if self._cursor.execute(query) == 1:
 			return True
 		else:
 			return False
 
 	# Adds a new PowerToken user to the TinyDB. This user will be referenced by
 	# a chosen username.
-	def createUser(self, username):
-		newUser = {
-			"username": username,
-			"goalPeriod": "",
-			"wcUserId": "",
-			"wcAccessToken": "",
-			"fbAccessToken": ""
-		}
-		self._db.insert(newUser)
-		#outputLogger.info(format("A new user with name %s was created." % (username,)))
+	def create_user(self, username):
+		query = ''' INSERT INTO users(username, registered_on) VALUES(?, ?) '''
+		registered_on = datetime.datetime.now()
+		self._cursor.execute(query, (username, registered_on))
+		self._db.commit()
 
 	# Logs user into WEconnect, produces an ID and access token that will last
 	# 90 days, and stores the token and ID in the TinyDB. Also stores the goal
 	# period. Returns True if the login is successful, false otherwise.
-	def loginToWc(self, username, email, password, goalPeriod):
+	def login_to_Wc(self, username, email, password, goal_period):
+		url = "https://palalinq.herokuapp.com/api/People/login"
 		data = {
 			"email": email,
 			"password": password
 		}
-		result = requests.post(self.wcLoginUrl, data=data)
+		result = requests.post(url, data=data)
 		if result.status_code != 200:
 			return False
 		jres = result.json()
-		userId = str(jres["accessToken"]["userId"])
-		userToken = str(jres["accessToken"]["id"])
+		wc_id = str(jres["accessToken"]["userId"])
+		wc_token = str(jres["accessToken"]["id"])
 		
-		# Stores user's WEconnect-related data in the TinyDB
-		userInfo = {
-			"goalPeriod": goalPeriod,
-			"wcUserId": userId,
-			"wcAccessToken": userToken
-		}
-		q = Query()
-		self._db.update(userInfo, q.username == username)
+		# Stores user's WEconnect-related data in the db
+		query = '''UPDATE users SET goal_period=?, wc_id=?, wc_token=? WHERE username=?'''
+		self._cursor.execute(query, (goal_period, wc_id, wc_token, username))
+		self._db.commit()
 		#outputLogger.info(format(" The user %s was just logged into WEconnect." % (username,)))
 		return True
 
 	# Returns a boolean value signifying that the user is or isn't logged into 
 	# WEconnect
-	def isLoggedIntoWc(self, username):
-		q = Query()
-		result = self._db.search(q.username == username)
+	def is_logged_into_wc(self, username):
+		query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
+		self._cursor.execute(query, (username,))
+		results = self._cursor.fetchall()
 
 		# Makes sure there exists a user with that username
-		if len(result) != 1:
+		if len(results) != 1:
 			return False
 		else:
 			# Only returns True if both WEconnect fields are filled
-			user = result[0]
-			if not user["wcUserId"] or not user["wcAccessToken"]:
+			user = results[0]
+			if not user[0] or not user[1]:
 				return False
 			else:
 				return True
 
 	# Returns a boolean value signifying that the user is or isn't logged into
 	# Fitbit
-	def isLoggedIntoFb(self, username):
-		q = Query()
-		result = self._db.search(q.username == username)
+	def is_logged_into_fb(self, username):
+		query = '''SELECT fb_token FROM users WHERE username=?;'''
+		self._cursor.execute(query, (username,))
+		results = self._cursor.fetchall()
 
 		# Makes sure there exists a user with that username
-		if len(result) != 1:
+		if len(results) != 1:
 			return False
 		else:
 			# Only returns True if the Fitbit access token field is filled
-			user = result[0]
-			if not user["fbAccessToken"]:
+			user = results[0]
+			if not user[0]:
 				return False
 			else:
 				return True
 
-	# Stores the Fitbit access token in the TinyDB
-	def completeFbLogin(self, username, accessToken):
-		q = Query()
-		self._db.update({"fbAccessToken": accessToken}, q.username == username)
-		#outputLogger.info(format(" The user %s was just logged into Fitbit." % (username,)))
-		result = self._db.search(q.username == username)
+	# Stores the Fitbit access token in the database
+	def complete_fb_login(self, username, accessToken):
+		query = '''UPDATE users SET fb_token=? WHERE username=?'''
+		self._cursor.execute(query, (username,))
 
 	# The program loop - runs until killed with Ctrl+C
-	def startExperiment(self, username):
+	def start_experiment(self, username):
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
-		userInfo = self._loadAccessInfo(username)
-		wc = weconnect.WeConnect(userInfo["wcUserId"], userInfo["wcAccessToken"],
-				userInfo["goalPeriod"])
-		fb = fitbit.Fitbit(userInfo["fbAccessToken"], userInfo["goalPeriod"])
+		goal_period, wc_id, wc_token, fb_token = self._load_info(username)
+		wc = weconnect.WeConnect(wc_id, wc_token, goal_period)
+		fb = fitbit.Fitbit(fb_token, goal_period)
 
 		# First, sets the Fitbit step goal to something ridiculous,
 		# like a million steps
-		fb.changeStepGoal(1000000)
+		fb.change_step_goal(1000000)
 
 		# This will hold the progress from the last time WEconnect was polled.
-		lastWcProgress = 0.0
+		last_progress = 0.0
 
 		# Starts an infinite loop that periodically polls WEconnect for changes
 		# and then updates Fitbit. Progress will be a decimal percentage.
 		while True:
-			wcProgress = wc.poll()
+			progress = wc.poll()
 
 			# Makes sure the poll request succeeded
-			if wcProgress != -1:
+			if progress != -1:
 				# If progress differs from last poll, updates Fitbit
-				if wcProgress != lastWcProgress:
-					fbStepCount = fb.resetAndUpdate(wcProgress)
-				lastWcProgress = wcProgress
+				if progress != last_progress:
+					step_count = fb.reset_and_update(progress)
+				last_progress = progress
 				
-				logEntry = {
+				'''logEntry = {
 					"username": username,
 					"wcProgress": wcProgress,
 					"fbStepCount": fbStepCount,
 					"timestamp": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 				}
-				self._log.insert(logEntry)
+				self._log.insert(logEntry)'''
 
 			# Delays a minute
 			time.sleep(60)
 
-	# Helper - retrieves user's info from the TinyDB
-	def _loadAccessInfo(self, username):
-		q = Query()
-		return self._db.search(q.username == username)[0]
+	# Helper - creates a table to store the users in the database, provided one
+	# does not already exist.
+	def _create_table(self):
+		query = '''	CREATE TABLE IF NOT EXISTS users (
+						id INTEGER PRIMARY KEY,
+						username TEXT NOT NULL UNIQUE,
+						registered_ON TEXT,
+						goal_period TEXT NOT NULL DEFAULT "daily",
+						wc_id TEXT,
+						wc_token TEXT,
+						fb_token TEXT
+				); '''
+		self._cursor.execute(query)
+		self._db.commit()
+
+	# Helper - retrieves user's info from the database.
+	def _load_info(self, username):
+		query = ''' SELECT goal_period, wc_id, wc_token, fb_token
+					FROM users
+					WHERE username=? '''
+		self._cursor.execute(query, (username,))
+		user = self._cursor.fetchone()
+		return user[0], user[1], user[2], user[3]
