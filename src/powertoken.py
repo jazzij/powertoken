@@ -211,7 +211,7 @@ class PowerToken:
 	def _load_info(self, username):
 		query = '''SELECT goal_period, wc_id, wc_token, fb_token
 				FROM users WHERE username=?'''
-		user = sqlite3.Row()
+		user = sqlite3.Row
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
