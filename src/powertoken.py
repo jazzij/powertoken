@@ -17,7 +17,7 @@ class PowerToken:
 		query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
 		db = sqlite3.connect(self._db_path)
 		cursor = db.cursor()
-		if cursor.execute(query) == 1:
+		if cursor.execute(query, (username,)) == 1:
 			db.close()
 			return True
 		else:
