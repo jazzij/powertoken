@@ -14,18 +14,24 @@ class PowerToken:
 
 	# Returns True if the user has already been created
 	def is_current_user(self, username):
+		is_user = False
 		query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
-		db = sqlite3.connect(self._db_path)
-		cursor = db.cursor()
-		if cursor.execute(query, (username,)) == 1:
+		try:
+			db = sqlite3.connect(self._db_path)
+			cursor = db.cursor()
+			if cursor.execute(query, (username,)) == 1:
+				is_user = True
+			else:
+				is_user = False
+		except Exception as e:
+			print(format("Couldn't determine if user exists. Message: %s" % (e,)))
+			raise(e)
+		finally:
 			db.close()
-			return True
-		else:
-			db.close()
-			return False
+		return is_user
 
-	# Adds a new PowerToken user to the TinyDB. This user will be referenced by
-	# a chosen username.
+	# Adds a new PowerToken user to the database. This user will be referenced
+	# by a chosen username.
 	def create_user(self, username):
 		query = '''INSERT INTO users(username, registered_on) VALUES(?, ?)'''
 		registered_on = datetime.datetime.now()
@@ -37,6 +43,7 @@ class PowerToken:
 		except Exception as e:
 			db.rollback()
 			print(format("Could not add user to the db. Message: %s" % (e,)))
+			raise(e)
 		finally:
 			db.close()
 
@@ -44,11 +51,9 @@ class PowerToken:
 	# 90 days, and stores the token and ID in the database. Also stores the goal
 	# period. Returns True if the login is successful, False otherwise.
 	def login_to_wc(self, username, email, password, goal_period):
+		# Gets the ID and access token from WEconnect server
 		url = "https://palalinq.herokuapp.com/api/People/login"
-		data = {
-			"email": email,
-			"password": password
-		}
+		data = {"email": email, "password": password}
 		result = requests.post(url, data=data)
 		if result.status_code != 200:
 			return False
@@ -66,6 +71,7 @@ class PowerToken:
 		except Exception as e:
 			db.rollback()
 			print(format("Could not add wc info to user's record. Message: %s" % (e,)))
+			raise(e)
 		finally:
 			db.close()
 		#outputLogger.info(format(" The user %s was just logged into WEconnect." % (username,)))
@@ -83,6 +89,7 @@ class PowerToken:
 			results = cursor.fetchall()
 		except Exception as e:
 			print("Couldn't find user's wc login status. Message: " % (e,))
+			raise(e)
 		finally:
 			db.close()
 
@@ -109,6 +116,7 @@ class PowerToken:
 			results = cursor.fetchall()
 		except Exception as e:
 			print("Couldn't find user's fb login status. Message: " % (e,))
+			raise(e)
 		finally:
 			db.close()
 
@@ -124,19 +132,21 @@ class PowerToken:
 				return True
 
 	# Stores the Fitbit access token in the database
-	def complete_fb_login(self, username, accessToken):
+	def complete_fb_login(self, username, access_token):
 		query = '''UPDATE users SET fb_token=? WHERE username=?'''
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			cursor.execute(query, (username,))
+			cursor.execute(query, (access_token, username,))
 			db.commit()
 		except Exception as e:
-			print(format("Couldn't add Fitbit token to the db. Message: %s", (e,)))
+			db.rollback()
+			print(format("Couldn't add Fitbit token to the db. Message: %s" % (e,)))
+			raise(e)
 		finally:
 			db.close()
 
-	# The program loop - runs until killed with Ctrl+C
+	# The program loop - Runs until killed with Ctrl+C
 	def start_experiment(self, username):
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
@@ -191,6 +201,7 @@ class PowerToken:
 			cursor.execute(query)
 			db.commit()
 		except Exception as e:
+			db.rollback()
 			print(format("Couldn't create table users. Message: %s" % (e,)))
 			raise(e)
 		finally:
