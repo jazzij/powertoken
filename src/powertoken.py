@@ -213,7 +213,6 @@ class PowerToken:
 			query = '''SELECT goal_period, wc_id, wc_token, fb_token FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
-			print("user fetched: " + user)
 			return user
 		except Exception as e:
 			print(format("Couldn't load user info. Message: %s" % (e,)))
