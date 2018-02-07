@@ -36,8 +36,8 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = '''INSERT INTO users(username, registered_on) VALUES(?, ?)'''
-			registered_on = datetime.datetime.now()
+			query = "INSERT INTO users(username, registered_on) VALUES(?, ?)"
+			registered_on = str(datetime.datetime.now())
 			cursor.execute(query, (username, registered_on))
 			db.commit()
 		except Exception as e:
