@@ -39,7 +39,9 @@ class PowerToken:
 			registered_on = datetime.datetime.now()
 			cursor.execute(query, (username, registered_on))
 			db.commit()
-			print("Successfully executed powertoken.create_user")
+			query = "SELECT * FROM users ORDER BY id DESC LIMIT 1"
+			cursor.execute(query)
+			print("User just inserted: " + cursor.fetchone())
 		except Exception as e:
 			db.rollback()
 			print(format("Could not add user to the db. Message: %s" % (e,)))
@@ -140,7 +142,7 @@ class PowerToken:
 			cursor = db.cursor()
 			cursor.execute(query, (access_token, username,))
 			db.commit()
-			print("Successfully stored fb token in db.")
+			print("Successfully stored fb token in db. fb_token = " + access_token)
 		except Exception as e:
 			db.rollback()
 			print(format("Couldn't add Fitbit token to the db. Message: %s" % (e,)))
@@ -219,7 +221,7 @@ class PowerToken:
 				FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
-			print("Successfully loaded user info")
+			print("user fetched: " + user)
 			return user[0], user[1], user[2], user[3]
 		except Exception as e:
 			print(format("Couldn't load user info. Message: %s" % (e,)))
