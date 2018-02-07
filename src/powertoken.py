@@ -38,7 +38,7 @@ class PowerToken:
 	# Logs user into WEconnect, produces an ID and access token that will last
 	# 90 days, and stores the token and ID in the TinyDB. Also stores the goal
 	# period. Returns True if the login is successful, false otherwise.
-	def login_to_Wc(self, username, email, password, goal_period):
+	def login_to_wc(self, username, email, password, goal_period):
 		url = "https://palalinq.herokuapp.com/api/People/login"
 		data = {
 			"email": email,
