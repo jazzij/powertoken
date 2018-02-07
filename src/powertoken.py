@@ -153,9 +153,9 @@ class PowerToken:
 	def start_experiment(self, username):
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
-		goal_period, wc_id, wc_token, fb_token = self._load_info(username)
-		wc = weconnect.WeConnect(wc_id, wc_token, goal_period)
-		fb = fitbit.Fitbit(fb_token, goal_period)
+		user = self._load_info(username)
+		wc = weconnect.WeConnect(user[1], user[2], user[0])
+		fb = fitbit.Fitbit(user[3], user[0])
 
 		# First, sets the Fitbit step goal to something ridiculous,
 		# like a million steps
@@ -216,12 +216,11 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = '''SELECT goal_period, wc_id, wc_token, fb_token
-				FROM users WHERE username=?'''
+			query = '''SELECT goal_period, wc_id, wc_token, fb_token FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
 			print("user fetched: " + user)
-			return user[0], user[1], user[2], user[3]
+			return user
 		except Exception as e:
 			print(format("Couldn't load user info. Message: %s" % (e,)))
 			raise(e)
