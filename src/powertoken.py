@@ -83,17 +83,16 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
+			query = "SELECT wc_id, wc_token FROM users WHERE username=? LIMIT 1"
 			cursor.execute(query, (username,))
-			results = cursor.fetchall()
+			user = cursor.fetchone()
+			print("user = " + user)
 
 			# Makes sure there exists a user with that username
-			if len(results) != 1:
+			if user == None:
 				return False
 			
 			# Only returns True if both WEconnect fields are filled
-			print("results = " + results)
-			user = results[0]
 			if not user[0] or not user[1]:
 				return False
 			else:
