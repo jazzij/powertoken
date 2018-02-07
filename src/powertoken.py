@@ -14,32 +14,32 @@ class PowerToken:
 
 	# Returns True if the user has already been created
 	def is_current_user(self, username):
-		is_user = False
-		query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			if cursor.execute(query, (username,)):
-				is_user = True
+			query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
+			is_current = cursor.execute(query, (username,))
+			if is_current:
+				return True
 			else:
-				is_user = False
+				return False
 		except Exception as e:
 			print(format("Couldn't determine if user exists. Message: %s" % (e,)))
 			raise(e)
 		finally:
 			db.close()
-		return is_user
 
 	# Adds a new PowerToken user to the database. This user will be referenced
 	# by a chosen username.
 	def create_user(self, username):
-		query = '''INSERT INTO users(username, registered_on) VALUES(?, ?)'''
-		registered_on = datetime.datetime.now()
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
+			query = '''INSERT INTO users(username, registered_on) VALUES(?, ?)'''
+			registered_on = datetime.datetime.now()
 			cursor.execute(query, (username, registered_on))
 			db.commit()
+			print("Successfully executed powertoken.create_user")
 		except Exception as e:
 			db.rollback()
 			print(format("Could not add user to the db. Message: %s" % (e,)))
@@ -62,74 +62,75 @@ class PowerToken:
 		wc_token = str(jres["accessToken"]["id"])
 		
 		# Stores user's WEconnect-related data in the db
-		query = '''UPDATE users SET goal_period=?, wc_id=?, wc_token=? WHERE username=?'''
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
+			query = '''UPDATE users SET goal_period=?, wc_id=?, wc_token=? WHERE username=?'''
 			cursor.execute(query, (goal_period, wc_id, wc_token, username))
 			db.commit()
+			print("Successfully logged into WEconnect. Id = " + wc_id + ", token = " + wc_token)
+			return True
 		except Exception as e:
 			db.rollback()
 			print(format("Could not add wc info to user's record. Message: %s" % (e,)))
 			raise(e)
 		finally:
 			db.close()
-		#outputLogger.info(format(" The user %s was just logged into WEconnect." % (username,)))
-		return True
 
 	# Returns a boolean value signifying that the user is or isn't logged into 
 	# WEconnect
 	def is_logged_into_wc(self, username):
-		query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
-		results = []
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
+			query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			results = cursor.fetchall()
+
+			# Makes sure there exists a user with that username
+			if len(results) != 1:
+				return False
+			
+			# Only returns True if both WEconnect fields are filled
+			print("results = " + results)
+			user = results[0]
+			if not user[0] or not user[1]:
+				return False
+			else:
+				print(format("User is logged into WEconnect"))
+				return True
 		except Exception as e:
 			print("Couldn't find user's wc login status. Message: " % (e,))
 			raise(e)
 		finally:
 			db.close()
 
-		# Makes sure there exists a user with that username
-		if len(results) != 1:
-			return False
-		else:
-			# Only returns True if both WEconnect fields are filled
-			user = results[0]
-			if not user[0] or not user[1]:
-				return False
-			else:
-				return True
-
 	# Returns a boolean value signifying that the user is or isn't logged into
 	# Fitbit
 	def is_logged_into_fb(self, username):
-		query = '''SELECT fb_token FROM users WHERE username=?;'''
-		results = []
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
+			query = '''SELECT fb_token FROM users WHERE username=?;'''
 			cursor.execute(query, (username,))
 			results = cursor.fetchall()
-		except Exception as e:
-			print("Couldn't find user's fb login status. Message: " % (e,))
-			raise(e)
-		finally:
-			db.close()
 
-		# Makes sure there exists a user with that username
-		if len(results) != 1:
-			return False
-		else:
+			# Makes sure there exists a user with that username
+			print("results = " + results)
+			if len(results) != 1:
+				return False
+			
 			# Only returns True if the Fitbit access token field is filled
 			user = results[0]
 			if not user[0]:
 				return False
 			else:
 				return True
+		except Exception as e:
+			print("Couldn't find user's fb login status. Message: " % (e,))
+			raise(e)
+		finally:
+			db.close()
 
 	# Stores the Fitbit access token in the database
 	def complete_fb_login(self, username, access_token):
@@ -139,6 +140,7 @@ class PowerToken:
 			cursor = db.cursor()
 			cursor.execute(query, (access_token, username,))
 			db.commit()
+			print("Successfully stored fb token in db.")
 		except Exception as e:
 			db.rollback()
 			print(format("Couldn't add Fitbit token to the db. Message: %s" % (e,)))
@@ -200,6 +202,7 @@ class PowerToken:
 			cursor = db.cursor()
 			cursor.execute(query)
 			db.commit()
+			print("Successfully created table users.")
 		except Exception as e:
 			db.rollback()
 			print(format("Couldn't create table users. Message: %s" % (e,)))
@@ -209,17 +212,17 @@ class PowerToken:
 
 	# Helper - Retrieves user's info from the database.
 	def _load_info(self, username):
-		query = '''SELECT goal_period, wc_id, wc_token, fb_token
-				FROM users WHERE username=?'''
-		user = sqlite3.Row
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
+			query = '''SELECT goal_period, wc_id, wc_token, fb_token
+				FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
+			print("Successfully loaded user info")
+			return user[0], user[1], user[2], user[3]
 		except Exception as e:
 			print(format("Couldn't load user info. Message: %s" % (e,)))
 			raise(e)
 		finally:
 			db.close()
-		return user[0], user[1], user[2], user[3]
