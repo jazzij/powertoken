@@ -10,17 +10,18 @@ class PowerToken:
 	_db_path = "data/ptdb"
 
 	def __init__(self):
-		self._db = sqlite3.connect(self._db_path)
-		self._cursor = self._db.cursor()
 		self._create_table()
 
 	# Returns True if the user has already been created
 	def is_current_user(self, username):
 		query = '''SELECT EXISTS(SELECT 1 FROM users WHERE username=? LIMIT 1);'''
-		cursor = self._db.cursor()
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
 		if cursor.execute(query) == 1:
+			db.close()
 			return True
 		else:
+			db.close()
 			return False
 
 	# Adds a new PowerToken user to the TinyDB. This user will be referenced by
@@ -28,8 +29,11 @@ class PowerToken:
 	def create_user(self, username):
 		query = ''' INSERT INTO users(username, registered_on) VALUES(?, ?) '''
 		registered_on = datetime.datetime.now()
-		self._cursor.execute(query, (username, registered_on))
-		self._db.commit()
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
+		cursor.execute(query, (username, registered_on))
+		db.commit()
+		db.close()
 
 	# Logs user into WEconnect, produces an ID and access token that will last
 	# 90 days, and stores the token and ID in the TinyDB. Also stores the goal
@@ -49,8 +53,11 @@ class PowerToken:
 		
 		# Stores user's WEconnect-related data in the db
 		query = '''UPDATE users SET goal_period=?, wc_id=?, wc_token=? WHERE username=?'''
-		self._cursor.execute(query, (goal_period, wc_id, wc_token, username))
-		self._db.commit()
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
+		cursor.execute(query, (goal_period, wc_id, wc_token, username))
+		db.commit()
+		db.close()
 		#outputLogger.info(format(" The user %s was just logged into WEconnect." % (username,)))
 		return True
 
@@ -58,8 +65,11 @@ class PowerToken:
 	# WEconnect
 	def is_logged_into_wc(self, username):
 		query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
-		self._cursor.execute(query, (username,))
-		results = self._cursor.fetchall()
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
+		cursor.execute(query, (username,))
+		results = cursor.fetchall()
+		db.close()
 
 		# Makes sure there exists a user with that username
 		if len(results) != 1:
@@ -76,8 +86,11 @@ class PowerToken:
 	# Fitbit
 	def is_logged_into_fb(self, username):
 		query = '''SELECT fb_token FROM users WHERE username=?;'''
-		self._cursor.execute(query, (username,))
-		results = self._cursor.fetchall()
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
+		cursor.execute(query, (username,))
+		results = cursor.fetchall()
+		db.close()
 
 		# Makes sure there exists a user with that username
 		if len(results) != 1:
@@ -93,7 +106,11 @@ class PowerToken:
 	# Stores the Fitbit access token in the database
 	def complete_fb_login(self, username, accessToken):
 		query = '''UPDATE users SET fb_token=? WHERE username=?'''
-		self._cursor.execute(query, (username,))
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
+		cursor.execute(query, (username,))
+		db.commit()
+		db.close()
 
 	# The program loop - runs until killed with Ctrl+C
 	def start_experiment(self, username):
@@ -145,14 +162,20 @@ class PowerToken:
 						wc_token TEXT,
 						fb_token TEXT
 				); '''
-		self._cursor.execute(query)
-		self._db.commit()
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
+		cursor.execute(query)
+		db.commit()
+		db.close()
 
 	# Helper - retrieves user's info from the database.
 	def _load_info(self, username):
 		query = ''' SELECT goal_period, wc_id, wc_token, fb_token
 					FROM users
 					WHERE username=? '''
-		self._cursor.execute(query, (username,))
-		user = self._cursor.fetchone()
+		db = sqlite3.connect(self._db_path)
+		cursor = db.cursor()
+		cursor.execute(query, (username,))
+		user = cursor.fetchone()
+		db.close()
 		return user[0], user[1], user[2], user[3]
