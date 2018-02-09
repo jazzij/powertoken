@@ -10,17 +10,16 @@ _db_path = "data/ptdb"
 def create_table_if_dne():
 	query = ''' CREATE TABLE IF NOT EXISTS logs(
 				id INTEGER PRIMARY KEY,
-				user_id INTEGER NOT NULL, 
-					FOREIGN KEY (user_id) REFERENCES users(id),
 				timestamp TEXT NOT NULL,
 				wc_progress REAL NOT NULL,
-				fb_step_count INTEGER NOT NULL) '''
+				fb_step_count INTEGER NOT NULL,
+				user_id INTEGER NOT NULL, 
+					FOREIGN KEY (user_id) REFERENCES users(id)) '''
 	try:
 		db = sqlite3.connect(_db_path)
 		cursor = db.cursor()
 		cursor.execute(query)
 		db.commit()
-		print("Successfully created table logs.")
 	except Exception as e:
 		db.rollback()
 		print(format("Couldn't create table logs. Message: %s" % (e,)))
@@ -43,6 +42,22 @@ def add_log(user_id, wc_progress, fb_step_count):
 		print(format("Couldn't add log. Message: %s" % (e,)))
 	finally:
 		db.close()
+
+# Returns all the logs in the database
+def get_logs():
+	query = ''' SELECT * FROM logs '''
+	try:
+		db = sqlite3.connect(_db_path)
+		cursor = db.cursor()
+		cursor.execute(query)
+		logs = cursor.fetchall()
+		return logs
+	except Exception as e:
+		print(format("Couldn't retrieve logs. Message: %s" % (e,)))
+		return ()
+	finally:
+		db.close()
+	
 
 # Helper - Gets the current date and time in a format that Sqlite can
 # understand.

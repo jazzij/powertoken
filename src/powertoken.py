@@ -5,13 +5,14 @@
 
 import datetime, json, requests, sqlite3, time
 import fitbit, weconnect
-from logging import create_table_if_dne, add_log
+import logging
 
 class PowerToken:
 	_db_path = "data/ptdb"
 
 	def __init__(self):
 		self._create_table()
+		logging.create_table_if_dne()
 
 	# Returns True if the user has already been created
 	def is_current_user(self, username):
@@ -149,8 +150,9 @@ class PowerToken:
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
 		user = self._load_info(username)
-		wc = weconnect.WeConnect(user[1], user[2], user[0])
-		fb = fitbit.Fitbit(user[3], user[0])
+		user_id = user[0]
+		wc = weconnect.WeConnect(user[2], user[3], user[1])
+		fb = fitbit.Fitbit(user[4], user[1])
 
 		# First, sets the Fitbit step goal to something ridiculous,
 		# like a million steps
@@ -169,15 +171,8 @@ class PowerToken:
 				# If progress differs from last poll, updates Fitbit
 				if progress != last_progress:
 					step_count = fb.reset_and_update(progress)
+					logging.add_log(user_id, progress, step_count)
 				last_progress = progress
-				
-				'''logEntry = {
-					"username": username,
-					"wcProgress": wcProgress,
-					"fbStepCount": fbStepCount,
-					"timestamp": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-				}
-				self._log.insert(logEntry)'''
 
 			# Delays a minute
 			time.sleep(60)
@@ -211,7 +206,7 @@ class PowerToken:
 		try:
 			db = sqlite3.connect(self._db_path)
 			cursor = db.cursor()
-			query = '''SELECT goal_period, wc_id, wc_token, fb_token FROM users WHERE username=?'''
+			query = '''SELECT id, goal_period, wc_id, wc_token, fb_token FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 			user = cursor.fetchone()
 			return user
