@@ -112,7 +112,7 @@ class Fitbit:
 	# Helper - logs an activity containing the number of steps specified in 
 	# newStepCount, and returns True if successful
 	def _log_step_activity(self, new_step_count):
-		url = format("%s/activities.json", (self.base_url,))
+		url = format("%s/activities.json" % (self.base_url,))
 		params = {
 			"activityId" : '90013', # Walking (activityId=90013)
 			"startTime" : self._get_current_time(), # HH:mm:ss
