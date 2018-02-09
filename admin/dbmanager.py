@@ -1,26 +1,13 @@
-from tinydb import TinyDB
+from log_manager import get_logs
 from ptmodels import PtLog, PtUser
 
 class DbManager:
-	_logs_path = "data/logs.json"
-	_users_path = "data/users.json"
-
 	def __init__(self):
-		self._logs_db = TinyDB(self._logs_path)
-		self._users_db = TinyDB(self._users_path)
+		self._users = PtUser[]
+		self._logs = PtLog[]
 
-	def get_all_users(self):
-		all_users = PtUser[]
-		for user in self._users_db:
-			username = user["username"]
-			registered_on = user["registeredOn"]
-			wc_login_status = "Current" if (user["wcUserId"] and user["wcAccessToken"]) else "Expired"
-			fb_login_status = "Current" if user["fbAccessToken"] else "Expired"
-			all_users.append(PtUser(username, registered_on, wc_login_status, fb_login_status))
-		return all_users
-
-	def get_all_logs(self):
-		all_logs = PtLog[]
-		for log in self._logs_db:
-			username = log["username"]
-			
+	def load_logs(self, username=None, user_id=None):
+		logs_raw = get_logs(username=username, user_id=user_id)
+		for log in logs_raw:
+			self._logs.append(PtUser(log[0], log[1], log[2], log[3], log[4]))
+		return self._logs

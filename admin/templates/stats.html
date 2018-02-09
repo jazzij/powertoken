@@ -3,4 +3,22 @@
 <p>
 	This is the stats page.
 </p>
+<table>
+	<tr>
+		<th>Log ID</th>
+		<th>User ID</th>
+		<th>Timestamp</th>
+		<th>WEconnect Progress</th>
+		<th>Fitbit Step Count</th>
+	</tr>
+	{% for log in pt_logs %}
+		<tr>
+			<td>{{log.id}}</td>
+			<td>{{log.user_id}}</td>
+			<td>{{log.timestamp}}</td>
+			<td>{{log.wc_progress}}</td>
+			<td>{{log.fb_step_count}}</td>
+		</tr>
+	{% endfor %}
+</table>
 {% endblock %}
