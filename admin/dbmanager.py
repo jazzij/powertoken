@@ -3,8 +3,8 @@ from ptmodels import PtLog, PtUser
 
 class DbManager:
 	def __init__(self):
-		self._users = PtUser[]
-		self._logs = PtLog[]
+		self._users = []
+		self._logs = []
 
 	def load_logs(self, username=None, user_id=None):
 		logs_raw = get_logs(username=username, user_id=user_id)
