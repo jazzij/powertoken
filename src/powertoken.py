@@ -1,10 +1,11 @@
 # powertoken.py
 # Contains the functionality for interfacing between WEconnect and Fitbit
 # Created by Abigail Franz
-# Last modified by Abigail Franz on 1/29/2018
+# Last modified by Abigail Franz on 2/9/2018
 
 import datetime, json, requests, sqlite3, time
 import fitbit, weconnect
+from logging import create_table_if_dne, add_log
 
 class PowerToken:
 	_db_path = "data/ptdb"
@@ -187,7 +188,7 @@ class PowerToken:
 		query = '''CREATE TABLE IF NOT EXISTS users(
 					id INTEGER PRIMARY KEY,
 					username TEXT NOT NULL UNIQUE, 
-					registered_ON TEXT,
+					registered_on TEXT,
 					goal_period TEXT NOT NULL DEFAULT "daily",
 					wc_id TEXT,
 					wc_token TEXT,
