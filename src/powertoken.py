@@ -5,14 +5,14 @@
 
 import datetime, json, requests, sqlite3, time
 import fitbit, weconnect
-import logging
+import log_manager
 
 class PowerToken:
 	_db_path = "data/ptdb"
 
 	def __init__(self):
 		self._create_table()
-		logging.create_table_if_dne()
+		log_manager.create_table_if_dne()
 
 	# Returns True if the user has already been created
 	def is_current_user(self, username):
@@ -171,7 +171,7 @@ class PowerToken:
 				# If progress differs from last poll, updates Fitbit
 				if progress != last_progress:
 					step_count = fb.reset_and_update(progress)
-					logging.add_log(user_id, progress, step_count)
+					log_manager.add_log(user_id, progress, step_count)
 				last_progress = progress
 
 			# Delays a minute

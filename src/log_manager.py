@@ -1,4 +1,4 @@
-# logging.py
+# log_manager.py
 # A non-class module to handle the logging portion of the application.
 # Created by Abigail Franz on 2/9/2018
 
