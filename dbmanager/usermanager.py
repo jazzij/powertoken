@@ -122,9 +122,11 @@ def update_fb_info(username, fb_token):
 		query = ''' UPDATE users SET fb_token=? WHERE username=? '''
 		cursor.execute(query, (fb_token, username,))
 		db.commit()
+		return True
 	except Exception as e:
 		db.rollback()
 		print(format("Couldn't add Fitbit token to the db. Message: %s" % (e,)))
+		return False
 	finally:
 		db.close()
 
