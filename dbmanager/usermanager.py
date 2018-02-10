@@ -20,9 +20,11 @@ def create_users_if_dne():
 		cursor = db.cursor()
 		cursor.execute(query)
 		db.commit()
+		return True
 	except Exception as e:
 		db.rollback()
 		print(format("Couldn't create table users. Message: %s" % (e,)))
+		return False
 	finally:
 		db.close()
 
