@@ -15,8 +15,8 @@ def create_logs_if_dne():
 					fb_step_count INTEGER NOT NULL,
 					user_id INTEGER NOT NULL, 
 						FOREIGN KEY (user_id) REFERENCES users(id)) '''
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		cursor.execute(query)
 		db.commit()
@@ -33,8 +33,8 @@ def insert_log(user_id, wc_progress, fb_step_count):
 	timestamp = _get_sqlite_timestamp()
 	query = ''' INSERT INTO logs(user_id, timestamp, wc_progress, fb_step_count)
 				VALUES(?, ?, ?, ?) '''
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		cursor.execute(query, (user_id, timestamp, wc_progress, fb_step_count))
 		db.commit()
@@ -49,8 +49,8 @@ def insert_log(user_id, wc_progress, fb_step_count):
 # If no parameters are specified, returns all the logs in the database.
 # If username or id is specified, returns all the logs for that user.
 def get_logs(username=None, user_id=None):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		if username != None:
 			query = ''' SELECT * FROM logs WHERE username=? '''

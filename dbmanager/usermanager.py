@@ -15,8 +15,8 @@ def create_users_if_dne():
 					wc_id TEXT,
 					wc_token TEXT,
 					fb_token TEXT)'''
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		cursor.execute(query)
 		db.commit()
@@ -27,8 +27,8 @@ def create_users_if_dne():
 		db.close()
 
 def user_exists(username):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		query = '''SELECT * FROM users WHERE username=? LIMIT 1'''
 		cursor.execute(query, (username,))
@@ -44,8 +44,8 @@ def user_exists(username):
 		db.close()
 
 def insert_user(username):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		query = '''INSERT INTO users(username, registered_on) VALUES(?, ?)'''
 		registered_on = _get_sqlite_timestamp()
@@ -60,8 +60,8 @@ def insert_user(username):
 		db.close()
 
 def update_wc_info(username, goal_period, wc_id, wc_token):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		query = '''UPDATE users SET goal_period=?, wc_id=?, wc_token=? WHERE username=?'''
 		cursor.execute(query, (goal_period, wc_id, wc_token, username))
@@ -75,8 +75,8 @@ def update_wc_info(username, goal_period, wc_id, wc_token):
 		db.close()
 
 def wc_info_filled(username):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		db.row_factory = sqlite3.Row
 		cursor = db.cursor()
 		query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
@@ -97,8 +97,8 @@ def wc_info_filled(username):
 		db.close()
 
 def fb_info_filled(username):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		db.row_factory = sqlite3.Row
 		cursor = db.cursor()
 		query = '''SELECT fb_token FROM users WHERE username=?'''
@@ -118,8 +118,8 @@ def fb_info_filled(username):
 		db.close()
 
 def update_fb_info(username, fb_token):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		query = ''' UPDATE users SET fb_token=? WHERE username=? '''
 		cursor.execute(query, (fb_token, username,))
@@ -133,8 +133,8 @@ def update_fb_info(username, fb_token):
 
 # Returns all the users in the database
 def get_users():
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		query = ''' SELECT * FROM users '''
 		cursor.execute(query)
@@ -148,8 +148,8 @@ def get_users():
 
 # Returns a single user, specified by username or id
 def get_user(username=None, id=None):
+	db = sqlite3.connect(DB_PATH)
 	try:
-		db = sqlite3.connect(DB_PATH)
 		db.row_factory = sqlite3.Row
 		cursor = db.cursor()
 		if username != None:
