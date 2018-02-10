@@ -87,10 +87,8 @@ def wc_info_filled(username):
 			
 		# Only returns True if both WEconnect fields are filled
 		if (user["wc_id"] == None) or (user["wc_token"] == None):
-			print("User is not logged into WEconnect")
 			return False
 		else:
-			print("User is logged into WEconnect")
 			return True
 	except Exception as e:
 		print("Couldn't find user's wc login status. Message: %s" % (e,))
@@ -109,10 +107,8 @@ def fb_info_filled(username):
 			
 		# Only returns True if the Fitbit access token field is filled
 		if user["fb_token"] == None:
-			print("User is not logged into Fitbit")
 			return False
 		else:
-			print("User is logged into Fitbit")
 			return True
 	except Exception as e:
 		print("Couldn't find user's fb login status. Message: " % (e,))
@@ -126,7 +122,6 @@ def update_fb_info(username, fb_token):
 		query = ''' UPDATE users SET fb_token=? WHERE username=? '''
 		cursor.execute(query, (fb_token, username,))
 		db.commit()
-		print("Successfully stored fb token in db. fb_token = " + access_token)
 	except Exception as e:
 		db.rollback()
 		print(format("Couldn't add Fitbit token to the db. Message: %s" % (e,)))
