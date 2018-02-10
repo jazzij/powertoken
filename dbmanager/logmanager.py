@@ -20,15 +20,16 @@ def create_logs_if_dne():
 		cursor = db.cursor()
 		cursor.execute(query)
 		db.commit()
+		return True
 	except Exception as e:
 		db.rollback()
 		print(format("Couldn't create table logs. Message: %s" % (e,)))
-		#raise(e)
+		return False
 	finally:
 		db.close()
 
 # Adds a log to the database's "logs" table.
-def add_log(user_id, wc_progress, fb_step_count):
+def insert_log(user_id, wc_progress, fb_step_count):
 	timestamp = _get_sqlite_timestamp()
 	query = ''' INSERT INTO logs(user_id, timestamp, wc_progress, fb_step_count)
 				VALUES(?, ?, ?, ?) '''
@@ -37,9 +38,11 @@ def add_log(user_id, wc_progress, fb_step_count):
 		cursor = db.cursor()
 		cursor.execute(query, (user_id, timestamp, wc_progress, fb_step_count))
 		db.commit()
+		return True
 	except Exception as e:
 		db.rollback()
 		print(format("Couldn't add log. Message: %s" % (e,)))
+		return False
 	finally:
 		db.close()
 
@@ -62,6 +65,6 @@ def get_logs(username=None, user_id=None):
 		return logs
 	except Exception as e:
 		print(format("Couldn't retrieve logs. Message: %s" % (e,)))
-		return ()
+		return None
 	finally:
 		db.close()

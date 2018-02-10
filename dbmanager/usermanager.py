@@ -39,6 +39,7 @@ def user_exists(username):
 			return True
 	except Exception as e:
 		print(format("Couldn't determine if user exists. Message: %s" % (e,)))
+		return None
 	finally:
 		db.close()
 
@@ -50,9 +51,11 @@ def insert_user(username):
 		registered_on = _get_sqlite_timestamp()
 		cursor.execute(query, (username, registered_on))
 		db.commit()
+		return True
 	except Exception as e:
 		db.rollback()
-		print(format("Could not add user to the db. Message: %s" % (str(e),)))
+		print(format("Could not add user to the db. Message: %s" % (e),))
+		return False
 	finally:
 		db.close()
 
@@ -67,6 +70,7 @@ def update_wc_info(username, goal_period, wc_id, wc_token):
 	except Exception as e:
 		db.rollback()
 		print("Could not add wc info. Message: %s" % (e,))
+		return False
 	finally:
 		db.close()
 
@@ -88,6 +92,7 @@ def wc_info_filled(username):
 			return True
 	except Exception as e:
 		print("Couldn't find user's wc login status. Message: %s" % (e,))
+		return None
 	finally:
 		db.close()
 
@@ -137,7 +142,7 @@ def get_users():
 		return users
 	except Exception as e:
 		print(format("Couldn't retrieve users. Message: %s" % (e,)))
-		return ()
+		return None
 	finally:
 		db.close()
 
