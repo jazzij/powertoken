@@ -13,4 +13,4 @@ class PtLog:
 		self.user_id = user_id
 		self.timestamp = timestamp
 		self.wc_progress = wc_progress
-		self.fb_count = fb_count
+		self.fb_step_count = fb_step_count

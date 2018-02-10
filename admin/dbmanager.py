@@ -9,5 +9,5 @@ class DbManager:
 	def load_logs(self, username=None, user_id=None):
 		logs_raw = get_logs(username=username, user_id=user_id)
 		for log in logs_raw:
-			self._logs.append(PtUser(log[0], log[1], log[2], log[3], log[4]))
+			self._logs.append(PtLog(log[0], log[1], log[2], log[3], log[4]))
 		return self._logs
