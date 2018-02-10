@@ -47,15 +47,12 @@ def insert_log(user_id, wc_progress, fb_step_count):
 		db.close()
 
 # If no parameters are specified, returns all the logs in the database.
-# If username or id is specified, returns all the logs for that user.
-def get_logs(username=None, user_id=None):
+# If user_id is specified, returns all the logs for that user.
+def get_logs(user_id=None):
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
-		if username != None:
-			query = ''' SELECT * FROM logs WHERE username=? '''
-			cursor.execute(query, (username,))
-		elif user_id != None:
+		if user_id != None:
 			query = ''' SELECT * FROM logs WHERE user_id=? '''
 			cursor.execute(query, (user_id,))
 		else:

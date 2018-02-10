@@ -182,23 +182,9 @@ def run_tests():
 		print(e)
 	
 	try:
-		assert not logmanager.get_logs("test_u") is NoneType
-	except AssertionError as e:
-		print('assert not logmanager.get_logs("test_u") is NoneType failed')
-	except Exception as e:
-		print(e)
-	
-	try:
 		assert not logmanager.get_logs(user_id=user["id"]) is NoneType
 	except AssertionError as e:
 		print('assert not logmanager.get_logs(user_id=user["id"]) is NoneType failed')
-	except Exception as e:
-		print(e)
-	
-	try:
-		assert not logmanager.get_logs("test_u", user["id"]) is NoneType
-	except AssertionError as e:
-		print('assert not logmanager.get_logs("test_u", user["id"]) is NoneType failed')
 	except Exception as e:
 		print(e)
 
