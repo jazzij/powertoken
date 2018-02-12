@@ -3,71 +3,78 @@
 # Created by Abigail Franz
 # Last modified by Abigail Franz on 1/29/2018
 
-import datetime, json, logging, requests
+import datetime, json, requests
 
 class WeConnect:
-	wcBaseUrl = "https://palalinq.herokuapp.com/api"
-	_wcUserId = ""
-	_wcAccessToken = ""
-	_goalPeriod = ""
+	base_url = "https://palalinq.herokuapp.com/api"
+	_wc_id = ""
+	_wc_token = ""
+	_goal_period = ""
     
-	def __init__(self, wcUserId, wcAccessToken, goalPeriod):
-		self._wcUserId = wcUserId
-		self._wcAccessToken = wcAccessToken
-		self._goalPeriod = goalPeriod
+	def __init__(self, wc_id, wc_token, goal_period):
+		self._wc_id = wc_id
+		self._wc_token = wc_token
+		self._goal_period = goal_period
 		#logging.basicConfig(filename="logs/powertoken.log", level=logging.INFO)
 
-	# Polls WEconnect for changes in progress
+	# Polls WEconnect for changes in progress.
 	# -1 denotes a failed request
 	def poll(self):
 		start, end = "", ""
-		if self._goalPeriod == "daily":
-			start, end = self._getToday()
-		elif self._goalPeriod == "weekly":
-			start, end = self._getWeek()
-		return self._getProgress(start, end)
+		if self._goal_period == "daily":
+			start, end = self._get_today()
+		elif self._goal_period == "weekly":
+			start, end = self._get_week()
+		return self._get_progress(start, end)
 
-	# Helper - gets a list of progress for all activities within a specified
+	# Helper - Gets a list of progress for all activities within a specified
 	# time range. Dates in format "YYYY-MM-dd"
-	def _getProgress(self, fromDate, toDate):
-		requestUrl = format("%s/People/%s/activities/progress?access_token=%s&from=%s&to=%s"
-				% (self.wcBaseUrl, self._wcUserId, self._wcAccessToken, fromDate, toDate))
-		response = requests.get(requestUrl)
-		if self._isValid(response):
+	def _get_progress(self, from_date, to_date):
+		url = format("%s/People/%s/activities/progress?access_token=%s&from=%s&to=%s"
+				% (self.base_url, self._wc_id, self._wc_token, from_date, to_date))
+		response = requests.get(url)
+		if self._is_valid(response):
 			progress = response.json()
-			completed = progress["events"]["completed"]
-			total = progress["events"]["total"]
-			percent = float(completed) / float(total)
-			outputLogger.info(format(" Progress: %d / %d = %f" % (completed, total, percent)))
+			completed = float(progress["events"]["completed"])
+			total = float(progress["events"]["total"])
+
+			# Handles the case where total = 0
+			if total == 0:
+				return 0
+
+			percent = completed / total
+			#outputLogger.info(format(" Progress: %d / %d = %f" % (completed, total, percent)))
 			return percent
 		else:
 			return -1
 
-	# Helper - returns two formatted strings representing the date of the past
+	# Helper - Returns two formatted strings representing the date of the past
 	# Sunday and the upcoming Saturday (for countries where Sunday is the first
 	# day of the week)
-	def _getWeek(self):
+	def _get_week(self):
 		today = datetime.date.today()
-		todayWeekday = (today.weekday() + 1) % 7	# SUN = 0, MON = 1, ... , SAT = 6
-		sun = today - datetime.timedelta(todayWeekday)
-		sat = today + datetime.timedelta(6 - todayWeekday)
-		sunStr = format("%d-%02d-%02d" % (sun.year, sun.month, sun.day))
-		satStr = format("%d-%02d-%02d" % (sat.year, sat.month, sat.day))
-		return sunStr, satStr
+		today_weekday = (today.weekday() + 1) % 7	# SUN = 0, ... , SAT = 6
+		sun = today - datetime.timedelta(today_weekday)
+		sat = today + datetime.timedelta(6 - today_weekday)
+		sun_str = format("%d-%02d-%02d" % (sun.year, sun.month, sun.day))
+		sat_str = format("%d-%02d-%02d" % (sat.year, sat.month, sat.day))
+		return sun_str, sat_str
 
-	# Helper - returns two formatted strings representing today at midnight and today
-	# at 11:59 PM
-	def _getToday(self):
+	# Helper - Returns two formatted strings representing today at midnight and
+	# today at 11:59 PM.
+	def _get_today(self):
 		today = datetime.datetime.now()
-		start = format("%d-%02d-%02dT%02d:%02d:%02d" % (today.year, today.month, today.day, 0, 0, 0))
-		end = format("%d-%02d-%02dT%02d:%02d:%02d" % (today.year, today.month, today.day, 23, 59, 59))
+		start = format("%d-%02d-%02dT%02d:%02d:%02d" 
+				% (today.year, today.month, today.day, 0, 0, 0))
+		end = format("%d-%02d-%02dT%02d:%02d:%02d" 
+				% (today.year, today.month, today.day, 23, 59, 59))
 		return start, end
 
-	# Helper - makes sure HTTP requests are successful
-	def _isValid(self, response):
+	# Helper - Makes sure HTTP requests are successful.
+	def _is_valid(self, response):
 		if response.status_code >= 300:
-			systemLogger.error(format(" Request could not be completed. Error: %d %s" 
-					% (response.status_code, response.text)))
+			#systemLogger.error(format(" Request could not be completed. Error: %d %s" 
+			#		% (response.status_code, response.text)))
 			return False
 		else:
 			return True
