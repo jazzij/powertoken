@@ -1,39 +1,25 @@
 Changes tracked:
 
-1) Edited readme to add python requests dependency
-2) added __init__.py file to the powertoken/src/ directory
-3) copied routes.py to routes_old_working.py to keep working code around
-
-Application code (__init.py, static, templates) is in 
-~/powertoken/src
-
-
-4) changed name of routes.py to __init__.py 
+1) Edited readme.md to add python requests dependency
+2) changed routes.py to __init__.py file to the powertoken/src/ directory
+	> copied routes.py to routes_old_working.py to keep working code around just in case 
 	>didn't seem to cause any errors when running the app again
 	> apache redirect is redirecting from the port (:5000) so internal changes to the directory or structure shouldn't affect it
 
 
-5)
+3) commented out outputlogger temporarily because it was throwing errors
+4) Changed directory structure-- renamed src folder to powertoken folder. It's confusing, but consistent with all the wsgi tutorial recommendations
+So application code is now in ~/powertoken/powertoken/
 
 
-Errors: gloabl name 'outputLogger is not defined)
-a) commented out outputlogger temporarily
-
-
-(charge) umhadmin@cs-u-cyberdemon:~/Documents/PowerToken_Proj/powertoken/src$ sudo a2ensite PowerToken
-Enabling site PowerToken.
-To activate the new configuration, you need to run:
-  service apache2 reload
-
-
-path on cyberdemon
-/home/umhadmin/Documents/PowerToken_Proj/powertoken/src
-
-
-PATHS to UPDATE
+ADD/UPDATE these files to set your local machine configs (need sudo access)
 /etc/apache2/sites-available/PowerToken.conf
 ~/powertoken/powertoken/powertoken.wsgi
 
-f
+
+Future look into:
+Multi-role web app (admin/user): https://andypi.co.uk/2015/11/27/multiple-user-roles-python-flask/
+
+
 
 
