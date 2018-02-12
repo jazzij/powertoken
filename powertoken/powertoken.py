@@ -20,7 +20,7 @@ class PowerToken:
 	# you're doing! We will remove this function eventually.
 	def resetLogins(self):
 		self._db.purge()
-		outputLogger.info(" The TinyDB was reset.")
+		#outputLogger.info(" The TinyDB was reset.")
 
 	# Returns True if the user has already been created
 	def isCurrentUser(self, username):
@@ -42,7 +42,7 @@ class PowerToken:
 			"fbAccessToken": ""
 		}
 		self._db.insert(newUser)
-		outputLogger.info(format("A new user with name %s was created." % (username,)))
+		#outputLogger.info(format("A new user with name %s was created." % (username,)))
 
 	# Logs user into WEconnect, produces an ID and access token that will last
 	# 90 days, and stores the token and ID in the TinyDB. Also stores the goal
@@ -67,7 +67,7 @@ class PowerToken:
 		}
 		q = Query()
 		self._db.update(userInfo, q.username == username)
-		outputLogger.info(format(" The user %s was just logged into WEconnect." % (username,)))
+		#outputLogger.info(format(" The user %s was just logged into WEconnect." % (username,)))
 		return True
 
 	# Returns a boolean value signifying that the user is or isn't logged into 
@@ -108,7 +108,7 @@ class PowerToken:
 	def completeFbLogin(self, username, accessToken):
 		q = Query()
 		self._db.update({"fbAccessToken": accessToken}, q.username == username)
-		outputLogger.info(format(" The user %s was just logged into Fitbit." % (username,)))
+		#outputLogger.info(format(" The user %s was just logged into Fitbit." % (username,)))
 		result = self._db.search(q.username == username)
 
 	# The program loop - runs until killed with Ctrl+C
