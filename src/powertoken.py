@@ -31,7 +31,7 @@ class PowerToken:
 		url = "https://palalinq.herokuapp.com/api/People/login"
 		data = {"email": email, "password": password}
 		result = requests.post(url, data=data)
-		if result.status_code != 200:
+		if result.status_code >= 400:
 			return False
 		jres = result.json()
 		wc_id = str(jres["accessToken"]["userId"])
@@ -80,7 +80,7 @@ class PowerToken:
 				# If progress differs from last poll, updates Fitbit
 				if progress != last_progress:
 					step_count = fb.reset_and_update(progress)
-					dbmanager.add_log(user_id, progress, step_count)
+					dbmanager.insert_log(user_id, progress, step_count)
 				last_progress = progress
 
 			# Delays a minute

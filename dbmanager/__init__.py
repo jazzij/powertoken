@@ -1,5 +1,5 @@
 from logmanager import create_logs_if_dne
-from logmanager import add_log
+from logmanager import insert_log
 from logmanager import get_logs
 from usermanager import create_users_if_dne
 from usermanager import user_exists
