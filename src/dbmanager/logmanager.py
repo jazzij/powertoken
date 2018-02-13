@@ -1,22 +1,22 @@
-# log_manager.py
+# module dbmanager.logmanager
 # A non-class module to handle the logging portion of the application.
 # Created by Abigail Franz on 2/9/2018
+# Last modified by Abigail Franz on 2/10/2018
 
-import datetime, sqlite3
-
-_db_path = "../src/data/ptdb"
+import sqlite3
+from common import _get_sqlite_timestamp, DB_PATH
 
 # Creates the "logs" table in the database if it doesn't already exist.
-def create_table_if_dne():
+def create_logs_if_dne():
 	query = ''' CREATE TABLE IF NOT EXISTS logs(
-				id INTEGER PRIMARY KEY,
-				timestamp TEXT NOT NULL,
-				wc_progress REAL NOT NULL,
-				fb_step_count INTEGER NOT NULL,
-				user_id INTEGER NOT NULL, 
-					FOREIGN KEY (user_id) REFERENCES users(id)) '''
+					id INTEGER PRIMARY KEY,
+					timestamp TEXT NOT NULL,
+					wc_progress REAL NOT NULL,
+					fb_step_count INTEGER NOT NULL,
+					user_id INTEGER NOT NULL, 
+						FOREIGN KEY (user_id) REFERENCES users(id)) '''
 	try:
-		db = sqlite3.connect(_db_path)
+		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		cursor.execute(query)
 		db.commit()
@@ -33,7 +33,7 @@ def add_log(user_id, wc_progress, fb_step_count):
 	query = ''' INSERT INTO logs(user_id, timestamp, wc_progress, fb_step_count)
 				VALUES(?, ?, ?, ?) '''
 	try:
-		db = sqlite3.connect(_db_path)
+		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		cursor.execute(query, (user_id, timestamp, wc_progress, fb_step_count))
 		db.commit()
@@ -47,7 +47,7 @@ def add_log(user_id, wc_progress, fb_step_count):
 # If username or id is specified, returns all the logs for that user.
 def get_logs(username=None, user_id=None):
 	try:
-		db = sqlite3.connect(_db_path)
+		db = sqlite3.connect(DB_PATH)
 		cursor = db.cursor()
 		if username != None:
 			query = ''' SELECT * FROM logs WHERE username=? '''
@@ -64,12 +64,4 @@ def get_logs(username=None, user_id=None):
 		print(format("Couldn't retrieve logs. Message: %s" % (e,)))
 		return ()
 	finally:
-		db.close()	
-
-# Helper - Gets the current date and time in a format that Sqlite can
-# understand.
-def _get_sqlite_timestamp():
-	dt = datetime.datetime.now()
-	formatted = format("%d-%02d-%02d %02d:%02d:%02d.000" 
-				% (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second))
-	return formatted
+		db.close()

@@ -1,5 +1,5 @@
 class PtUser:
-	def __init__(self, id, username, registered_on, goal_period, wc_login_status, fb_login_status):
+	def __init__(self, id, username, registered_on, goal_period, wc_id, wc_token, fb_token):
 		self.id = id
 		self.username = username
 		self.registered_on = registered_on
