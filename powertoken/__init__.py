@@ -28,13 +28,6 @@ def home():
 	else:
 		return render_template("home.html")
 
-# Clears all logins! Don't do this unless you really know what you're doing.
-# We will probably remove this option altogether in a production environment.
-@app.route('/reset')
-def reset():
-	powertoken.resetLogins()
-	return render_template("home.html")
-
 @app.route("/pt_login", methods=["GET", "POST"])
 def pt_login():
 	# GET: renders the PowerToken login page
@@ -46,12 +39,12 @@ def pt_login():
 		session["username"] = request.form["username"]
 
 		# Checks if the user already exists in the TinyDB
-		if powertoken.isCurrentUser(session["username"]):
+		if powertoken.is_current_user(session["username"]):
 
 			# If the user is already logged into WEconnect and Python, he/she is
 			# redirected to the home page
-			if (powertoken.isLoggedIntoWc(session["username"]) and 
-				powertoken.isLoggedIntoFb(session["username"])):
+			if (powertoken.is_logged_into_wc(session["username"]) and 
+				powertoken.is_logged_into_fb(session["username"])):
 				return redirect(url_for("home"))
 
 			# Otherwise, the user is sent right to the WEconnect login
@@ -61,7 +54,7 @@ def pt_login():
 		# If this is a new user, adds him/her to the TinyDB and redirects to the
 		# WEconnect login
 		else:
-			powertoken.createUser(session["username"])
+			powertoken.create_user(session["username"])
 			return redirect(url_for("wc_login"))
 
 @app.route("/wc_login", methods=["GET", "POST"])
@@ -75,14 +68,14 @@ def wc_login():
 		# Logs user into WEconnect
 		email = request.form["email"]
 		password = request.form["password"]
-		goalPeriod = request.form["goalPeriod"]
-		loginSuccessful = powertoken.loginToWc(session["username"], email, 
-				password, goalPeriod)
+		goal_period = request.form["goalPeriod"]
+		login_successful = powertoken.login_to_wc(session["username"], email, 
+				password, goal_period)
 
 		# If the login failed, reloads the page with an error message
-		if not loginSuccessful:
-			errorMessage = "Login failed. Try again."
-			return render_template("wc_login.html", login_error=errorMessage)
+		if not login_successful:
+			error_message = "Login failed. Try again."
+			return render_template("wc_login.html", login_error=error_message)
 
 		# Redirects to Fitbit login page
 		return redirect(url_for("fb_login"))
@@ -98,9 +91,9 @@ def fb_login():
 		# Converts the response into the correct format and passes it to a function
 		# that stores the user's access token in the TinyDB
 		data = request.data
-		convData = data.decode('utf8')
-		datajs = json.loads(convData)
-		powertoken.completeFbLogin(session["username"], datajs["tok"])
+		conv_data = data.decode('utf8')
+		datajs = json.loads(conv_data)
+		powertoken.complete_fb_login(session["username"], datajs["tok"])
 
 		# This code will never be called but must be present
 		return render_template("home.html")
@@ -114,7 +107,7 @@ def start():
 @app.route("/running", methods=["GET"])
 def running():
 	# Begins the program loop, which will run until killed
-	powertoken.startExperiment(session["username"])
+	powertoken.start_experiment(session["username"])
 
 	# This code will never be called
 	return render_template("home.html")
