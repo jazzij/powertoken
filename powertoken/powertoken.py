@@ -42,6 +42,7 @@ class PowerToken:
 
 		# Stores user's WEconnect-related data in the db
 		dbmanager.update_wc_info(username, goal_period, wc_id, wc_token)
+		return True
 
 
 	# Returns a boolean value signifying that the user is or isn't logged into 
