@@ -6,9 +6,8 @@
 
 import os, requests
 from flask import Flask, json, redirect, render_template, request, session, url_for
-from sqlalchemy import create_engine
+from flask.sessions import SecureCookieSession
 import powertoken
-import flaskmanager
 
 # Creates a new Flask server application
 app = Flask(__name__)
@@ -16,6 +15,10 @@ app = Flask(__name__)
 
 # We will use the powertoken object to access the core PowerToken functionality
 powertoken = powertoken.PowerToken()
+
+session = SecureCookieSession()
+session.permanent = True
+session.modified = True
 
 @app.before_request
 def session_management():
