@@ -17,6 +17,11 @@ app = Flask(__name__)
 # We will use the powertoken object to access the core PowerToken functionality
 powertoken = powertoken.PowerToken()
 
+@app.before_request
+def session_management():
+	session.permanent = True
+	session.modified = True
+
 # The landing page
 @app.route("/")
 @app.route("/home")
@@ -41,6 +46,8 @@ def pt_login():
 	# POST: processes the PowerToken login form
 	elif request.method == "POST":
 		session["username"] = request.form["username"]
+		session.modified = True
+		print(format("pt_login[post]: session['username'] = %s" % (session["username"])))
 
 		# Checks if the user already exists in the TinyDB
 		if powertoken.is_current_user(session.get("username")):
@@ -65,10 +72,12 @@ def pt_login():
 def wc_login():
 	# GET: renders the WEconnect login page
 	if request.method == "GET":
+		print(format("wc_login[get]: session['username'] = %s" % (session["username"])))
 		return render_template("wc_login.html")
 
 	# POST: processes the WEconnect login form
 	elif request.method == "POST":
+		print(format("wc_login[post]: session['username'] = %s" % (session["username"])))
 		# Logs user into WEconnect
 		email = request.form["email"]
 		password = request.form["password"]
@@ -88,12 +97,14 @@ def wc_login():
 def fb_login():
 	# GET: renders the Fitbit login page
 	if request.method == "GET":
+		print(format("fb_login[get]: session['username'] = %s" % (session["username"])))
 		return render_template("fb_login.html")
 
 	# When Fitbit is all setup, fb_login.js redirects here.
 	elif request.method == "POST":
 		# Converts the response into the correct format and passes it to a function
 		# that stores the user's access token in the TinyDB
+		print(format("fb_login[post]: session['username'] = %s" % (session["username"])))
 		data = request.data
 		conv_data = data.decode('utf8')
 		datajs = json.loads(conv_data)
@@ -110,6 +121,7 @@ def start():
 
 @app.route("/running", methods=["GET"])
 def running():
+	print(format("running: session['username'] = %s" % (session["username"])))
 	# Begins the program loop, which will run until killed
 	powertoken.start_experiment(session.get("username"))
 
