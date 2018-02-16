@@ -43,12 +43,12 @@ def pt_login():
 		session["username"] = request.form["username"]
 
 		# Checks if the user already exists in the TinyDB
-		if powertoken.is_current_user(session["username"]):
+		if powertoken.is_current_user(session.get("username"):
 
 			# If the user is already logged into WEconnect and Python, he/she is
 			# redirected to the home page
-			if (powertoken.is_logged_into_wc(session["username"]) and 
-				powertoken.is_logged_into_fb(session["username"])):
+			if (powertoken.is_logged_into_wc(session.get("username")) and 
+				powertoken.is_logged_into_fb(session.get("username"))):
 				return redirect(url_for("home"))
 
 			# Otherwise, the user is sent right to the WEconnect login
@@ -58,7 +58,7 @@ def pt_login():
 		# If this is a new user, adds him/her to the TinyDB and redirects to the
 		# WEconnect login
 		else:
-			powertoken.create_user(session["username"])
+			powertoken.create_user(session.get("username"))
 			return redirect(url_for("wc_login"))
 
 @app.route("/wc_login", methods=["GET", "POST"])
@@ -73,7 +73,7 @@ def wc_login():
 		email = request.form["email"]
 		password = request.form["password"]
 		goal_period = request.form["goalPeriod"]
-		login_successful = powertoken.login_to_wc(session["username"], email, 
+		login_successful = powertoken.login_to_wc(session.get("username"), email, 
 				password, goal_period)
 
 		# If the login failed, reloads the page with an error message
@@ -97,7 +97,7 @@ def fb_login():
 		data = request.data
 		conv_data = data.decode('utf8')
 		datajs = json.loads(conv_data)
-		powertoken.complete_fb_login(session["username"], datajs["tok"])
+		powertoken.complete_fb_login(session.get("username"), datajs["tok"])
 
 		# This code will never be called but must be present
 		return render_template("home.html")
@@ -111,7 +111,7 @@ def start():
 @app.route("/running", methods=["GET"])
 def running():
 	# Begins the program loop, which will run until killed
-	powertoken.start_experiment(session["username"])
+	powertoken.start_experiment(session.get("username"))
 
 	# This code will never be called
 	return render_template("home.html")
