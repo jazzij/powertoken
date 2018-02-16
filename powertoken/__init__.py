@@ -12,7 +12,7 @@ import flaskmanager
 
 # Creates a new Flask server application
 app = Flask(__name__)
-engine = create_engine(flaskmanager.engine_path, echo=True)
+#engine = create_engine(flaskmanager.engine_path, echo=True)
 
 # We will use the powertoken object to access the core PowerToken functionality
 powertoken = powertoken.PowerToken()
@@ -43,7 +43,7 @@ def pt_login():
 		session["username"] = request.form["username"]
 
 		# Checks if the user already exists in the TinyDB
-		if powertoken.is_current_user(session.get("username"):
+		if powertoken.is_current_user(session.get("username")):
 
 			# If the user is already logged into WEconnect and Python, he/she is
 			# redirected to the home page

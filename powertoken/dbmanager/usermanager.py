@@ -116,12 +116,15 @@ def fb_info_filled(username):
 		db.close()
 
 def update_fb_info(username, fb_token):
+	print("dbmanager.update_fb_into: fb_token = " + fb_token)
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
 		query = ''' UPDATE users SET fb_token=? WHERE username=? '''
-		cursor.execute(query, (fb_token, username,))
+		cursor.execute(query, (fb_token, username))
 		db.commit()
+		cursor.execute('''SELECT * FROM users WHERE username=?''', (username,))
+		print(cursor.fetchone())
 		return True
 	except Exception as e:
 		db.rollback()
