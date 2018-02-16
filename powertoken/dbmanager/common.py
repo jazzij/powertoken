@@ -5,7 +5,7 @@
 
 from datetime import datetime
 
-DB_PATH = "/export/scratch/ptdata/ptdb"
+DB_PATH = "/export/scratch/ptdata/pt.db"
 
 # Helper - Gets the current date and time in a format that Sqlite can
 # understand.

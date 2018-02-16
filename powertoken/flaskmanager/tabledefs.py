@@ -1,16 +1,21 @@
 from datetime import datetime
 from sqlalchemy import create_engine, ForeignKey
-from sqlalchemy import Column, DateTime, Integer, String, Float
+from sqlalchemy import Column, DateTime, Integer, String, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
-engine = create_engine('sqlite:////export/scratch/ptdata/pt.db', echo=True)
+engine_path = 'sqlite:////export/scratch/ptdata/pt.db'
+
+engine = create_engine(engine_path, echo=True)
 Base = declarative_base()
 
 class PtUser(Base):
    	__tablename__ = "users"
 
 	id = Column(Integer, primary_key=True)
+	is_authenticated = Column(Boolean)
+	is_active = Column(Boolean)
+	is_anonymous = Column(Boolean)
 	username = Column(String)
 	registered_on = Column(DateTime)
 	goal_period = Column(String)
@@ -21,6 +26,9 @@ class PtUser(Base):
 	def __init__(self, username):
 		self.username = username
 		self.registered_on = datetime.now()
+
+	def get_id():
+		return self.id.encode("utf-8")
 
 class PtLog(Base):
 	__tablename__ = "logs"

@@ -1,21 +1,24 @@
-# routes.py
+# __init__.py
 # Python Flask main application. Handles form processing and routing.
 # To run this application, type "python routes.py" at the command line.
 # Created by Jasmine Jones
 # Last modified by Abigail Franz on 1/29/2018
 
-from flask import Flask, json, redirect, render_template, request, url_for
+from flask import Flask, json, redirect, render_template, request, session, url_for
+from flask_login import create_engine
 import requests
 import powertoken
+import flaskmanager
 
 # Creates a new Flask server application
 app = Flask(__name__)
+engine = create_engine(flaskmanager.engine_path, echo=True)
 
 # We will use the powertoken object to access the core PowerToken functionality
 powertoken = powertoken.PowerToken()
 
 # Stores the username (for referencing the TinyDB) across the session
-session = { "username": "" }
+#session = { "username": "" }
 
 # The landing page
 @app.route("/")
@@ -23,8 +26,12 @@ session = { "username": "" }
 @app.route("/index")
 @app.route("/default")
 def home():
-	if session["username"]:
-		return render_template("home.html", username=session["username"])
+	#if session["username"]:
+	#	return render_template("home.html", username=session["username"])
+	#else:
+	#	return render_template("home.html")
+	if not session.get("username"):
+		return redirect(url_for("pt_login"))
 	else:
 		return render_template("home.html")
 

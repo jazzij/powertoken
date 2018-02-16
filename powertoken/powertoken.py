@@ -3,12 +3,11 @@
 # Created by Abigail Franz
 # Last modified by Abigail Franz on 2/9/2018
 
-import datetime, json, requests, sqlite3, time
+import json, requests, time
 import fitbit, weconnect
 import dbmanager
 
 class PowerToken:
-	_db_path = "data/ptdb"
 
 	def __init__(self):
 		dbmanager.create_logs_if_dne()
@@ -50,21 +49,11 @@ class PowerToken:
 	def is_logged_into_wc(self, username):
 		return dbmanager.wc_info_filled(username)
 
+
 	# Returns a boolean value signifying that the user is or isn't logged into
 	# Fitbit
 	def is_logged_into_fb(self, username):
 		return dbmanager.fb_info_filled(username)
-
-		# Makes sure there exists a user with that username
-		if len(result) != 1:
-			return False
-		else:
-			# Only returns True if the Fitbit access token field is filled
-			user = result[0]
-			if not user["fbAccessToken"]:
-				return False
-			else:
-				return True
 
 
 	# Stores the Fitbit access token in the database

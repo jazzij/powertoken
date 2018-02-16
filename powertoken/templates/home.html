@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
 	<div class="card">
-		{% if username is defined %}
-			<p>Welcome {{username}}!</p>
+		{% if session["username"] is defined %}
+			<p>Welcome {{session["username"]}}!</p>
 			<hr />
 			<a href="{{url_for('start')}}" class="btn">
 				START
