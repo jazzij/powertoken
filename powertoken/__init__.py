@@ -4,9 +4,9 @@
 # Created by Jasmine Jones
 # Last modified by Abigail Franz on 1/29/2018
 
+import os, requests
 from flask import Flask, json, redirect, render_template, request, session, url_for
-from flask_login import create_engine
-import requests
+from sqlalchemy import create_engine
 import powertoken
 import flaskmanager
 
@@ -16,9 +16,6 @@ engine = create_engine(flaskmanager.engine_path, echo=True)
 
 # We will use the powertoken object to access the core PowerToken functionality
 powertoken = powertoken.PowerToken()
-
-# Stores the username (for referencing the TinyDB) across the session
-#session = { "username": "" }
 
 # The landing page
 @app.route("/")
@@ -121,4 +118,5 @@ def running():
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":
+	app.secret_key = os.urandom(12)
 	app.run(threaded=True, debug=True)
