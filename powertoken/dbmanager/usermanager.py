@@ -8,13 +8,13 @@ from common import _get_sqlite_timestamp, DB_PATH
 
 def create_users_if_dne():
 	query = '''CREATE TABLE IF NOT EXISTS users(
-					id INTEGER PRIMARY KEY,
-					username TEXT NOT NULL UNIQUE, 
-					registered_on TEXT,
-					goal_period TEXT NOT NULL DEFAULT "daily",
-					wc_id TEXT,
-					wc_token TEXT,
-					fb_token TEXT)'''
+				  id INTEGER PRIMARY KEY,
+				  username TEXT NOT NULL UNIQUE, 
+				  registered_on TEXT,
+				  goal_period TEXT NOT NULL DEFAULT "daily",
+				  wc_id TEXT,
+				  wc_token TEXT,
+				  fb_token TEXT)'''
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
@@ -107,24 +107,29 @@ def fb_info_filled(username):
 			
 		# Only returns True if the Fitbit access token field is filled
 		if user["fb_token"] == None:
+			print("Not logged into Fitbit")
 			return False
 		else:
+			print("Logged into Fitbit")
 			return True
 	except Exception as e:
 		print("Couldn't find user's fb login status. Message: " % (e,))
 	finally:
 		db.close()
 
+'''
+Adds Fitbit access token to the user's record.
+Returns True if successful, False otherwise.
+'''
 def update_fb_info(username, fb_token):
-	print("dbmanager.update_fb_into: fb_token = " + fb_token)
+	print("dbmanager.update_fb_info: fb_token = " + fb_token)
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
-		query = ''' UPDATE users SET fb_token=? WHERE username=? '''
+		query = '''UPDATE users SET fb_token=? WHERE username=?'''
 		cursor.execute(query, (fb_token, username))
 		db.commit()
-		cursor.execute('''SELECT * FROM users WHERE username=?''', (username,))
-		print(cursor.fetchone())
+		print(get_user(username))
 		return True
 	except Exception as e:
 		db.rollback()
@@ -138,7 +143,7 @@ def get_users():
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
-		query = ''' SELECT * FROM users '''
+		query = '''SELECT * FROM users'''
 		cursor.execute(query)
 		users = cursor.fetchall()
 		return users
@@ -155,10 +160,10 @@ def get_user(username=None, id=None):
 		db.row_factory = sqlite3.Row
 		cursor = db.cursor()
 		if username != None:
-			query = ''' SELECT * FROM users WHERE username=? '''
+			query = '''SELECT * FROM users WHERE username=?'''
 			cursor.execute(query, (username,))
 		elif id != None:
-			query = ''' SELECT * FROM users WHERE id=? '''
+			query = '''SELECT * FROM users WHERE id=?'''
 			cursor.execute(query, (id,))
 		else:
 			raise(Exception())
