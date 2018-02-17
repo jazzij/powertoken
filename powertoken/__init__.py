@@ -5,13 +5,12 @@
 # Last modified by Abigail Franz on 1/29/2018
 
 import os, requests
-from flask import Flask, json, redirect, render_template, request, session, url_for
+from flask import Flask, json, redirect, render_template, request, url_for
 from flask.sessions import SecureCookieSession
 import powertoken
 
 # Creates a new Flask server application
 app = Flask(__name__)
-#engine = create_engine(flaskmanager.engine_path, echo=True)
 
 # We will use the powertoken object to access the core PowerToken functionality
 powertoken = powertoken.PowerToken()
@@ -31,14 +30,10 @@ def session_management():
 @app.route("/index")
 @app.route("/default")
 def home():
-	#if session["username"]:
-	#	return render_template("home.html", username=session["username"])
-	#else:
-	#	return render_template("home.html")
 	if not session.get("username"):
 		return redirect(url_for("pt_login"))
 	else:
-		return render_template("home.html")
+		return render_template("home.html", username=session["username"])
 
 @app.route("/pt_login", methods=["GET", "POST"])
 def pt_login():
@@ -50,7 +45,6 @@ def pt_login():
 	elif request.method == "POST":
 		session["username"] = request.form["username"]
 		session.modified = True
-		print(format("pt_login[post]: session['username'] = %s" % (session["username"])))
 
 		# Checks if the user already exists in the TinyDB
 		if powertoken.is_current_user(session.get("username")):
@@ -75,12 +69,10 @@ def pt_login():
 def wc_login():
 	# GET: renders the WEconnect login page
 	if request.method == "GET":
-		print(format("wc_login[get]: session['username'] = %s" % (session["username"])))
 		return render_template("wc_login.html")
 
 	# POST: processes the WEconnect login form
 	elif request.method == "POST":
-		print(format("wc_login[post]: session['username'] = %s" % (session["username"])))
 		# Logs user into WEconnect
 		email = request.form["email"]
 		password = request.form["password"]
@@ -100,14 +92,12 @@ def wc_login():
 def fb_login():
 	# GET: renders the Fitbit login page
 	if request.method == "GET":
-		print(format("fb_login[get]: session['username'] = %s" % (session["username"])))
 		return render_template("fb_login.html")
 
 	# When Fitbit is all setup, fb_login.js redirects here.
 	elif request.method == "POST":
 		# Converts the response into the correct format and passes it to a function
-		# that stores the user's access token in the TinyDB
-		print(format("fb_login[post]: session['username'] = %s" % (session["username"])))
+		# that stores the user's access token in the database
 		data = request.data
 		conv_data = data.decode('utf8')
 		datajs = json.loads(conv_data)
@@ -124,7 +114,6 @@ def start():
 
 @app.route("/running", methods=["GET"])
 def running():
-	print(format("running: session['username'] = %s" % (session["username"])))
 	# Begins the program loop, which will run until killed
 	powertoken.start_experiment(session.get("username"))
 

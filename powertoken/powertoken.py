@@ -1,34 +1,40 @@
-# powertoken.py
-# Contains the functionality for interfacing between WEconnect and Fitbit
-# Created by Abigail Franz
-# Last modified by Abigail Franz on 2/9/2018
+"""
+module powertoken\n
+Contains the functionality for interfacing between WEconnect and Fitbit\n
+Created by Abigail Franz\n
+Last modified by Abigail Franz on 2/16/2018
+"""
 
 import json, requests, time
 import fitbit, weconnect
 import dbmanager
 
 class PowerToken:
-
+	"""
+	Main class of the PowerToken application.
+	"""
 	def __init__(self):
 		dbmanager.create_logs_if_dne()
 		dbmanager.create_users_if_dne()
 
-
-	# Returns True if the user has already been created
 	def is_current_user(self, username):
+		"""
+		Return True if the user has already been added.
+		"""
 		return dbmanager.user_exists(username)
 
-
-	# Adds a new PowerToken user to the database. This user will be referenced
-	# by a chosen username.
 	def create_user(self, username):
+		"""
+		Add a new PowerToken user, who will be referenced by a chosen username.
+		"""
 		dbmanager.insert_user(username)
 
-
-	# Logs user into WEconnect, produces an ID and access token that will last
-	# 90 days, and stores the token and ID in the database. Also stores the goal
-	# period. Returns True if the login is successful, False otherwise.
 	def login_to_wc(self, username, email, password, goal_period):
+		"""
+		Log user into WEconnect, produce an ID and access token that will last
+		90 days, and store the token and ID. Also store the goal period.
+		Return a Boolean indicating the success of the login.
+		"""
 		# Gets the ID and access token from the WEconnect server
 		url = "https://palalinq.herokuapp.com/api/People/login"
 		data = {"email": email, "password": password}
@@ -43,26 +49,30 @@ class PowerToken:
 		dbmanager.update_wc_info(username, goal_period, wc_id, wc_token)
 		return True
 
-
-	# Returns a boolean value signifying that the user is or isn't logged into 
-	# WEconnect
 	def is_logged_into_wc(self, username):
+		"""
+		Return a Boolean signifying that the user is or isn't logged into
+		WEconnect.
+		"""
 		return dbmanager.wc_info_filled(username)
 
-
-	# Returns a boolean value signifying that the user is or isn't logged into
-	# Fitbit
 	def is_logged_into_fb(self, username):
+		"""
+		Return a Boolean value signifying that the user is or isn't logged
+		into Fitbit.
+		"""
 		return dbmanager.fb_info_filled(username)
 
-
-	# Stores the Fitbit access token in the database
 	def complete_fb_login(self, username, fb_token):
+		"""
+		Store the Fitbit access token.
+		"""
 		dbmanager.update_fb_info(username, fb_token)
 
-
-	# The program loop - Runs until killed with Ctrl+C
 	def start_experiment(self, username):
+		"""
+		The program loop. Run until killed with Ctrl+C.
+		"""
 		# Sets up the objects that will perform the WEconnect and Fitbit API
 		# calls
 		user = dbmanager.get_user(username)

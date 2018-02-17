@@ -1,12 +1,16 @@
-# module dbmanager.usermanager
-# A non-class module to deal with the "users" table in the database
-# Created by Abigail Franz on 2/9/2018
-# Last modified by Abigail Franz on 2/10/2018
+"""
+module usermanager\n
+A non-class module to deal with the "users" table in the database\n
+Created by Abigail Franz on 2/9/2018\n
+Last modified by Abigail Franz on 2/16/2018
+"""
 
 import sqlite3
 from common import _get_sqlite_timestamp, DB_PATH
 
 def create_users_if_dne():
+	"""Create the users table in the database if it does not already exist."""
+
 	query = '''CREATE TABLE IF NOT EXISTS users(
 				  id INTEGER PRIMARY KEY,
 				  username TEXT NOT NULL UNIQUE, 
@@ -29,6 +33,8 @@ def create_users_if_dne():
 		db.close()
 
 def user_exists(username):
+	"""Return true if the user has a record in the database, false otherwise."""
+
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
@@ -46,6 +52,10 @@ def user_exists(username):
 		db.close()
 
 def insert_user(username):
+	"""
+	Insert a new user row into the database. Only username and registered_on
+	will be filled. Return a Boolean indicating success.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
@@ -62,6 +72,10 @@ def insert_user(username):
 		db.close()
 
 def update_wc_info(username, goal_period, wc_id, wc_token):
+	"""
+	Update the user's record with his/her WEconnect information. Return a
+	Boolean indicating success.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
@@ -77,6 +91,9 @@ def update_wc_info(username, goal_period, wc_id, wc_token):
 		db.close()
 
 def wc_info_filled(username):
+	"""
+	Return True if the user's record contains his/her WEconnect info.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		db.row_factory = sqlite3.Row
@@ -97,6 +114,9 @@ def wc_info_filled(username):
 		db.close()
 
 def fb_info_filled(username):
+	"""
+	Returns True if the user's record contains his/her Fitbit info.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		db.row_factory = sqlite3.Row
@@ -107,29 +127,26 @@ def fb_info_filled(username):
 			
 		# Only returns True if the Fitbit access token field is filled
 		if user["fb_token"] == None:
-			print("Not logged into Fitbit")
 			return False
 		else:
-			print("Logged into Fitbit")
 			return True
 	except Exception as e:
 		print("Couldn't find user's fb login status. Message: " % (e,))
 	finally:
 		db.close()
 
-'''
-Adds Fitbit access token to the user's record.
-Returns True if successful, False otherwise.
-'''
+
 def update_fb_info(username, fb_token):
-	print("dbmanager.update_fb_info: fb_token = " + fb_token)
+	"""
+	Add Fitbit access token to the user's record. Return a Boolean
+	indicating success.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
 		query = '''UPDATE users SET fb_token=? WHERE username=?'''
 		cursor.execute(query, (fb_token, username))
 		db.commit()
-		print(get_user(username))
 		return True
 	except Exception as e:
 		db.rollback()
@@ -138,8 +155,10 @@ def update_fb_info(username, fb_token):
 	finally:
 		db.close()
 
-# Returns all the users in the database
 def get_users():
+	"""
+	Return all the users in the database as a list of Row objects.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()
@@ -153,8 +172,10 @@ def get_users():
 	finally:
 		db.close()
 
-# Returns a single user, specified by username or id
 def get_user(username=None, id=None):
+	"""
+	Return a single user, specified by username or id, as a Row object.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		db.row_factory = sqlite3.Row
