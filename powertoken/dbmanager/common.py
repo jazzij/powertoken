@@ -7,7 +7,7 @@ Last modified by Abigail Franz on 2/16/2018
 
 from datetime import datetime
 
-DB_PATH = "/export/scratch/ptdata/pt.db"
+DB_PATH = "/export/scratch/powertoken/ptdata/pt.db"
 
 def _get_sqlite_timestamp():
 	"""

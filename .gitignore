@@ -1,8 +1,6 @@
 __pycache__/*
 .vscode/*
-dbmanager/__pycache__/*
-ptdb
-src/db.json
+ptdata/*
 tests/*
+venv/*
 *.pyc
-powertoken.wsgi
