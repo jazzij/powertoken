@@ -21,13 +21,13 @@
 		<td>
 			<svg id="daily{{user.id}}" width="50" height="50"></svg>
 			<script>
-				var gauge = loadLiquidFillGauge("daily{{user.id}}", 25);
+				var gauge = loadLiquidFillGauge("daily{{user.id}}", "{{user.wc_daily_progress}}");
 			</script>
 		</td>
 		<td>
 			<svg id="weekly{{user.id}}" width="50" height="50"></svg>
 			<script>
-				var gauge = loadLiquidFillGauge("weekly{{user.id}}", 90);
+				var gauge = loadLiquidFillGauge("weekly{{user.id}}", "{{user.wc_weekly_progress}}");
 			</script>
 		</td>
 	</tr>

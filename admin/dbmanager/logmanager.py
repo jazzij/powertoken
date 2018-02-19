@@ -22,6 +22,7 @@ def create_logs_if_dne():
 					user_id INTEGER NOT NULL, 
 						FOREIGN KEY (user_id) REFERENCES users(id)) '''
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
 		cursor = db.cursor()
 		cursor.execute(query)
@@ -42,6 +43,7 @@ def insert_log(user_id, wc_progress, fb_step_count):
 	query = ''' INSERT INTO logs(user_id, timestamp, wc_progress, fb_step_count)
 				VALUES(?, ?, ?, ?) '''
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
 		cursor = db.cursor()
 		cursor.execute(query, (user_id, timestamp, wc_progress, fb_step_count))
@@ -60,6 +62,7 @@ def get_logs(user_id=None):
 	user_id is specified, return all the logs for that user.
 	"""
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
 		cursor = db.cursor()
 		if user_id != None:
