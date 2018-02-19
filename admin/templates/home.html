@@ -3,4 +3,29 @@
 <p>
 	This is the homepage.
 </p>
+<table class="pt-table">
+	<tr>
+		<th>Username</th>
+		<th>Registered On</th>
+		<th>WEconnect Status</th>
+		<th>Fitbit Status</th>
+		<th>Today's Progress</th>
+		<th>This Week's Progress</th>
+	</tr>
+	{% for user in pt_users %}
+	<tr>
+		<td>{{user.username}}</td>
+		<td>{{user.registered_on}}</td>
+		<td>{{user.wc_login_status}}</td>
+		<td>{{user.fb_login_status}}</td>
+		<td>
+			<svg id="fillgauge1" width="50" height="50"></svg>
+			<script>
+				var gauge = loadLiquidFillGauge("daily{{user.id}}", 25);
+			</script>
+		</td>
+		<td></td>
+	</tr>
+	{% endfor %}
+</table>
 {% endblock %}

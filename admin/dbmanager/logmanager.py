@@ -1,13 +1,19 @@
-# module dbmanager.logmanager
-# A non-class module to handle the logging portion of the application.
-# Created by Abigail Franz on 2/9/2018
-# Last modified by Abigail Franz on 2/10/2018
+""" 
+module logmanager\n
+A non-class module to handle the logging portion of the application.\n
+Created by Abigail Franz on 2/9/2018\n
+Last modified by Abigail Franz on 2/16/2018
+"""
 
 import sqlite3
 from common import _get_sqlite_timestamp, DB_PATH
 
 # Creates the "logs" table in the database if it doesn't already exist.
 def create_logs_if_dne():
+	"""
+	Create the logs table in the database if it does not already exist. Return
+	Boolean indicating success.
+	"""
 	query = ''' CREATE TABLE IF NOT EXISTS logs(
 					id INTEGER PRIMARY KEY,
 					timestamp TEXT NOT NULL,
@@ -28,8 +34,10 @@ def create_logs_if_dne():
 	finally:
 		db.close()
 
-# Adds a log to the database's "logs" table.
 def insert_log(user_id, wc_progress, fb_step_count):
+	"""
+	Insert a new log row into the database. Return Boolean indicating success.
+	"""
 	timestamp = _get_sqlite_timestamp()
 	query = ''' INSERT INTO logs(user_id, timestamp, wc_progress, fb_step_count)
 				VALUES(?, ?, ?, ?) '''
@@ -46,9 +54,11 @@ def insert_log(user_id, wc_progress, fb_step_count):
 	finally:
 		db.close()
 
-# If no parameters are specified, returns all the logs in the database.
-# If user_id is specified, returns all the logs for that user.
 def get_logs(user_id=None):
+	"""
+	If no parameters are specified, return all the logs in the database. If
+	user_id is specified, return all the logs for that user.
+	"""
 	db = sqlite3.connect(DB_PATH)
 	try:
 		cursor = db.cursor()

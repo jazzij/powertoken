@@ -1,7 +1,8 @@
 # admin.py
 
 from flask import Flask, json, redirect, render_template, request, url_for
-import dbmanager, ptmodels
+import dbmanager
+from ptmodels import PtLog, PtUser
 
 # Creates a new Flask server application
 app = Flask(__name__)
@@ -12,7 +13,17 @@ app = Flask(__name__)
 @app.route("/index")
 @app.route("/default")
 def home():
-	return render_template("home.html")
+	pt_users_raw = dbmanager.get_users()
+	pt_users = []
+	for user_raw in pt_users_raw:
+		id = user_raw[0]
+		username = user_raw[1]
+		registered_on = user_raw[2]
+		goal_period = user_raw[3]
+		wc_status = "Current" if (user_raw[4] and user_raw[5]) else "Expired"
+		fb_status = "Current" if user_raw[6] else "Expired"
+		pt_users.append(PtUser(id, username, registered_on, goal_period, wc_status, wc_status))
+	return render_template("home.html", pt_users=pt_users)
 	
 @app.route("/manage")
 def manage():

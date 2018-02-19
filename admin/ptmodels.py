@@ -1,4 +1,6 @@
 class PtUser:
+	wc_daily_progress = 0
+	wc_weekly_progress = 0
 	def __init__(self, id, username, registered_on, goal_period, wc_login_status, fb_login_status):
 		self.id = id
 		self.username = username

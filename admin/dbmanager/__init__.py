@@ -1,3 +1,11 @@
+"""
+module dbmanager\n
+Contains functions that interface between the PowerToken application and its
+underlying Sqlite database.\n
+Created by Abigail Franz on 2/9/2018\n
+Last modified by Abigail Franz on 2/16/2018
+"""
+
 from logmanager import create_logs_if_dne
 from logmanager import insert_log
 from logmanager import get_logs

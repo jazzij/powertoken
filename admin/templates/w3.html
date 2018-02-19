@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+        <title>PowerToken</title>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kaushan+Script&text=PowerTokenAdmin" />
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="../static/css/admin.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="../static/liquidFillGauge.js"></script>
+    </head>
+    <body>
+        <div id="ptSidebar" class="pt-sidebar pt-tb-gradient w3-bar-block w3-collapse w3-animate-left">
+            <button class="w3-bar-item w3-button" onclick="w3_close()" id="ptClose">
+                Close &times;
+            </button>
+            <a href="#" class="w3-bar-item w3-button">Manage Users</a>
+            <a href="#" class="w3-bar-item w3-button">View Stats</a>
+            <a href="#" class="w3-bar-item w3-button">Documentation</a>
+        </div>
+        <div id="ptMain" class="pt-main">
+            <div class="pt-header w3-container">
+                <button id="ptHamburger" class="w3-button w3-xlarge w3-hide-large" onclick="w3_open()">
+                    &#9776;
+                </button>
+                <h1 class="pt-heading" style="font-family: 'Kaushan Script', cursive">
+                    PowerToken <sub>/Admin</sub>
+                </h1>
+                <div class="pt-lr-gradient pt-bar w3-bar"></div>
+            </div>
+            <div class="w3-container">
+                <p>
+                    Lorem ipsum sit dolor...
+                </p>
+                <table class="pt-table">
+                    <tr>
+                        <th>Username</th>
+                        <th>Registered On</th>
+                        <th>WEconnect Status</th>
+                        <th>Fitbit Status</th>
+                        <th>Today's Progress</th>
+                        <th>This Week's Progress</th>
+                    </tr>
+                    <tr>
+                        <td>Norbert</td>
+                        <td>01/27/2018 08:30:00</td>
+                        <td>Current</td>
+                        <td>Current</td>
+                        <td>
+                            <svg id="fillgauge1" width="50" height="50"></svg>
+                            <script>
+                                var gauge1 = loadLiquidFillGauge("fillgauge1", 50);
+                            </script>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>DaraS</td>
+                        <td>01/27/2018 08:45:00</td>
+                        <td>Current</td>
+                        <td>Expired</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

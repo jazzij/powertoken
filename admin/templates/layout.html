@@ -2,27 +2,39 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
 		<title>PowerToken</title>
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kaushan+Script&text=PowerTokenAdmin" />
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<link rel="stylesheet" href="{{url_for('static', filename='css/admin.css')}}" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="http://d3js.org/d3.v3.min.js"></script>
+        <script src="../static/liquidFillGauge.js"></script>
 	</head>
 	<body>
-		<header>
-			<a href="{{url_for('home')}}">
-				<h1 style="font-family: 'Kaushan Script', cursive">PowerToken <sub>Admin</sub></h1>
-			</a>
-			<h3>Promoting recovery through social connection</h3>
-			<div class="bar"></div>
-		</header>
-		<nav>
-			<a href="{{url_for('manage')}}">Manage</a>
-			<a href="{{url_for('stats')}}">Stats</a>
-			<a href="{{url_for('docs')}}">Docs</a>
-		</nav>
-		<div class="content">
-			{% block content %}
-			{% endblock %}
+		<div id="ptSidebar" class="pt-sidebar pt-tb-gradient w3-bar-block w3-collapse w3-animate-left">
+			<button class="w3-bar-item w3-button" onclick="w3_close()" id="ptClose">
+				Close &times;
+			</button>
+			<a href="url_for('manage')" class="w3-bar-item w3-button">Manage Users</a>
+			<a href="url_for('stats')" class="w3-bar-item w3-button">View Stats</a>
+			<a href="url_for('docs')" class="w3-bar-item w3-button">Documentation</a>
+		</div>
+		<div id="ptMain" class="pt-main">
+			<div class="pt-header w3-container">
+				<button id="ptHamburger" class="w3-button w3-xlarge w3-hide-large" onclick="w3_open()">
+					&#9776;
+				</button>
+				<h1 class="pt-heading" style="font-family: 'Kaushan Script', cursive">
+					PowerToken <sub>/Admin</sub>
+				</h1>
+				<div class="pt-lr-gradient pt-bar w3-bar"></div>
+			</div>
+			<div class="content">
+				{% block content %}
+				{% endblock %}
+			</div>
 		</div>
 	</body>
 </html>
