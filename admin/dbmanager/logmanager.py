@@ -66,15 +66,15 @@ def get_logs(user_id=None):
 	try:
 		cursor = db.cursor()
 		if user_id != None:
-			query = ''' SELECT * FROM logs WHERE user_id=? '''
+			query = '''SELECT * FROM logs WHERE user_id=?'''
 			cursor.execute(query, (user_id,))
 		else:
-			query = ''' SELECT * FROM logs '''
+			query = '''SELECT * FROM logs'''
 			cursor.execute(query)
 		logs = cursor.fetchall()
 		return logs
 	except Exception as e:
 		print(format("Couldn't retrieve logs. Message: %s" % (e,)))
-		return None
+		return []
 	finally:
 		db.close()
