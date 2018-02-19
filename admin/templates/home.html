@@ -19,12 +19,17 @@
 		<td>{{user.wc_login_status}}</td>
 		<td>{{user.fb_login_status}}</td>
 		<td>
-			<svg id="fillgauge1" width="50" height="50"></svg>
+			<svg id="daily{{user.id}}" width="50" height="50"></svg>
 			<script>
 				var gauge = loadLiquidFillGauge("daily{{user.id}}", 25);
 			</script>
 		</td>
-		<td></td>
+		<td>
+			<svg id="daily{{user.id}}" width="50" height="50"></svg>
+			<script>
+				var gauge = loadLiquidFillGauge("daily{{user.id}}", 90);
+			</script>
+		</td>
 	</tr>
 	{% endfor %}
 </table>
