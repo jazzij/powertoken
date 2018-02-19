@@ -2,7 +2,7 @@
 
 import math
 from flask import Flask, json, redirect, render_template, request, url_for
-import dbmanager
+import admin
 from ptmodels import PtLog, PtUser
 
 # Creates a new Flask server application
@@ -14,20 +14,7 @@ app = Flask(__name__)
 @app.route("/index")
 @app.route("/default")
 def home():
-	pt_users_raw = dbmanager.get_users()
-	pt_users = []
-	for user_raw in pt_users_raw:
-		id = user_raw["id"]
-		username = user_raw["username"]
-		registered_on = user_raw["registered_on"]
-		goal_period = user_raw["goal_period"]
-		wc_status = "Current" if (user_raw["wc_id"] and user_raw["wc_token"]) else "Expired"
-		fb_status = "Current" if user_raw["fb_token"] else "Expired"
-		user = PtUser(id, username, registered_on, goal_period, wc_status, wc_status)
-		logs_raw = dbmanager.get_logs(id)
-		last_progress = logs_raw[len(logs_raw) - 1]["wc_progress"]
-		user.wc_daily_progress = math.floor(last_progress * 100)
-		pt_users.append(user)
+	pt_users = admin.load_users()
 	return render_template("home.html", pt_users=pt_users)
 	
 @app.route("/manage")
