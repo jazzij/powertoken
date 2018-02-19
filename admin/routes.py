@@ -22,7 +22,10 @@ def home():
 		goal_period = user_raw[3]
 		wc_status = "Current" if (user_raw[4] and user_raw[5]) else "Expired"
 		fb_status = "Current" if user_raw[6] else "Expired"
-		pt_users.append(PtUser(id, username, registered_on, goal_period, wc_status, wc_status))
+		logs_raw = dbmanager.get_logs(id)
+		last_progress = logs_raw[len(logs_raw) - 1][3]
+		user = PtUser(id, username, registered_on, goal_period, wc_status, wc_status)
+		user.wc_daily_progress = last_progress
 	return render_template("home.html", pt_users=pt_users)
 	
 @app.route("/manage")
