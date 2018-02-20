@@ -2,11 +2,7 @@
 {% block content %}
 	<div class="card">
 		{% if username is defined %}
-			<p>Welcome {{username}}!</p>
-			<hr />
-			<a href="{{url_for('start')}}" class="btn">
-				START
-			</a>
+			<p>Welcome {{username}}! You're all set to go.</p>
 		{% else %}
 			<a href="{{url_for('pt_login')}}" class="btn">
 				SIGN UP / SIGN IN

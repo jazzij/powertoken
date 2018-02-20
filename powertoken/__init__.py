@@ -106,6 +106,7 @@ def fb_login():
 		# This code will never be called but must be present
 		return render_template("home.html")
 
+"""Shoudn't be needed anymore.
 @app.route("/start", methods=["GET"])
 def start():
 	# Start page redirects to the /running route, but running.html is the
@@ -119,6 +120,7 @@ def running():
 
 	# This code will never be called
 	return render_template("home.html")
+"""
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":
