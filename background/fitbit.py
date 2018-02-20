@@ -112,8 +112,8 @@ class Fitbit:
 		Get the user's step goal. If the request is unsuccessful, return a
 		default value of 1 million.
 		"""
-		url =  format("activities/goals/%s.json" 
-				% (self.base_url, self._goal_period,))
+		url =  format("%s/activities/goals/%s.json" 
+				% (self.base_url, self._goal_period))
 		response = requests.get(url, headers=self._auth_headers)
 		if is_valid(response):
 			return response.json()["goals"]["steps"]
