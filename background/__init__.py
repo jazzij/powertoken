@@ -15,12 +15,14 @@ def loop():
 	"""
 	while True:
 		pt_users = dbmanager.get_users()
+		print(pt_users)
 		for user in pt_users:
 			pollAndUpdate(user)
 
 def pollAndUpdate(user):
 	# Sets up the objects that will perform the WEconnect and Fitbit API
 	# calls
+	print(user)
 	user_id = user["id"]
 	wc = weconnect.WeConnect(user["wc_id"], user["wc_token"], user["goal_period"])
 	fb = fitbit.Fitbit(user["fb_token"], user["goal_period"])
@@ -28,8 +30,13 @@ def pollAndUpdate(user):
 	# Polls WEconnect for changes and then updates Fitbit. Progress will be a 
 	# decimal percentage.
 	progress = wc.poll()
+	print(progress)
 
 	# Makes sure the poll request succeeded
 	if progress != -1:
 		step_count = fb.reset_and_update(progress)
 		dbmanager.add_log(user_id, progress, step_count)
+
+# Runs code
+setup()
+loop()
