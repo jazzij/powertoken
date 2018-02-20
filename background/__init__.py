@@ -22,7 +22,7 @@ def loop():
 def pollAndUpdate(user):
 	# Sets up the objects that will perform the WEconnect and Fitbit API
 	# calls
-	print(user)
+	print(user.keys())
 	user_id = user["id"]
 	wc = weconnect.WeConnect(user["wc_id"], user["wc_token"], user["goal_period"])
 	fb = fitbit.Fitbit(user["fb_token"], user["goal_period"])
