@@ -16,7 +16,7 @@ def is_valid(response):
 	"""
 	if response.status_code >= 300:
 		error_logger.error(format(" Request could not be completed. Error: %d %s" 
-				% (response.status_code, response.text))
+				% (response.status_code, response.text)))
 		return False
 	else:
 		return True
