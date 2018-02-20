@@ -35,7 +35,7 @@ def pollAndUpdate(user):
 	# Makes sure the poll request succeeded
 	if progress != -1:
 		step_count = fb.reset_and_update(progress)
-		dbmanager.add_log(user_id, progress, step_count)
+		dbmanager.insert_log(user_id, progress, step_count)
 
 # Runs code
 setup()
