@@ -26,15 +26,15 @@ class PowerToken:
 		for user in pt_users:
 			self._add_user(user)
 
-	def _add_user(self, user):
+	def _track_user(self, user):
 		fb = fitbit.Fitbit(user["fb_token"], user["goal_period"])
 		wc = weconnect.WeConnect(user["wc_id"], user["wc_token"],
 				user["goal_period"])
-		fb.change_step_goal(STEP_GOAL)
+		fb.change_step_goal(self.STEP_GOAL)
 		self.pt_users.append(PtUser(user, fb, wc))
 
 	# user is a Row object from the database
-	def _is_existing_user(self, user):
+	def _is_tracked(self, user):
 		results = [u for u in self.pt_users if u.row == user]
 		if len(results) > 0:
 			return True
@@ -46,11 +46,11 @@ class PowerToken:
 		This code will run forever.
 		"""
 		while True:
-			pt_users = dbmanager.get_users()
-			if len(pt_users) != len(self.pt_users):
-				for user in pt_users:
-					if not self._is_existing_user(user):
-						self._add_user(user)
+			rows = dbmanager.get_users()
+			if len(rows) != len(self.pt_users):
+				for row in rows:
+					if not self._is_tracked(row):
+						self._track_user(row)
 
 			for user in self.pt_users:
 				self._poll_and_update(user)
