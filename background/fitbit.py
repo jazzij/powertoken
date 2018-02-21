@@ -19,6 +19,8 @@ class Fitbit:
 	def __init__(self, fb_token, goal_period):
 		self._auth_headers = {'Authorization': 'Bearer ' + fb_token}
 		self._goal_period = goal_period
+		logging.basicConfig(filename="pt.log", level=logging.DEBUG, 
+				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 
 	def change_step_goal(self, new_step_goal):
 		"""
@@ -37,6 +39,7 @@ class Fitbit:
 			new_goal = response.json()["goals"]["steps"]
 			return True
 		else:
+			logging.error("Couldn't change the step goal")
 			return False
 
 	def update(self, percent):
@@ -50,6 +53,7 @@ class Fitbit:
 		if success:
 			return new_steps
 		else:
+			logging.error("Couldn't update Fitbit")
 			return -1
 
 	def reset_and_update(self, percent):
@@ -76,6 +80,7 @@ class Fitbit:
 		if is_valid(response):
 			return response.json()["activities"]
 		else:
+			logging.error("Couldn't get today's step activities")
 			return []
 
 	# Helper - returns a list of all the activities the user has completed this
@@ -93,18 +98,19 @@ class Fitbit:
 		if is_valid(response):
 			return response.json()["activities-log-steps"]
 		else:
+			logging.error("Couldn't get this week's step activities")
 			return []
 
-	def _delete_activity(self, logId):
+	def _delete_activity(self, log_id):
 		"""
 		Delete an activity and return a Boolean indicating success.
 		"""
-		url = format("%s/activities/%s.json" % (self.base_url, str(logId)))
+		url = format("%s/activities/%s.json" % (self.base_url, str(log_id)))
 		response = requests.delete(url, headers=self._auth_headers)
 		if response.status_code == 204:
 			return True
 		else:
-			error_logger.error(format(" Activity %d was not successfully deleted." % (logId,)))
+			logging.error(format(" Activity %d was not successfully deleted." % (log_id,)))
 			return False
 
 	def _get_step_goal(self):
@@ -118,6 +124,7 @@ class Fitbit:
 		if is_valid(response):
 			return response.json()["goals"]["steps"]
 		else:
+			logging.warning("Couldn't get step goal. Using 1000000 as default.")
 			return 1000000
 
 	def _get_current_steps(self):
@@ -131,6 +138,7 @@ class Fitbit:
 		if is_valid(response):
 			return response.json()["summary"]["steps"]
 		else:
+			logging.error("Couldn't get today's step count")
 			return -1
 		
 	def _log_step_activity(self, new_step_count):
@@ -151,6 +159,7 @@ class Fitbit:
 		if is_valid(response):
 			return True
 		else:
+			logging.error("Couldn't log step activity")
 			return False
 
 	def _get_current_date(self):
