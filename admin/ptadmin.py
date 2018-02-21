@@ -50,4 +50,4 @@ class PtAdmin:
 		wc_status = "Current" if (row["wc_id"] and row["wc_token"]) else "Expired"
 		fb_status = "Current" if row["fb_token"] else "Expired"
 		daily_progress, weekly_progress = self._get_last_progress(row["id"])
-		self.pt_users[row["id"]] = PtUser(row, fb, wc, daily_progress, weekly_progress)
+		self.pt_users[row["id"]] = PtUser(row, fb_status, wc_status, daily_progress, weekly_progress)
