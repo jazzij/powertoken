@@ -198,3 +198,15 @@ def get_user(username=None, id=None):
 		return None
 	finally:
 		db.close()
+
+def count_users():
+	db = sqlite3.connect(DB_PATH)
+	try:
+		cursor = db.cursor()
+		cursor.execute("SELECT COUNT(*) FROM users")
+		return cursor.fetchone()[0]
+	except Exception as e:
+		print(format("Couldn't count the users. Message: %s" % (e,)))
+		return None
+	finally:
+		db.close()

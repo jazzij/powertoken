@@ -13,13 +13,14 @@ class PtUser:
 		self.row = row
 		self.fb = fb
 		self.wc = wc
+		self.last_progress = 0
 
 class PowerToken:
 	"""
 	Main class of the PowerToken background application.
 	"""
 	STEP_GOAL = 1000000
-	pt_users = []
+	pt_users = {}
 
 	def __init__(self):
 		rows = dbmanager.get_users()
@@ -37,17 +38,21 @@ class PowerToken:
 		wc = weconnect.WeConnect(row["wc_id"], row["wc_token"],
 				row["goal_period"])
 		fb.change_step_goal(self.STEP_GOAL)
-		self.pt_users.append(PtUser(row, fb, wc))
+		self.pt_users[row["id"]] = PtUser(row, fb, wc)
 
 	# user is a Row object from the database
-	def _is_tracked(self, user):
+	def _is_tracked_old(self, user):
 		results = [u for u in self.pt_users if u.row == user]
 		if len(results) > 0:
 			return True
 		else:
 			return False
 
-	def run(self):
+	# User is represented as a Row object from the database
+	def _is_tracked(self, row):
+		return row["id"] in self.pt_users:
+
+	def run_old(self):
 		"""
 		This code will run forever.
 		"""
@@ -61,6 +66,19 @@ class PowerToken:
 			for user in self.pt_users:
 				self._poll_and_update(user)
 
+	def run(self):
+		"""
+		This code will run forever.
+		"""
+		while True:
+			rows = dbmanager.get_users()
+			for row in rows:
+				if not self._is_tracked(row):
+					self._track_user(row)
+
+			for user in self.pt_users:
+				self._poll_and_update(user)
+
 	def _poll_and_update(self, user):
 		# Polls WEconnect for changes and then updates Fitbit. Progress will be a 
 		# decimal percentage.
@@ -68,6 +86,7 @@ class PowerToken:
 		print(progress)
 
 		# Makes sure the poll request succeeded
-		if progress != -1:
+		if progress != -1 and progress != user.last_progress:
 			step_count = user.fb.reset_and_update(progress)
 			dbmanager.insert_log(user.row["id"], progress, step_count)
+			user.last_progress = progress
