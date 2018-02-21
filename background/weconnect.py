@@ -5,7 +5,7 @@ Created by Abigail Franz\n
 Last modified by Abigail Franz on 2/16/2018
 """
 
-import datetime, json, requests
+import datetime, json, logging, requests
 from common import is_valid
 
 class WeConnect:
@@ -21,6 +21,8 @@ class WeConnect:
 		self._wc_id = wc_id
 		self._wc_token = wc_token
 		self._goal_period = goal_period
+		logging.basicConfig(filename="pt.log", level=logging.DEBUG, 
+				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 
 	def poll(self):
 		"""
@@ -53,6 +55,7 @@ class WeConnect:
 			percent = completed / total
 			return percent
 		else:
+			logging.error("Couldn't get WEconnect progress.")
 			return -1
 
 	def _get_week(self):

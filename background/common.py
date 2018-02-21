@@ -7,15 +7,15 @@ Last modified by Abigail Franz on 2/20/2018
 
 import logging, requests
 
-error_logger = logging.getLogger("ptErrorLogger")
-error_logger.setLevel(logging.ERROR)
+logging.basicConfig(filename="pt.log", level=logging.DEBUG, 
+		format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 
 def is_valid(response):
 	"""
 	Return a Boolean value indicating the success of an HTTP request.
 	"""
 	if response.status_code >= 300:
-		error_logger.error(format(" Request could not be completed. Error: %d %s" 
+		logging.error(format(" Request could not be completed. Error: %d %s" 
 				% (response.status_code, response.text)))
 		return False
 	else:
