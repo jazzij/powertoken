@@ -26,14 +26,18 @@ class PowerToken:
 		for user in pt_users:
 			self._track_user(user)
 
-	def _track_user(self, user):
-		print(user.keys())
-		print(user["fb_token"])
-		fb = fitbit.Fitbit(user["fb_token"], user["goal_period"])
-		wc = weconnect.WeConnect(user["wc_id"], user["wc_token"],
-				user["goal_period"])
+	def _track_user(self, row):
+		# Doesn't add the user if any fields are missing
+		if not (row["id"] and row["username"] and row["registered_on"]
+				and row["goal_period"] and row["wc_id"] and row["wc_token"]
+				and row["fb_token"]):
+			return
+
+		fb = fitbit.Fitbit(row["fb_token"], row["goal_period"])
+		wc = weconnect.WeConnect(row["wc_id"], row["wc_token"],
+				row["goal_period"])
 		fb.change_step_goal(self.STEP_GOAL)
-		self.pt_users.append(PtUser(user, fb, wc))
+		self.pt_users.append(PtUser(row, fb, wc))
 
 	# user is a Row object from the database
 	def _is_tracked(self, user):
