@@ -24,9 +24,11 @@ class PowerToken:
 	def __init__(self):
 		pt_users = dbmanager.get_users()
 		for user in pt_users:
-			self._add_user(user)
+			self._track_user(user)
 
 	def _track_user(self, user):
+		print(user.keys())
+		print(user["fb_token"])
 		fb = fitbit.Fitbit(user["fb_token"], user["goal_period"])
 		wc = weconnect.WeConnect(user["wc_id"], user["wc_token"],
 				user["goal_period"])
