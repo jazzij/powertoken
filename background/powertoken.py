@@ -22,9 +22,9 @@ class PowerToken:
 	pt_users = []
 
 	def __init__(self):
-		pt_users = dbmanager.get_users()
-		for user in pt_users:
-			self._track_user(user)
+		rows = dbmanager.get_users()
+		for row in rows:
+			self._track_user(row)
 
 	def _track_user(self, row):
 		# Doesn't add the user if any fields are missing
@@ -64,10 +64,10 @@ class PowerToken:
 	def _poll_and_update(self, user):
 		# Polls WEconnect for changes and then updates Fitbit. Progress will be a 
 		# decimal percentage.
-		progress = wc.poll()
+		progress = user.wc.poll()
 		print(progress)
 
 		# Makes sure the poll request succeeded
 		if progress != -1:
-			step_count = fb.reset_and_update(progress)
+			step_count = user.fb.reset_and_update(progress)
 			dbmanager.insert_log(user.row["id"], progress, step_count)
