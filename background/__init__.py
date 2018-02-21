@@ -1,42 +1,12 @@
-import dbmanager
-import weconnect, fitbit
+"""
+module __init__\n
+Script that polls WEconnect and updates Fitbit in the background.\n
+To run, type "python __init__.py" at the command line.\n
+Created by Abigail Franz on 2/20/2018\n
+Last modified by Abigail Franz on 2/21/2018
+"""
 
-STEP_GOAL = 1000000
+import powertoken
 
-def setup():
-	pt_users = dbmanager.get_users()
-	for user in pt_users:
-		fb = fitbit.Fitbit(user["fb_token"], user["goal_period"])
-		fb.change_step_goal(STEP_GOAL)
-
-def loop():
-	"""
-	This code will run forever.
-	"""
-	while True:
-		pt_users = dbmanager.get_users()
-		print(pt_users)
-		for user in pt_users:
-			pollAndUpdate(user)
-
-def pollAndUpdate(user):
-	# Sets up the objects that will perform the WEconnect and Fitbit API
-	# calls
-	print(user.keys())
-	user_id = user["id"]
-	wc = weconnect.WeConnect(user["wc_id"], user["wc_token"], user["goal_period"])
-	fb = fitbit.Fitbit(user["fb_token"], user["goal_period"])
-
-	# Polls WEconnect for changes and then updates Fitbit. Progress will be a 
-	# decimal percentage.
-	progress = wc.poll()
-	print(progress)
-
-	# Makes sure the poll request succeeded
-	if progress != -1:
-		step_count = fb.reset_and_update(progress)
-		dbmanager.insert_log(user_id, progress, step_count)
-
-# Runs code
-setup()
-loop()
+pt = powertoken.PowerToken()
+pt.run()

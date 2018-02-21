@@ -1,19 +1,19 @@
 # __init__.py
 # Python Flask main application. Handles form processing and routing.
-# To run this application, type "python routes.py" at the command line.
+# To run this application, type "python __init__.py" at the command line.
 # Created by Jasmine Jones
-# Last modified by Abigail Franz on 1/29/2018
+# Last modified by Abigail Franz on 2/21/2018
 
 import os, requests
 from flask import Flask, json, redirect, render_template, request, url_for
 from flask.sessions import SecureCookieSession
-import powertoken
+import login
 
 # Creates a new Flask server application
 app = Flask(__name__)
 
-# We will use the powertoken object to access the core PowerToken functionality
-powertoken = powertoken.PowerToken()
+# We will use the Login object to access the PowerToken login functionality
+login = login.Login()
 
 session = SecureCookieSession()
 session.permanent = True
@@ -46,23 +46,23 @@ def pt_login():
 		session["username"] = request.form["username"]
 		session.modified = True
 
-		# Checks if the user already exists in the TinyDB
-		if powertoken.is_current_user(session.get("username")):
+		# Checks if the user already exists in the database
+		if login.is_current_user(session.get("username")):
 
-			# If the user is already logged into WEconnect and Python, he/she is
+			# If the user is already logged into WEconnect and Fitbit, he/she is
 			# redirected to the home page
-			if (powertoken.is_logged_into_wc(session.get("username")) and 
-				powertoken.is_logged_into_fb(session.get("username"))):
+			if (login.is_logged_into_wc(session.get("username")) and 
+				login.is_logged_into_fb(session.get("username"))):
 				return redirect(url_for("home"))
 
 			# Otherwise, the user is sent right to the WEconnect login
 			else:
 				return redirect(url_for("wc_login"))
 
-		# If this is a new user, adds him/her to the TinyDB and redirects to the
-		# WEconnect login
+		# If this is a new user, adds him/her to the database and redirects to
+		# the WEconnect login
 		else:
-			powertoken.create_user(session.get("username"))
+			login.create_user(session.get("username"))
 			return redirect(url_for("wc_login"))
 
 @app.route("/wc_login", methods=["GET", "POST"])
@@ -77,7 +77,7 @@ def wc_login():
 		email = request.form["email"]
 		password = request.form["password"]
 		goal_period = request.form["goalPeriod"]
-		login_successful = powertoken.login_to_wc(session.get("username"), email, 
+		login_successful = login.login_to_wc(session.get("username"), email, 
 				password, goal_period)
 
 		# If the login failed, reloads the page with an error message
@@ -101,7 +101,7 @@ def fb_login():
 		data = request.data
 		conv_data = data.decode('utf8')
 		datajs = json.loads(conv_data)
-		powertoken.complete_fb_login(session.get("username"), datajs["tok"])
+		login.complete_fb_login(session.get("username"), datajs["tok"])
 
 		# This code will never be called but must be present
 		return render_template("home.html")

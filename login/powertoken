@@ -4,6 +4,6 @@ server {
 
 	location / {
 		include proxy_params;
-		proxy_pass https://unix:/export/scratch/powertoken/powertoken/powertoken.sock;
+		proxy_pass https://unix:/export/scratch/powertoken/login/powertoken.sock;
 	}
 }

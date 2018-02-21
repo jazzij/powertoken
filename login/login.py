@@ -1,6 +1,6 @@
 """
-module powertoken\n
-Contains the functionality for interfacing between WEconnect and Fitbit\n
+module login\n
+Contains the logins for PowerToken, WEconnect, and Fitbit\n
 Created by Abigail Franz\n
 Last modified by Abigail Franz on 2/16/2018
 """
@@ -9,9 +9,9 @@ import json, requests, time
 import fitbit, weconnect
 import dbmanager
 
-class PowerToken:
+class Login:
 	"""
-	Main class of the PowerToken application.
+	Main class of the PowerToken's login application.
 	"""
 	def __init__(self):
 		dbmanager.create_logs_if_dne()
@@ -69,6 +69,7 @@ class PowerToken:
 		"""
 		dbmanager.update_fb_info(username, fb_token)
 
+	'''Shouldn't be needed anymore
 	def start_experiment(self, username):
 		"""
 		The program loop. Run until killed with Ctrl+C.
@@ -102,3 +103,4 @@ class PowerToken:
 
 			# Delays a minute
 			time.sleep(60)
+	'''

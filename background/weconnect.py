@@ -12,7 +12,6 @@ class WeConnect:
 	"""
 	Class encapsulating the WEconnect API calls.
 	"""
-
 	base_url = "https://palalinq.herokuapp.com/api"
 	_wc_id = ""
 	_wc_token = ""

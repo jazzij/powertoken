@@ -2,7 +2,7 @@
 module fitbit\n
 This class contains the API calls to Fitbit (except for the login).\n
 Created by Abigail Franz\n
-Last modified by Abigail Franz on 1/29/2018
+Last modified by Abigail Franz on 2/20/2018
 """
 
 import datetime, json, logging, requests
