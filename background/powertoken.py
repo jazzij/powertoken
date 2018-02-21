@@ -50,7 +50,7 @@ class PowerToken:
 
 	# User is represented as a Row object from the database
 	def _is_tracked(self, row):
-		return row["id"] in self.pt_users:
+		return row["id"] in self.pt_users
 
 	def run_old(self):
 		"""
@@ -63,8 +63,8 @@ class PowerToken:
 					if not self._is_tracked(row):
 						self._track_user(row)
 
-			for user in self.pt_users:
-				self._poll_and_update(user)
+			for id in self.pt_users:
+				self._poll_and_update(id)
 
 	def run(self):
 		"""
@@ -76,17 +76,17 @@ class PowerToken:
 				if not self._is_tracked(row):
 					self._track_user(row)
 
-			for user in self.pt_users:
-				self._poll_and_update(user)
+			for id in self.pt_users:
+				self._poll_and_update(id)
 
-	def _poll_and_update(self, user):
+	def _poll_and_update(self, id):
 		# Polls WEconnect for changes and then updates Fitbit. Progress will be a 
 		# decimal percentage.
-		progress = user.wc.poll()
+		progress = self.pt_users["id"].wc.poll()
 		print(progress)
 
 		# Makes sure the poll request succeeded
-		if progress != -1 and progress != user.last_progress:
-			step_count = user.fb.reset_and_update(progress)
-			dbmanager.insert_log(user.row["id"], progress, step_count)
-			user.last_progress = progress
+		if progress != -1 and progress != self.pt_users["id"].last_progress:
+			step_count = self.pt_users["id"].fb.reset_and_update(progress)
+			dbmanager.insert_log(id, progress, step_count)
+			self.pt_users["id"].last_progress = progress
