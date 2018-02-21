@@ -11,13 +11,16 @@ import login
 
 # Creates a new Flask server application
 app = Flask(__name__)
+print("Just created a new Flask server app")
 
 # We will use the Login object to access the PowerToken login functionality
 login = login.Login()
+print("Just created a new Login object")
 
 session = SecureCookieSession()
 session.permanent = True
 session.modified = True
+print("Just created a new SecureCookieSession object")
 
 @app.before_request
 def session_management():
@@ -30,6 +33,7 @@ def session_management():
 @app.route("/index")
 @app.route("/default")
 def home():
+	print("A browser requested the homepage")
 	if not session.get("username"):
 		return redirect(url_for("pt_login"))
 	else:
@@ -39,10 +43,12 @@ def home():
 def pt_login():
 	# GET: renders the PowerToken login page
 	if request.method == "GET":
+		print("A browser requested the pt_login.html file")
 		return render_template("pt_login.html")
 
 	# POST: processes the PowerToken login form
 	elif request.method == "POST":
+		print("A client submitted the pt_login form")
 		session["username"] = request.form["username"]
 		session.modified = True
 
@@ -69,10 +75,12 @@ def pt_login():
 def wc_login():
 	# GET: renders the WEconnect login page
 	if request.method == "GET":
+		print("A browser requested the wc_login.html file")
 		return render_template("wc_login.html")
 
 	# POST: processes the WEconnect login form
 	elif request.method == "POST":
+		print("A client submitted the wc_login form")
 		# Logs user into WEconnect
 		email = request.form["email"]
 		password = request.form["password"]
@@ -92,10 +100,12 @@ def wc_login():
 def fb_login():
 	# GET: renders the Fitbit login page
 	if request.method == "GET":
+		print("A browser requested the fb_login.html page")
 		return render_template("fb_login.html")
 
 	# When Fitbit is all setup, fb_login.js redirects here.
 	elif request.method == "POST":
+		print("A client submitted the fb_login form")
 		# Converts the response into the correct format and passes it to a function
 		# that stores the user's access token in the database
 		data = request.data
@@ -124,5 +134,6 @@ def running():
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":
+	print("Running the Flask app")
 	app.secret_key = os.urandom(12)
 	app.run(threaded=True, debug=True)

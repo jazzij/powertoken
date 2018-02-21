@@ -6,7 +6,6 @@ Last modified by Abigail Franz on 2/16/2018
 """
 
 import json, requests, time
-import fitbit, weconnect
 import dbmanager
 
 class Login:
