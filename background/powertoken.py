@@ -47,7 +47,7 @@ class PowerToken:
 		else:
 			return False
 
-	def run():
+	def run(self):
 		"""
 		This code will run forever.
 		"""
