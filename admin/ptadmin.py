@@ -41,6 +41,8 @@ class PtAdmin:
 		"""
 		logs = dbmanager.get_logs(user_id)
 		last_index = len(logs) - 1
+		if last_index < 0:
+			return 0, 0
 		last_log = logs[last_index]
 		daily_progress = math.floor(last_log["daily_progress"] * 100)
 		weekly_progress = math.floor(last_log["weekly_progress"] * 100)
