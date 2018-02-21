@@ -82,11 +82,11 @@ class PowerToken:
 	def _poll_and_update(self, id):
 		# Polls WEconnect for changes and then updates Fitbit. Progress will be a 
 		# decimal percentage.
-		progress = self.pt_users["id"].wc.poll()
+		progress = self.pt_users[id].wc.poll()
 		print(progress)
 
 		# Makes sure the poll request succeeded
-		if progress != -1 and progress != self.pt_users["id"].last_progress:
-			step_count = self.pt_users["id"].fb.reset_and_update(progress)
+		if progress != -1 and progress != self.pt_users[id].last_progress:
+			step_count = self.pt_users[id].fb.reset_and_update(progress)
 			dbmanager.insert_log(id, progress, step_count)
-			self.pt_users["id"].last_progress = progress
+			self.pt_users[id].last_progress = progress
