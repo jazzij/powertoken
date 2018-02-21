@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 2/20/2018
 """
 
 import datetime, json, logging, requests
-from common import is_valid, error_logger
+from common import is_valid
 
 class Fitbit:
 	"""

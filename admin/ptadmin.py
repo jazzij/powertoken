@@ -1,8 +1,17 @@
+"""
+module ptadmin\n
+Main class of the PowerToken/Admin Flask application\n
+Last modified by Abigail Franz on 2/21/2018
+"""
+
 import math
 import dbmanager
 from ptmodels import PtLog, PtUser
 
-class Admin:
+class PtAdmin:
+	"""
+	Main class for the PowerToken/Admin application
+	"""
 	pt_users = {}
 
 	def __init__(self):
@@ -28,16 +37,17 @@ class Admin:
 
 	def _get_last_progress(self, user_id):
 		"""
-		Return the latest progress for the user.
+		Return the latest progress (daily and weekly) for the user.
 		"""
 		logs = dbmanager.get_logs(user_id)
 		last_index = len(logs) - 1
 		last_log = logs[last_index]
-		return math.floor(last_log["wc_progress"] * 100)
+		daily_progress = math.floor(last_log["daily_progress"] * 100)
+		weekly_progress = math.floor(last_log["weekly_progress"] * 100)
+		return daily_progress, weekly_progress
 
 	def _track_user(self, row):
-		wc_login_status = "Current" if (row["wc_id"] and row["wc_token"]) else "Expired"
-		fb_login_status = "Current" if row["fb_token"] else "Expired"
-		last_daily_progress = self._get_last_progress(row["id"])
-		last_weekly_progress = self._compute_weekly_progress(row["id"])
-		self.pt_users[row["id"]] = PtUser(row, fb, wc)
+		wc_status = "Current" if (row["wc_id"] and row["wc_token"]) else "Expired"
+		fb_status = "Current" if row["fb_token"] else "Expired"
+		daily_progress, weekly_progress = self._get_last_progress(row["id"])
+		self.pt_users[row["id"]] = PtUser(row, fb, wc, daily_progress, weekly_progress)

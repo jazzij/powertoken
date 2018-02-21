@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 2/21/2018
 
 import math
 from flask import Flask, json, redirect, render_template, request, url_for
-import admin
+from ptadmin import PtAdmin
 from ptmodels import PtLog, PtUser
 
 # Creates a new Flask server application
@@ -18,8 +18,8 @@ app = Flask(__name__)
 @app.route("/index")
 @app.route("/default")
 def home():
-	pt_users = admin.load_users()
-	return render_template("home.html", pt_users=pt_users)
+	admin = PtAdmin()
+	return render_template("home.html", pt_users=admin.pt_users)
 	
 @app.route("/manage")
 def manage():

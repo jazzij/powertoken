@@ -16,15 +16,17 @@ class PtUserOld:
 		self.wc_weekly_progress = wc_daily_progress / 7
 
 class PtUser:
-	def __init__(self, row, wc_login_status, fb_login_status):
+	def __init__(self, row, wc_login_status, fb_login_status, daily_progress=0,
+				weekly_progress=0):
 		self.row = row
 		self.wc_login_status = wc_login_status
 		self.fb_login_status = fb_login_status
-		self.last_daily_progress = 0
-		self.last_weekly_progress = 0
+		self.daily_progress = daily_progress
+		self.weekly_progress = weekly_progress
 
 class PtLog:
-	def __init__(self, id, user_id, timestamp, wc_progress, fb_step_count):
+	def __init__(self, id, user_id, timestamp, daily_progress, weekly_progress,
+				fb_step_count):
 		self.id = id
 		self.user_id = user_id
 		self.timestamp = timestamp
