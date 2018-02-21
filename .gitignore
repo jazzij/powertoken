@@ -3,4 +3,5 @@ __pycache__/*
 ptdata/*
 tests/*
 venv/*
+!venv/lib/python2.7/site-packages/dbmanager
 *.pyc
