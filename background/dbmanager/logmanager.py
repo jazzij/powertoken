@@ -17,8 +17,9 @@ def create_logs_if_dne():
 	query = ''' CREATE TABLE IF NOT EXISTS logs(
 					id INTEGER PRIMARY KEY,
 					timestamp TEXT NOT NULL,
-					wc_progress REAL NOT NULL,
-					fb_step_count INTEGER NOT NULL,
+					daily_progress REAL NOT NULL,
+					weekly_progress REAL,
+					step_count INTEGER NOT NULL,
 					user_id INTEGER NOT NULL, 
 						FOREIGN KEY (user_id) REFERENCES users(id)) '''
 	db = sqlite3.connect(DB_PATH)
@@ -35,18 +36,20 @@ def create_logs_if_dne():
 	finally:
 		db.close()
 
-def insert_log(user_id, wc_progress, fb_step_count):
+def insert_log(user_id, daily_progress, weekly_progress, step_count):
 	"""
 	Insert a new log row into the database. Return Boolean indicating success.
 	"""
 	timestamp = _get_sqlite_timestamp()
-	query = ''' INSERT INTO logs(user_id, timestamp, wc_progress, fb_step_count)
-				VALUES(?, ?, ?, ?) '''
+	query = ''' INSERT INTO logs(user_id, timestamp, daily_progress, weekly_progress, 
+						step_count)
+				VALUES(?, ?, ?, ?, ?) '''
 	db = sqlite3.connect(DB_PATH)
 	db.row_factory = sqlite3.Row
 	try:
 		cursor = db.cursor()
-		cursor.execute(query, (user_id, timestamp, wc_progress, fb_step_count))
+		cursor.execute(query, (user_id, timestamp, daily_progress, 
+				weekly_progress, step_count))
 		db.commit()
 		return True
 	except Exception as e:

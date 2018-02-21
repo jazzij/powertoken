@@ -24,7 +24,7 @@ class WeConnect:
 		logging.basicConfig(filename="pt.log", level=logging.DEBUG, 
 				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 
-	def poll(self):
+	def poll_old(self):
 		"""
 		Poll WEconnect for changes in progress. -1 denotes a failed request.
 		"""
@@ -34,6 +34,13 @@ class WeConnect:
 		elif self._goal_period == "weekly":
 			start, end = self._get_week()
 		return self._get_progress(start, end)
+
+	def poll(self):
+		start, end = self._get_today()
+		daily_progress = self._get_progress(start, end)
+		start, end = self._get_week()
+		weekly_progress = self._get_progress(start, end)
+		return daily_progress, weekly_progress
 
 	def _get_progress(self, from_date, to_date):
 		"""

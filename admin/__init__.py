@@ -1,4 +1,8 @@
-# admin.py
+"""
+module __init__\n
+Handles the routing for the PowerToken/Admin Flask application\n
+Last modified by Abigail Franz on 2/21/2018
+"""
 
 import math
 from flask import Flask, json, redirect, render_template, request, url_for
@@ -19,19 +23,11 @@ def home():
 	
 @app.route("/manage")
 def manage():
-	'''
-	pt_users = [
-		PtUser("Norbert", "01-27-2018 08:30:00", "Current", "Current"),
-		PtUser("DaraS", "01-27-2018 08:40:00", "Current", "Expired")
-	]
-	'''
-	return render_template("manage.html", pt_users=pt_users)
+	return render_template("manage.html")
 	
 @app.route("/stats")
 def stats():
-	dbm = dbmanager.DbManager()
-	pt_stats = dbm.load_logs()
-	return render_template("stats.html", pt_stats=pt_stats)
+	return render_template("stats.html")
 	
 @app.route("/docs")
 def docs():

@@ -3,7 +3,7 @@ module ptmodels\n
 Templates for user and log objects.
 """
 
-class PtUser:
+class PtUserOld:
 	def __init__(self, id, username, registered_on, goal_period, wc_login_status,
 			fb_login_status, wc_daily_progress):
 		self.id = id
@@ -14,6 +14,14 @@ class PtUser:
 		self.fb_login_status = fb_login_status
 		self.wc_daily_progress = wc_daily_progress
 		self.wc_weekly_progress = wc_daily_progress / 7
+
+class PtUser:
+	def __init__(self, row, wc_login_status, fb_login_status):
+		self.row = row
+		self.wc_login_status = wc_login_status
+		self.fb_login_status = fb_login_status
+		self.last_daily_progress = 0
+		self.last_weekly_progress = 0
 
 class PtLog:
 	def __init__(self, id, user_id, timestamp, wc_progress, fb_step_count):

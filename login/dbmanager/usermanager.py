@@ -77,6 +77,7 @@ def update_wc_info(username, goal_period, wc_id, wc_token):
 	Boolean indicating success.
 	"""
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
 		cursor = db.cursor()
 		query = '''UPDATE users SET goal_period=?, wc_id=?, wc_token=? WHERE username=?'''
@@ -95,8 +96,8 @@ def wc_info_filled(username):
 	Return True if the user's record contains his/her WEconnect info.
 	"""
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
-		db.row_factory = sqlite3.Row
 		cursor = db.cursor()
 		query = '''SELECT wc_id, wc_token FROM users WHERE username=?'''
 		cursor.execute(query, (username,))
@@ -118,8 +119,8 @@ def fb_info_filled(username):
 	Returns True if the user's record contains his/her Fitbit info.
 	"""
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
-		db.row_factory = sqlite3.Row
 		cursor = db.cursor()
 		query = '''SELECT fb_token FROM users WHERE username=?'''
 		cursor.execute(query, (username,))
@@ -142,6 +143,7 @@ def update_fb_info(username, fb_token):
 	indicating success.
 	"""
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
 		cursor = db.cursor()
 		query = '''UPDATE users SET fb_token=? WHERE username=?'''
@@ -160,6 +162,7 @@ def get_users():
 	Return all the users in the database as a list of Row objects.
 	"""
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
 		cursor = db.cursor()
 		query = '''SELECT * FROM users'''
@@ -177,8 +180,8 @@ def get_user(username=None, id=None):
 	Return a single user, specified by username or id, as a Row object.
 	"""
 	db = sqlite3.connect(DB_PATH)
+	db.row_factory = sqlite3.Row
 	try:
-		db.row_factory = sqlite3.Row
 		cursor = db.cursor()
 		if username != None:
 			query = '''SELECT * FROM users WHERE username=?'''
@@ -192,6 +195,18 @@ def get_user(username=None, id=None):
 		return user
 	except Exception as e:
 		print(format("Couldn't retrieve users. Message: %s" % (e,)))
+		return None
+	finally:
+		db.close()
+
+def count_users():
+	db = sqlite3.connect(DB_PATH)
+	try:
+		cursor = db.cursor()
+		cursor.execute("SELECT COUNT(*) FROM users")
+		return cursor.fetchone()[0]
+	except Exception as e:
+		print(format("Couldn't count the users. Message: %s" % (e,)))
 		return None
 	finally:
 		db.close()

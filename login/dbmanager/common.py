@@ -11,9 +11,9 @@ DB_PATH = "/export/scratch/powertoken/ptdata/pt.db"
 
 def _get_sqlite_timestamp():
 	"""
-	Get the current date and time in a format that Sqlite can understand.
+	Get the current date and time in a format that Sqlite likes.
 	"""
 	dt = datetime.now()
-	formatted = format("%d-%02d-%02d %02d:%02d:%02d.000" 
-				% (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second))
+	formatted = format("%d-%02d-%02d %02d:%02d" 
+				% (dt.year, dt.month, dt.day, dt.hour, dt.minute))
 	return formatted
