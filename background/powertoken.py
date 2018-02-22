@@ -94,3 +94,5 @@ class PowerToken:
 			step_count = self.pt_users[id].fb.reset_and_update(progress)
 			dbmanager.insert_log(id, daily_progress, weekly_progress, step_count)
 			self.pt_users[id].last_progress = progress
+
+		delay(60)
