@@ -5,6 +5,7 @@ Created by Abigail Franz on 2/20/2018\n
 Last modified by Abigail Franz on 2/21/2018
 """
 
+import time
 import dbmanager
 import weconnect, fitbit
 
@@ -95,4 +96,4 @@ class PowerToken:
 			dbmanager.insert_log(id, daily_progress, weekly_progress, step_count)
 			self.pt_users[id].last_progress = progress
 
-		delay(60)
+		time.sleep(60)
