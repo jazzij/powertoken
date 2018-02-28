@@ -1,0 +1,54 @@
+.pt-lr-gradient {
+    background: linear-gradient(to right, #0099FF 25%, #00FF99);
+        background: -moz-linear-gradient(to right, #0099FF 25%, #00FF99);
+        background: -o-linear-gradient(to right, #0099FF 25%, #00FF99);
+        background: -webkit-linear-gradient(to right, #0099FF 25%, #00FF99);
+    color: white;
+}
+.pt-tb-gradient {
+    background: linear-gradient(to bottom, #0099FF, #00FF99);
+    background: -moz-linear-gradient(to bottom, #0099FF, #00FF99);
+    background: -o-linear-gradient(to bottom, #0099FF, #00FF99);
+    background: -webkit-linear-gradient(to bottom, #0099FF, #00FF99);
+    color: white;
+}
+
+.pt-navbar {
+    background: white;
+    padding-bottom: 1em;
+    background: linear-gradient(to right, #0099FF 25%, #00FF99) left bottom no-repeat;
+    background-size: 100% 1em;
+    box-sizing: border-box;
+}
+.pt-hamburger {
+    font-size: x-large;
+    color: rgba(0, 0, 0, 0.5)!important;
+}
+.pt-hamburger:hover, .pt-hamburger:active {
+    color: rgba(0, 0, 0, 0.7)!important;
+}
+.pt-title, .pt-title sub {
+    font-family: 'Kaushan Script', cursive;
+    background: -webkit-linear-gradient(#0099FF, #00FF99);
+    background-clip: text;
+	-webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.pt-title {
+    font-size: xx-large;
+    margin-left: 1em;
+}
+.pt-nav-link {
+    color: rgba(255, 255, 255, 1.0);
+}
+
+.pt-table-striped tbody tr:nth-of-type(odd) {
+    background-color: #0099FF33;
+}
+.pt-table-striped tbody tr:hover {
+    background-color: #0099FF55;
+}
+
+.pt-lightweight {
+    font-weight: 200;
+}

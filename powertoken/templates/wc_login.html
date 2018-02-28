@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+	<div class="card">
+		<p>Now enter your WEconnect info. Your information will not be stored or seen by the researchers.</p>
+		<form id="wc_login_form" action="{{url_for('wc_login')}}" method="post">
+			<div class="form-group">
+				<label for="email">Email:</label>
+				<input name="email" type="email" required />
+			</div>
+			<div class="form-group">
+				<label for="password">Password:</label>
+				<input name="password" type="password" required />
+			</div>
+			<div class="form-group">
+				<label for="goalPeriod">Measure my progress daily or weekly?</label>
+				<input type="radio" name="goalPeriod" value="daily" checked="checked" />
+				<input type="radio" name="goalPeriod" value="weekly" />
+			</div>
+			<div class="form-group">
+				<label>&nbsp;</label>
+				<input type="submit" value="NEXT" class="btn" />
+			</div>
+		</form>
+		<p class="warning">{{login_error}}</p>
+	</div>
+{% endblock %}
