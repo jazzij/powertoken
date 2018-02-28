@@ -15,6 +15,8 @@ def poll_and_update():
 	owns them to a list. Then poll all the users in the list for progress.
 	"""
 	user_ids = dbmanager.get_users_with_current_activities()
+	if user_ids == None:
+		return
 	for id in user_ids:
 		user = dbmanager.get_user(id=id)
 		wc = WeConnect(user["wc_id"], user["wc_token"], user["goal_period"])
