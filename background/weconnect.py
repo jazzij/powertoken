@@ -36,6 +36,9 @@ class WeConnect:
 		return self._get_progress(start, end)
 
 	def poll(self):
+		"""
+		Poll WEconnect for changes in progress. -1 denotes a failed request.
+		"""
 		start, end = self._get_today()
 		daily_progress = self._get_progress(start, end)
 		start, end = self._get_week()
