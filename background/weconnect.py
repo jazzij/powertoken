@@ -90,3 +90,12 @@ class WeConnect:
 		end = format("%d-%02d-%02dT%02d:%02d:%02d" 
 				% (today.year, today.month, today.day, 23, 59, 59))
 		return start, end
+
+def get_activities(wc_id, wc_token):
+	url = format("https://palalinq.herokuapp.com/api/people/%s/activities?access_token=%s" 
+		% (wc_id, wc_token))
+	response = requests.get(url)
+	if is_valid(response):
+		return response.json()
+	else:
+		return None

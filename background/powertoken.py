@@ -19,39 +19,19 @@ class PtUser:
 class PowerToken:
 	"""
 	Main class of the PowerToken background application.
+	Runs every fifteen minutes (Cron job). Gets list of activities from the
+	database, sorts it by time. If any start or end within the next fifteen
+	minutes, add that user to a list. Then poll all the users in the list for
+	progress.
 	"""
 	STEP_GOAL = 1000000
-	pt_users = {}
+	pt_users = []
 
 	def __init__(self):
-		rows = dbmanager.get_users()
-		for row in rows:
-			self._track_user(row)
-
-	def _track_user(self, row):
-		# Doesn't add the user if any fields are missing
-		if not (row["id"] and row["username"] and row["registered_on"]
-				and row["goal_period"] and row["wc_id"] and row["wc_token"]
-				and row["fb_token"]):
-			return
-
-		fb = fitbit.Fitbit(row["fb_token"], row["goal_period"])
-		wc = weconnect.WeConnect(row["wc_id"], row["wc_token"],
-				row["goal_period"])
-		fb.change_step_goal(self.STEP_GOAL)
-		self.pt_users[row["id"]] = PtUser(row, fb, wc)
-
-	# user is a Row object from the database
-	def _is_tracked_old(self, user):
-		results = [u for u in self.pt_users if u.row == user]
-		if len(results) > 0:
-			return True
-		else:
-			return False
-
-	# User is represented as a Row object from the database
-	def _is_tracked(self, row):
-		return row["id"] in self.pt_users
+		user_ids = dbmanager.get_users_with_current_activities()
+		for user_id in user_ids:
+			user = dbmanager.get_user(id=user_id)
+			self.pt_users.push(user)
 
 	def run_old(self):
 		"""
