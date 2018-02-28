@@ -45,6 +45,9 @@ def maintain_activities():
 	"""
 	print("Running activity maintenance...")
 
+	# Just in case activities table has been deleted
+	dbmanager.create_activities_if_dne()
+
 	# Makes sure activities aren't assigned to "ghost users"
 	activities = dbmanager.get_activities()
 	user_ids = dbmanager.get_user_ids()
@@ -54,7 +57,7 @@ def maintain_activities():
 
 	# Makes sure no activities are expired
 	activities = dbmanager.get_activities()
-	dt_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+	dt_format = "%Y-%m-%d %H:%M:%S"
 	now = datetime.now()
 	for activity in activities:
 		expiration = datetime.strptime(activity["expiration"], dt_format)
