@@ -38,10 +38,10 @@ def maintain_users():
 
 def maintain_activities():
 	"""
-	Go through the activities table of the database and check 2 things:
+	Go through the activities table of the database and check 3 things:
 	1. No activity is assigned to a user that no longer exists in the database.
 	2. All activities are unexpired, and expired activities are removed.
-	3. If users have added new activities, those are added to the database.
+	3. If users have added/updated activities, those are added to the database.
 	"""
 	print("Running activity maintenance...")
 
