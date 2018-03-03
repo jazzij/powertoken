@@ -13,7 +13,8 @@ from fitbit import Fitbit
 # Configures logging for the module
 logger = logging.getLogger("background.poll_and_update")
 logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
+logpath = "/export/scratch/powertoken/ptdata/background.poll_and_update.log"
+handler = logging.FileHandler(logpath)
 handler.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s: %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
