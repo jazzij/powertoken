@@ -72,7 +72,7 @@ def maintain_activities():
 	activities = dbmanager.get_activities()
 	now = datetime.now()
 	for act in activities:
-		expiration = datetime.strptime(act["expiration"], dbmanager.HR_FORMAT)
+		expiration = datetime.strptime(act["expiration"], dbmanager.WC_FORMAT)
 		if expiration <= now:
 			success = dbmanager.delete_activity(act["id"])
 			if not success:
