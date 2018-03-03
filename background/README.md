@@ -41,6 +41,6 @@ The `poll_and_update.py` script performs the main function of the PowerToken sys
 
 1. If any activities (from the database) start or end within the next 15 minutes, add the user who owns them to a list. 
 2. For each user in the list:
-    A. Poll WEconnect for progress. Progress is returned as a decimal percentage.
-    B. Update Fitbit with the new step count `progress * 1000000`.
-    C. Add an entry to the `logs` table of the database.
+    1. Poll WEconnect for progress. Progress is returned as a decimal percentage.
+    2. Update Fitbit with the new step count `progress * 1000000`.
+    3. Add an entry to the `logs` table of the database.
