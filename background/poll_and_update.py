@@ -45,6 +45,8 @@ def poll_and_update():
 		# the logs.
 		if progress == -1:
 			logger.error("Couldn't get progress for user with id %d", id)
+		elif progress == 0:
+			logger.error("User with id %d has no progress yet today", id)
 		else:
 			step_count = fb.reset_and_update(progress)
 			if step_count == -1:
