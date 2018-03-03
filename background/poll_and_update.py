@@ -16,7 +16,7 @@ logger.setLevel(logging.INFO)
 logpath = "/export/scratch/powertoken/ptdata/background.poll_and_update.log"
 handler = logging.FileHandler(logpath)
 handler.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s: %(levelname)s - %(message)s")
+formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -45,17 +45,17 @@ def poll_and_update():
 		# If the poll request succeeded, updates Fitbit and adds a new entry to
 		# the logs.
 		if progress == -1:
-			logger.error("Couldn't get progress for user with id %d", id)
+			logger.error("\tCouldn't get progress for user with id %d.", id)
 		elif progress == 0:
-			logger.error("User with id %d has no progress yet today", id)
+			logger.info("\tUser with id %d has no progress yet today.", id)
 		else:
 			step_count = fb.reset_and_update(progress)
 			if step_count == -1:
-				logger.error("Couldn't update Fitbit for user with id %d", id)
+				logger.error("\tCouldn't update Fitbit for user with id %d.", id)
 			else:
 				dbmanager.insert_log(id, daily_progress, weekly_progress, step_count)
 
 if __name__ == "__main__":
-	logger.info("Starting the poll-and-update loop...")
+	logger.info("Running the poll-and-update loop...")
 	poll_and_update()
-	logger.info("...Finished the poll-and-update loop.")
+	logger.info("...Done.")

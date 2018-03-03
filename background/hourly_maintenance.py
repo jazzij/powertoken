@@ -16,7 +16,7 @@ logger.setLevel(logging.INFO)
 logpath = "/export/scratch/powertoken/ptdata/background.hourly_maintenance.log"
 handler = logging.FileHandler(logpath)
 handler.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s: %(levelname)s - %(message)s")
+formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
@@ -26,7 +26,7 @@ def maintain_users():
 	1. All user fields are complete, and incomplete profiles are removed.
 	2. All WEconnect and Fitbit access tokens are unexpired.
 	"""
-	logger.info("Running user maintenance...")
+	logger.info("\tRunning user maintenance...")
 
 	# Removes incomplete user rows from the database
 	users = dbmanager.get_users()
@@ -35,16 +35,16 @@ def maintain_users():
 			and user["fb_token"]):
 			success = dbmanager.delete_user(user["id"])
 			if not success:
-				logger.error("Unable to delete user with id %d", user["id"])
+				logger.error("\t\tUnable to delete user with id %d.", user["id"])
 
 	# Makes sure all access tokens are current
 	users = dbmanager.get_users()
 	for user in users:
 		# Determine if WC token is expired
 		# Determine if FB token is expired
-		logger.warning("Token expiration check not implemented.")
+		logger.warning("\t\tToken expiration check not implemented.")
 
-	logger.info("Done.")
+	logger.info("\t...Done.")
 
 def maintain_activities():
 	"""
@@ -53,12 +53,12 @@ def maintain_activities():
 	2. All activities are unexpired, and expired activities are removed.
 	3. If users have added/updated activities, those are added to the database.
 	"""
-	logger.info("Running activity maintenance...")
+	logger.info("\tRunning activity maintenance...")
 
 	# Just in case activities table has been deleted
 	success = dbmanager.create_activities_if_dne()
 	if not success:
-		logger.error("Unable to determine if the activities table exists.") 
+		logger.error("\t\tUnable to determine if activities table exists.") 
 
 	# Makes sure activities aren't assigned to "ghost users"
 	activities = dbmanager.get_activities()
@@ -67,7 +67,7 @@ def maintain_activities():
 		if not act["user_id"] in user_ids:
 			success = dbmanager.delete_activity(act["id"])
 			if not success:
-				logger.error("Unable to delete activity with id %d", act["id"])
+				logger.error("\t\tUnable to delete activity with id %d", act["id"])
 
 	# Makes sure no activities are expired
 	activities = dbmanager.get_activities()
@@ -77,7 +77,7 @@ def maintain_activities():
 		if expiration <= now:
 			success = dbmanager.delete_activity(act["id"])
 			if not success:
-				logger.error("Unable to delete activity with id %d", act["id"])
+				logger.error("\t\tUnable to delete activity with id %d", act["id"])
 
 	# Adds new activities
 	users = dbmanager.get_users()
@@ -88,12 +88,12 @@ def maintain_activities():
 			was_added = dbmanager.insert_activity(user["id"], act)
 			if was_added:
 				added_count = added_count + 1
-	logger.info("%d activities added to the database", added_count)
+	logger.info("\t\t%d activities added to the database.", added_count)
 
-	logger.info("Done")
+	logger.info("\t...Done.")
 
 if __name__ == "__main__":
-	logger.info("Starting database maintenance...")
+	logger.info("Running database maintenance...")
 	maintain_users()
 	maintain_activities()
-	logger.info("...Finished database maintenance.")
+	logger.info("...Done.")
