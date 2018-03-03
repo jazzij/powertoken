@@ -1,16 +1,23 @@
 """
 module hourly_maintenance\n
 Script that makes sure the database is up-to-date.\n
-Meant to be run as a job in CronTab.\n
+Meant to be run as a job in Cron Tab.\n
 Created by Abigail Franz on 2/28/2018\n
 """
 
+import logging
 from datetime import datetime
 import dbmanager
 import weconnect
 
-# Global list to hold errors encountered during maintenance
-errors = []
+# Configures logging for the module
+logger = logging.getLogger("background.hourly_maintenance")
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s: %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 def maintain_users():
 	"""
@@ -18,23 +25,25 @@ def maintain_users():
 	1. All user fields are complete, and incomplete profiles are removed.
 	2. All WEconnect and Fitbit access tokens are unexpired.
 	"""
-	print("Running user maintenance...")
+	logger.info("Running user maintenance...")
 
 	# Removes incomplete user rows from the database
 	users = dbmanager.get_users()
 	for user in users:
 		if not(user["username"] and user["wc_id"] and user["wc_token"]
 			and user["fb_token"]):
-			dbmanager.delete_user(user["id"])
+			success = dbmanager.delete_user(user["id"])
+			if not success:
+				logger.error("Unable to delete user with id %d", user["id"])
 
 	# Makes sure all access tokens are current
 	users = dbmanager.get_users()
 	for user in users:
 		# Determine if WC token is expired
 		# Determine if FB token is expired
-		x = 1 + 1
+		logger.warning("Token expiration check not implemented.")
 
-	print("Done.")
+	logger.info("Done.")
 
 def maintain_activities():
 	"""
@@ -43,41 +52,48 @@ def maintain_activities():
 	2. All activities are unexpired, and expired activities are removed.
 	3. If users have added/updated activities, those are added to the database.
 	"""
-	print("Running activity maintenance...")
+	logger.info("Running activity maintenance...")
 
 	# Just in case activities table has been deleted
-	dbmanager.create_activities_if_dne()
+	success = dbmanager.create_activities_if_dne()
+	if not success:
+		logger.error("Unable to determine if the activities table exists.") 
 
 	# Makes sure activities aren't assigned to "ghost users"
 	activities = dbmanager.get_activities()
 	user_ids = dbmanager.get_user_ids()
-	for activity in activities:
-		if not activity["user_id"] in user_ids:
-			dbmanager.delete_activity(activity["id"])
+	for act in activities:
+		if not act["user_id"] in user_ids:
+			success = dbmanager.delete_activity(act["id"])
+			if not success:
+				logger.error("Unable to delete activity with id %d", act["id"])
 
 	# Makes sure no activities are expired
 	activities = dbmanager.get_activities()
 	dt_format = "%Y-%m-%d %H:%M:%S"
 	now = datetime.now()
-	for activity in activities:
-		expiration = datetime.strptime(activity["expiration"], dt_format)
+	for act in activities:
+		expiration = datetime.strptime(act["expiration"], dt_format)
 		if expiration <= now:
-			dbmanager.delete_activity(activity["id"])
+			success = dbmanager.delete_activity(act["id"])
+			if not success:
+				logger.error("Unable to delete activity with id %d", act["id"])
 
 	# Adds new activities
 	users = dbmanager.get_users()
 	added_count = 0
 	for user in users:
 		activities = weconnect.get_activities(user["wc_id"], user["wc_token"])
-		for activity in activities:
-			was_added = dbmanager.insert_activity(user["id"], activity)
+		for act in activities:
+			was_added = dbmanager.insert_activity(user["id"], act)
 			if was_added:
 				added_count = added_count + 1
-	print(format("%d activities added to the database" % (added_count,)))
+	logger.info("%d activities added to the database", added_count)
 
-	print("Done")
+	logger.info("Done")
 
 if __name__ == "__main__":
+	logger.info("Starting database maintenance...")
 	maintain_users()
 	maintain_activities()
-	print("Finished database maintenance; no errors to report.")
+	logger.info("...Finished database maintenance.")
