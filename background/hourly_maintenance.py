@@ -13,7 +13,8 @@ import weconnect
 # Configures logging for the module
 logger = logging.getLogger("background.hourly_maintenance")
 logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
+logpath = "/export/scratch/powertoken/ptdata/background.hourly_maintenance.log"
+handler = logging.FileHandler(logpath)
 handler.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s: %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
