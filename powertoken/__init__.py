@@ -127,11 +127,13 @@ def admin():
 
 @app.route("/admin/user_stats")
 def user_stats():
-	return render_template("admin/user_stats.html")
+	admin = ptadmin.PtAdmin()
+	return render_template("admin/user_stats.html", pt_users=admin.pt_users)
 
 @app.route("/admin/progress_logs")
 def progress_logs():
-	return render_template("admin/progress_logs.html")
+	admin = ptadmin.PtAdmin()
+	return render_template("admin/progress_logs.html", pt_logs=admin.pt_logs)
 
 @app.route("/admin/system_logs")
 def system_logs():
