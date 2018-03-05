@@ -117,6 +117,7 @@ def fb_login():
 		return render_template("main/home.html")
 
 @app.route("/admin")
+@app.route("/admin/")
 @app.route("/admin/home")
 @app.route("/admin/index")
 @app.route("/admin/default")

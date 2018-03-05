@@ -33,7 +33,7 @@ def load_users():
 	for row in pt_users_raw:
 		wc_status = "Current" if (row["wc_id"] and row["wc_token"]) else "Expired"
 		fb_status = "Current" if row["fb_token"] else "Expired"
-		daily_progress, weekly_progress = self._get_last_progress(row["id"])
+		daily_progress, weekly_progress = get_last_progress(row["id"])
 		user = PtUser(row, fb_status, wc_status, daily_progress, weekly_progress)
 		pt_users[row["id"]] = user
 	return pt_users
@@ -47,7 +47,7 @@ def load_logs():
 		pt_logs[row["id"]] = log
 	return pt_logs
 
-def _get_last_progress(self, user_id):
+def get_last_progress(user_id):
 	"""
 	Return the latest progress (daily and weekly) for the user.
 	"""
