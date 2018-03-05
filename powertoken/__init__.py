@@ -135,7 +135,7 @@ def progress_logs():
 
 @app.route("/admin/system_logs")
 def system_logs():
-	retuurn render_template("admin/system_logs.html")
+	return render_template("admin/system_logs.html")
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":

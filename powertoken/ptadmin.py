@@ -24,14 +24,14 @@ class PtLog:
 	Object to represent a progress log.
 	"""
 	def __init__(self, id, user_id, username, timestamp, daily_progress,
-			weekly_progress, fb_step_count):
+			weekly_progress, step_count):
 		self.id = id
 		self.user_id = user_id
 		self.username = username
 		self.timestamp = timestamp
 		self.daily_progress = daily_progress
 		self.weekly_progress = weekly_progress
-		self.fb_step_count = fb_step_count
+		self.step_count = step_count
 
 class PtAdmin:
 	"""
@@ -92,6 +92,6 @@ class PtAdmin:
 			row["timestamp"],
 			row["daily_progress"],
 			row["weekly_progress"],
-			row["fb_step_count"]
+			row["step_count"]
 		)
 		self.pt_logs[row["id"]] = log
