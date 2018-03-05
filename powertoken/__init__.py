@@ -7,7 +7,7 @@
 import os, requests
 from flask import Flask, json, redirect, render_template, request, url_for
 from flask.sessions import SecureCookieSession
-import login, admin
+import login, ptadmin
 
 # Creates a new Flask server application
 app = Flask(__name__)
@@ -122,7 +122,7 @@ def fb_login():
 @app.route("/admin/default")
 def admin():
 	# Gets the admin page
-	admin = admin.PtAdmin()
+	admin = ptadmin.PtAdmin()
 	return render_template("admin/home.html", pt_users=admin.pt_users)
 
 # In production, debug will probably be set to False.
