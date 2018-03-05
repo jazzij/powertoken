@@ -1,5 +1,5 @@
 # PowerToken Background Scripts
-### (Last Update, 3/2/2018)
+### (Last Update, 3/5/2018)
 
 
 ## Dependencies
@@ -14,11 +14,12 @@
 
 The scripts `hourly_maintenance.py` and `poll_and_update.py` are meant to be run as Cron jobs. You can edit your Cron Tab to run them periodically using `crontab -e` and adding these two lines:
 
-`0 * * * * python <absolute-path>/powertoken/background/hourly_maintenance.py > <absolute-path>/powertoken/ptdata/maintenance.log`
-
-`0,15,30,45 * * * * python <absolute-path>/powertoken/background/poll_and_update.py > <absolute-path>/powertoken/ptdata/polling.log`
+`0 * * * * bash <absolute-path>/powertoken/run_maintenance.sh`
+`0,15,30,45 * * * * bash <absolute-path>/powertoken/run_polling.sh`
 
 We have the maintenance script set to run at the beginning of every hour and the polling script to run at the 0, 15, 30, and 45 minute marks (effectively every 15 minutes).
+
+You might notice that we are not running `hourly_maintenance.py` and `poll_and_update.py` directly from Cron. This is because both utilize a virtualenv, which Cron has no knowledge of. Instead, the bash scripts `run_maintenance.sh` and `run_polling.sh` activate the virtualenv, run the respective Python script, and then deactivate the virtualenv.
 
 
 ## Database Maintenance
@@ -44,3 +45,5 @@ The `poll_and_update.py` script performs the main function of the PowerToken sys
     1. Poll WEconnect for progress. Progress is returned as a decimal percentage.
     2. Update Fitbit with the new step count `progress * 1000000`.
     3. Add an entry to the `logs` table of the database.
+
+The two classes used by the application are `WeConnect` and `Fitbit`, which are located in the [weconnect.py](weconnect.py) and [fitbit.py](fitbit.py) files, respectively. As might be expected, the `WeConnect` class handles API calls to WEconnect and the `Fitbit` class handles API calls to Fitbit.

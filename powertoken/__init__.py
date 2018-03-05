@@ -37,14 +37,14 @@ def home():
 	if not session.get("username"):
 		return redirect(url_for("pt_login"))
 	else:
-		return render_template("home.html", username=session["username"])
+		return render_template("main/home.html", username=session["username"])
 
 @app.route("/pt_login", methods=["GET", "POST"])
 def pt_login():
 	# GET: renders the PowerToken login page
 	if request.method == "GET":
 		print("A browser requested the pt_login.html file")
-		return render_template("pt_login.html")
+		return render_template("main/pt_login.html")
 
 	# POST: processes the PowerToken login form
 	elif request.method == "POST":
@@ -76,7 +76,7 @@ def wc_login():
 	# GET: renders the WEconnect login page
 	if request.method == "GET":
 		print("A browser requested the wc_login.html file")
-		return render_template("wc_login.html")
+		return render_template("main/wc_login.html")
 
 	# POST: processes the WEconnect login form
 	elif request.method == "POST":
@@ -91,7 +91,7 @@ def wc_login():
 		# If the login failed, reloads the page with an error message
 		if not login_successful:
 			error_message = "Login failed. Try again."
-			return render_template("wc_login.html", login_error=error_message)
+			return render_template("main/wc_login.html", login_error=error_message)
 
 		# Redirects to Fitbit login page
 		return redirect(url_for("fb_login"))
@@ -101,7 +101,7 @@ def fb_login():
 	# GET: renders the Fitbit login page
 	if request.method == "GET":
 		print("A browser requested the fb_login.html page")
-		return render_template("fb_login.html")
+		return render_template("main/fb_login.html")
 
 	# When Fitbit is all setup, fb_login.js redirects here.
 	elif request.method == "POST":
@@ -114,13 +114,16 @@ def fb_login():
 		login.complete_fb_login(session.get("username"), datajs["tok"])
 
 		# This code will never be called but must be present
-		return render_template("home.html")
+		return render_template("main/home.html")
 
-@app.route("/admin-55455")
+@app.route("/admin")
+@app.route("/admin/home")
+@app.route("/admin/index")
+@app.route("/admin/default")
 def admin():
 	# Gets the admin page
 	admin = admin.PtAdmin()
-	return render_template("admin.html", pt_users=admin.pt_users)
+	return render_template("admin/home.html", pt_users=admin.pt_users)
 
 # In production, debug will probably be set to False.
 if __name__ == "__main__":
