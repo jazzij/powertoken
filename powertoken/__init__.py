@@ -125,6 +125,18 @@ def admin():
 	admin = ptadmin.PtAdmin()
 	return render_template("admin/home.html", pt_users=admin.pt_users)
 
+@app.route("/admin/user_stats")
+def user_stats():
+	return render_template("admin/user_stats.html")
+
+@app.route("/admin/progress_logs")
+def progress_logs():
+	return render_template("admin/progress_logs.html")
+
+@app.route("/admin/system_logs")
+def system_logs():
+	retuurn render_template("admin/system_logs.html")
+
 # In production, debug will probably be set to False.
 if __name__ == "__main__":
 	print("Running the Flask app")

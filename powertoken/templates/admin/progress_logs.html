@@ -1,0 +1,19 @@
+{% extends "admin/layout.html" %}
+{% block content %}
+<table class="pt-table">
+	<tr>
+		<th>Username</th>
+		<th>Timestamp</th>
+        <th>Daily Progress</th>
+        <th>Weekly Progress</th>
+	</tr>
+	{% for id in pt_logs %}
+	<tr>
+		<td>{{pt_users[id].username}}</td>
+        <td>{{pt_users[id].timestamp}}</td>
+        <td>{{pt_users[id].daily_progress}}</td>
+        <td>{{pt_users[id].weekly_progress}}</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}
