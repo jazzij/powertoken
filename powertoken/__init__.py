@@ -122,18 +122,18 @@ def fb_login():
 @app.route("/admin/default")
 def admin():
 	# Gets the admin page
-	admin = ptadmin.PtAdmin()
-	return render_template("admin/home.html", pt_users=admin.pt_users)
+	users = ptadmin.load_users()
+	return render_template("admin/home.html", pt_users=users)
 
 @app.route("/admin/user_stats")
 def user_stats():
-	admin = ptadmin.PtAdmin()
-	return render_template("admin/user_stats.html", pt_users=admin.pt_users)
+	users = ptadmin.load_users()
+	return render_template("admin/user_stats.html", pt_users=users)
 
 @app.route("/admin/progress_logs")
 def progress_logs():
-	admin = ptadmin.PtAdmin()
-	return render_template("admin/progress_logs.html", pt_logs=admin.pt_logs)
+	logs = ptadmin.load_logs()
+	return render_template("admin/progress_logs.html", pt_logs=logs)
 
 @app.route("/admin/system_logs")
 def system_logs():

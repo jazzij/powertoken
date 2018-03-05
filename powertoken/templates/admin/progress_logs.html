@@ -9,10 +9,10 @@
 	</tr>
 	{% for id in pt_logs %}
 	<tr>
-		<td>{{pt_users[id].username}}</td>
-        <td>{{pt_users[id].timestamp}}</td>
-        <td>{{pt_users[id].daily_progress}}</td>
-        <td>{{pt_users[id].weekly_progress}}</td>
+		<td>{{pt_logs[id].username}}</td>
+        <td>{{pt_logs[id].row["timestamp"]}}</td>
+        <td>{{pt_logs[id].row["daily_progress"]}}</td>
+        <td>{{pt_logs[id].row["weekly_progress"]}}</td>
 	</tr>
 	{% endfor %}
 </table>

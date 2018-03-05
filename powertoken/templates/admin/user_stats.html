@@ -11,8 +11,9 @@
 	</tr>
 	{% for id in pt_users %}
 	<tr>
-		<td>{{pt_logs[id]["user_id"]}}</td>
-		<td>{{pt_logs[id].row["registered_on"]}}</td>
+        <td>{{id}}</td>
+        <td>{{pt_users[id].row["username"]}}</td>
+		<td>{{pt_users[id].row["registered_on"]}}</td>
 		<td>{{pt_users[id].row["wc_id"]}}</td>
         <td>{{pt_users[id].row["wc_token"]}}</td>
         <td>{{pt_users[id].row["fb_token"]}}</td>
