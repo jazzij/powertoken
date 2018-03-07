@@ -53,6 +53,10 @@
     background-color: #0099FF55;
 }
 
+.pt-hide-overflow {
+    text-overflow: ellipsis;
+}
+
 .pt-lightweight {
     font-weight: 200;
 }
