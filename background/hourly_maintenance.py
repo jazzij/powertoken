@@ -92,8 +92,22 @@ def maintain_activities():
 
 	logger.info("\t...Done.")
 
+def maintain_admins():
+	"""
+	Go through the admins table of the database and check 1 thing:
+	"""
+	logger.info("\tRunning admin maintenance...")
+
+	# Just in case admins table has been deleted
+	success = dbmanager.create_admins_if_dne()
+	if not success:
+		logger.error("\t\tUnable to determine if admins table exists.")
+	
+	logger.info("\t...Done.")
+
 if __name__ == "__main__":
 	logger.info("Running database maintenance...")
 	maintain_users()
 	maintain_activities()
+	maintain_admins()
 	logger.info("...Done.")

@@ -6,6 +6,7 @@ Last modified by Abigail Franz on 3/5/2018
 
 import math
 import dbmanager
+import adminlogin
 
 class PtUser:
 	"""
@@ -78,6 +79,16 @@ def _track_log(self, row):
 		row["step_count"]
 	)
 	self.pt_logs[row["id"]] = log
+
+def signup_login(email, username, password):
+	if dbmanager.admin_exists(email):
+		if dbmanager.check_admin_password(email, password):
+			return "logged in"
+		else:
+			return "login failure"
+	else:
+		dbmanager.insert_admin(email, password, username)
+		return "signed up"
 
 class PtAdmin:
 	"""

@@ -126,6 +126,20 @@ def admin():
 	users = ptadmin.load_users()
 	return render_template("admin/home.html", pt_users=users)
 
+@app.route("/admin/login", methods=["GET", POST"])
+def admin_login():
+	if request.method == "GET":
+		return render_template("admin/login.html")
+	elif request.method == "POST":
+		email = request.form["email"]
+		username = request.form["username"]
+		password = request.form["password"]
+		status = ptadmin.signup_login(email, username, password)
+		if status == "login failure":
+			return render_template("admin/login.html")
+		else:
+			return redirect(url_for("admin/home"))
+
 @app.route("/admin/user_stats")
 def user_stats():
 	users = ptadmin.load_users()
