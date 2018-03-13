@@ -73,6 +73,7 @@ def user_wc_login():
 		# Gets WEconnect info and adds it to the database
 		email = form.email.data
 		password = form.password.data
+		print(email, password)
 		wc_id, wc_token = login_to_wc(email, password)
 		print(wc_id, wc_token)
 		user.wc_id = wc_id
