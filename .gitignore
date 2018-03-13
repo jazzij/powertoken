@@ -1,7 +1,6 @@
 __pycache__/*
 .vscode/*
-ptdata/*
-tests/*
+data/*
+logs/*
 venv/*
-!venv/lib/python2.7/site-packages/dbmanager
 *.pyc
