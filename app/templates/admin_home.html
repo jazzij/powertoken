@@ -12,22 +12,34 @@
 		<th>Today's Progress</th>
 		<th>This Week's Progress</th>
 	</tr>
-	{% for id in pt_users %}
+	{% for pt_user in pt_users %}
 	<tr>
-		<td>{{pt_users[id].row["username"]}}</td>
-		<td>{{pt_users[id].row["registered_on"]}}</td>
-		<td>{{pt_users[id].wc_login_status}}</td>
-		<td>{{pt_users[id].fb_login_status}}</td>
+		<td>{{pt_user.user.username}}</td>
+		<td>{{pt_user.user.registered_on}}</td>
 		<td>
-			<svg id="daily{{id}}" width="50" height="50"></svg>
+			{% if pt_user.user.wc_id and pt_user.user.wc_token %}
+				Current
+			{% else %}
+				Expired
+			{% endif %}
+		</td>
+		<td>
+			{% if pt_user.user.fb_token %}
+				Current
+			{% else %}
+				Expired
+			{% endif %}
+		</td>
+		<td>
+			<svg id="daily{{pt_user.user.id}}" width="50" height="50"></svg>
 			<script>
-				var gauge = loadLiquidFillGauge("daily{{id}}", "{{pt_users[id].daily_progress}}");
+				var gauge = loadLiquidFillGauge("daily{{pt_user.user.id}}", "{{pt_user.last_log.daily_progress}}");
 			</script>
 		</td>
 		<td>
-			<svg id="weekly{{id}}" width="50" height="50"></svg>
+			<svg id="weekly{{pt_user.user.id}}" width="50" height="50"></svg>
 			<script>
-				var gauge = loadLiquidFillGauge("weekly{{id}}", "{{pt_users[id].weekly_progress}}");
+				var gauge = loadLiquidFillGauge("weekly{{pt_user.user.id}}", "{{pt_user.last_log.weekly_progress}}");
 			</script>
 		</td>
 	</tr>

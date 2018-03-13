@@ -7,12 +7,12 @@
 			<th>Daily Progress</th>
 			<th>Weekly Progress</th>
 		</tr>
-		{% for id in pt_logs %}
+		{% for log in logs %}
 			<tr>
-				<td>{{pt_logs[id].username}}</td>
-				<td>{{pt_logs[id].row["timestamp"]}}</td>
-				<td>{{pt_logs[id].row["daily_progress"]}}</td>
-				<td>{{pt_logs[id].row["weekly_progress"]}}</td>
+				<td>{{log.user.username}}</td>
+				<td>{{log.timestamp}}</td>
+				<td>{{log.daily_progress}}</td>
+				<td>{{log.weekly_progress}}</td>
 			</tr>
 		{% endfor %}
 	</table>

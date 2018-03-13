@@ -8,7 +8,6 @@
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Kaushan+Script&text=PowerTokenAdmin" />
 		<link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}" />
 		<link rel="stylesheet" href="{{url_for('static', filename='css/fontawesome.min.css')}}" />
-		<link rel="stylesheet" href="{{url_for('static', filename='css/ptsetup.css')}}" />
 		<link rel="stylesheet" href="{{url_for('static', filename='css/bsadmin.css')}}" />
 		<link rel="stylesheet" href="{{url_for('static', filename='css/ptadmin.css')}}" />
 		<script src="https://d3js.org/d3.v3.min.js"></script>
@@ -29,7 +28,9 @@
 							<i class="fa fa-user"></i> {{current_user.username}}
 						</a>
 						<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-							<a class="dropdown-item" href="#">Log Out</a>
+							<a class="dropdown-item" href="{{url_for('admin_logout')}}">
+								<i class="fa fa-fw fa-sign-out-alt"></i> Log Out
+							</a>
 						</div>
 					</li>
 				</ul>

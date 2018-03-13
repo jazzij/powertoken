@@ -7,12 +7,12 @@
 			<th>WEconnect ID</th>
 			<th>Goal Period</th>
 		</tr>
-		{% for id in pt_users %}
+		{% for user in users %}
 			<tr>
-				<td>{{pt_users[id].row["username"]}}</td>
-				<td>{{pt_users[id].row["registered_on"]}}</td>
-				<td>{{pt_users[id].row["wc_id"]}}</td>
-				<td>{{pt_users[id].row["goal_period"]}}</td>
+				<td>{{user.username}}</td>
+				<td>{{user.registered_on}}</td>
+				<td>{{user.wc_id}}</td>
+				<td>{{user.goal_period}}</td>
 			</tr>
 		{% endfor %}
 	</table>

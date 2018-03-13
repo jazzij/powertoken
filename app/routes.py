@@ -114,7 +114,14 @@ def user_fb_login():
 @app.route("/admin/home")
 @login_required
 def admin_home():
-	return render_template("admin_home.html")
+	users = User.query.order_by(User.registered_on).all()
+	pt_users = []
+	for user in users:
+		last_log = user.logs[-1]
+		if last_log is None:
+			last_log = Log(daily_progress=0.0, weekly_progress=0.0)
+		pt_users.append({"user": user, "last_log": last_log})
+	return render_template("admin_home.html", pt_users=pt_users)
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -163,12 +170,14 @@ def admin_register():
 @app.route("/admin/progress_logs")
 @login_required
 def admin_progress_logs():
-	return render_template("admin_progress_logs.html")
+	logs = Log.query.order_by(Log.timestamp).all()
+	return render_template("admin_progress_logs.html", logs=logs)
 
 @app.route("/admin/user_stats")
 @login_required
 def admin_user_stats():
-	return render_template("admin_user_stats.html")
+	users = User.query.order_by(Log.timestamp).all()
+	return render_template("admin_user_stats.html", users=users)
 
 @app.route("/admin/system_logs")
 @login_required
