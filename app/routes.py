@@ -120,7 +120,7 @@ def admin_home():
 def admin_login():
 	print("Called admin_login()")
 	if current_user.is_authenticated:
-		return redirect(url_for("admin/home"))
+		return redirect(url_for("admin_home"))
 	form = AdminLoginForm()
 
 	# POST: If a valid form was submitted
@@ -130,11 +130,11 @@ def admin_login():
 		if admin is None or not admin.check_password(form.password.data):
 			flash("Invalid username or password")
 			print("Invalid username or password")
-			return redirect(url_for("admin/login"))
+			return redirect(url_for("admin_login"))
 		login_user(admin, remember=form.remember_me.data)
 		next_page = request.args.get("next")
 		if not next_page or url_parse(next_page).netloc != '':
-			next_page = url_for("admin/home")
+			next_page = url_for("admin_home")
 		print("next_page = {}".format(str(next_page)))
 		return redirect(next_page)
 
@@ -144,12 +144,12 @@ def admin_login():
 @app.route("/admin/logout")
 def admin_logout():
 	logout_user()
-	return redirect(url_for("admin/home"))
+	return redirect(url_for("admin_home"))
 
 @app.route("/admin/register", methods=["GET", "POST"])
 def admin_register():
 	if current_user.is_authenticated:
-		return redirect(url_for("admin/home"))
+		return redirect(url_for("admin_home"))
 	form = AdminRegistrationForm()
 	if form.validate_on_submit():
 		admin = Admin(username=form.username.data, email=form.email.data)
@@ -157,5 +157,20 @@ def admin_register():
 		db.session.add(admin)
 		db.session.commit()
 		login_user(admin, remember=False)
-		return redirect(url_for("admin/home"))
+		return redirect(url_for("admin_home"))
 	return render_template("admin_register.html", form=form)
+
+@app.route("/admin/progress_logs")
+@login_required
+def admin_progress_logs():
+	return render_template("admin_progress_logs.html")
+
+@app.route("/admin/user_stats")
+@login_required
+def admin_user_stats():
+	return render_template("admin_user_stats.html")
+
+@app.route("/admin/system_logs")
+@login_required
+def admin_system_logs():
+	return render_template("admin_system_logs.html")
