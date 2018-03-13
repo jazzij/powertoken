@@ -1,0 +1,36 @@
+{% extends "admin_layout.html" %}
+{% block content %}
+<p>
+	<h3 class="mb-4 pt-lightweight">Recent Activity</h1>
+</p>
+<table class="table table-responsive-sm pt-table-striped">
+	<tr>
+		<th>Username</th>
+		<th>Registered On</th>
+		<th>WEconnect Status</th>
+		<th>Fitbit Status</th>
+		<th>Today's Progress</th>
+		<th>This Week's Progress</th>
+	</tr>
+	{% for id in pt_users %}
+	<tr>
+		<td>{{pt_users[id].row["username"]}}</td>
+		<td>{{pt_users[id].row["registered_on"]}}</td>
+		<td>{{pt_users[id].wc_login_status}}</td>
+		<td>{{pt_users[id].fb_login_status}}</td>
+		<td>
+			<svg id="daily{{id}}" width="50" height="50"></svg>
+			<script>
+				var gauge = loadLiquidFillGauge("daily{{id}}", "{{pt_users[id].daily_progress}}");
+			</script>
+		</td>
+		<td>
+			<svg id="weekly{{id}}" width="50" height="50"></svg>
+			<script>
+				var gauge = loadLiquidFillGauge("weekly{{id}}", "{{pt_users[id].weekly_progress}}");
+			</script>
+		</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endblock %}

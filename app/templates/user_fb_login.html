@@ -1,0 +1,10 @@
+{% extends "user_layout.html" %}
+{% block content %}
+
+<div class="block-1">
+	You will be redirected to the Fitbit login page shortly...
+</div>
+
+<script type="text/javascript" src="{{url_for('static', filename='js/fb_login.js')}}"></script>
+
+{% endblock %}
