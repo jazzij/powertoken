@@ -126,7 +126,7 @@ def admin():
 	users = ptadmin.load_users()
 	return render_template("admin/home.html", pt_users=users)
 
-@app.route("/admin/login", methods=["GET", POST"])
+@app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
 	if request.method == "GET":
 		return render_template("admin/login.html")
