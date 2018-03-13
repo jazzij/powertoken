@@ -34,12 +34,12 @@ def user_login():
 		username = form.username.data
 		print(username)
 		user = User.query.filter_by(username=username).first()
+		session["username"] = username
+		session.modified = True
 
 		# If the user has not been added to the database, adds the user to the
-		# session and the database
+		# database
 		if user is None:
-			session["username"] = username
-			session.modified = True
 			user = User(username=username)
 			db.session.add(user)
 			db.session.commit()
