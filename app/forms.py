@@ -8,7 +8,7 @@ Last modified by Abigail Franz on 3/13/2018
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
-from app.models import Admin, GoalPeriod
+from app.models import Admin
 
 class AdminLoginForm(FlaskForm):
 	username = StringField("Username", validators=[DataRequired()])
@@ -42,5 +42,5 @@ class UserWcLoginForm(FlaskForm):
 	email = StringField("Email", validators=[DataRequired(), Email()])
 	password = PasswordField("Password", validators=[DataRequired()])
 	goal_period = RadioField("Goal Period", 
-		choices=[("daily", GoalPeriod.daily), ("weekly", GoalPeriod.weekly)])
+		choices=[("daily", "daily"), ("weekly", "weekly")])
 	submit = SubmitField("Next")

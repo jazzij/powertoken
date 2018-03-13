@@ -12,6 +12,7 @@
 * WTForms library (http://wtforms.readthedocs.io/en/latest/)
 * Flask-WTF extension (https://flask-wtf.readthedocs.io/en/stable/)
 * Python Requests library (http://docs.python-requests.org/en/v0.10.6/)
+* Python Enum library (https://pypi.python.org/pypi/enum/)
 * JavaScript Fetch API (https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 * Fitbit Web API (https://dev.fitbit.com/reference/web-api/quickstart/)
 * WEconnect Web API (documentation not available to the public)

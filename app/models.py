@@ -5,14 +5,11 @@ Last modified by Abigail Franz on 3/13/2018.
 """
 
 from datetime import datetime
-from enum import Enum
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db, login
 
-class GoalPeriod(Enum):
-	daily = 0
-	weekly = 1
+#GoalPeriod = Enum("daily", "weekly")
 
 @login.user_loader
 def load_admin(id):
@@ -44,7 +41,7 @@ class User(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(64), index=True, unique=True)
 	registered_on = db.Column(db.DateTime, index=True, default=datetime.now())
-	goal_period = db.Column(db.Enum(GoalPeriod), default=GoalPeriod.daily)
+	goal_period = db.Column(db.String(16), default="daily")
 	wc_id = db.Column(db.Integer, unique=True)
 	wc_token = db.Column(db.String(128))
 	fb_token = db.Column(db.String(256))

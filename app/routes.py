@@ -30,11 +30,13 @@ def user_login():
 	form = UserLoginForm()
 
 	# POST: processes the PowerToken login form
-	if form.validate_on_submit():		
+	if form.validate_on_submit():
+		username = form.username.data
+		print(username)
+		user = User.query.filter_by(username=username).first()
+
 		# If the user has not been added to the database, adds the user to the
 		# session and the database
-		username = form.username.data
-		user = User.query.filter_by(username=username).first()
 		if user is None:
 			session["username"] = username
 			session.modified = True
@@ -68,10 +70,11 @@ def user_wc_login():
 			flash("Invalid user")
 			return redirect(url_for("user_login"))
 
-		# Gets WC info and adds it to db
+		# Gets WEconnect info and adds it to the database
 		email = form.email.data
 		password = form.password.data
 		wc_id, wc_token = login_to_wc(email, password)
+		print(wc_id, wc_token)
 		user.wc_id = wc_id
 		user.wc_token = wc_token
 		db.session.commit()
@@ -93,6 +96,7 @@ def user_fb_login():
 		
 		# Gets FB info and adds it to db
 		fb_token = complete_fb_login(request.data)
+		print(fb_token)
 		user.fb_token = fb_token
 		db.session.commit()
 
