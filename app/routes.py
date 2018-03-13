@@ -116,11 +116,11 @@ def user_fb_login():
 def admin_home():
 	return render_template("admin_home.html")
 
-@app.route("/admin/admin_login", methods=["GET", "POST"])
+@app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
 	print("Called admin_login()")
 	if current_user.is_authenticated:
-		return redirect(url_for("/admin/home"))
+		return redirect(url_for("admin/home"))
 	form = AdminLoginForm()
 
 	# POST: If a valid form was submitted
@@ -130,7 +130,7 @@ def admin_login():
 		if admin is None or not admin.check_password(form.password.data):
 			flash("Invalid username or password")
 			print("Invalid username or password")
-			return redirect(url_for("/admin/admin_login"))
+			return redirect(url_for("admin/login"))
 		login_user(admin, remember=form.remember_me.data)
 		next_page = request.args.get("next")
 		if not next_page or url_parse(next_page).netloc != '':
