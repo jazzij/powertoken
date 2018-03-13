@@ -20,7 +20,7 @@ from app.apis import login_to_wc, complete_fb_login
 @app.route("/index")
 @app.route("/home")
 def user_home():
-	if not session["username"]:
+	if not "username" in session:
 		return redirect(url_for("user_login"))
 	else:
 		return render_template("user_home.html", username=session["username"])
