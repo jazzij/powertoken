@@ -7,13 +7,12 @@ Created by Abigail Franz on 2/28/2018\n
 
 import logging
 from datetime import datetime
-import dbmanager
 import weconnect
 
 # Configures logging for the module
 logger = logging.getLogger("background.hourly_maintenance")
 logger.setLevel(logging.INFO)
-logpath = "/export/scratch/powertoken/ptdata/background.hourly_maintenance.log"
+logpath = "/export/scratch/powertoken/data/background.hourly_maintenance.log"
 handler = logging.FileHandler(logpath)
 handler.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")

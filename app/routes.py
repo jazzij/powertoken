@@ -49,11 +49,11 @@ def user_login():
 		
 		# If the user exists in the database, and the WEconnect and Fitbit info
 		# is already filled out, skips the login process.
-		if not (user.wc_id is None or user.wc_token is None):
+		if (not user.wc_id is None) and (not user.wc_token is None):
 			return redirect(url_for("user_home"))
 
-		# If the user exists in the database, but the WEconnect and Fitbit info
-		# isn't filled out, redirects to WEconnect login.
+		# If the user exists in the database, but the WEconnect (or Fitbit)
+		# info isn't filled out, redirects to WEconnect login.
 		return redirect(url_for("user_wc_login"))
 
 	# GET: renders the PowerToken login page
@@ -111,26 +111,34 @@ def user_fb_login():
 @app.route("/admin")
 @app.route("/admin/")
 @app.route("/admin/index")
-@app.route("/admn/home")
+@app.route("/admin/home")
 @login_required
 def admin_home():
 	return render_template("admin_home.html")
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
+	print("Called admin_login()")
 	if current_user.is_authenticated:
 		return redirect(url_for("admin/home"))
 	form = AdminLoginForm()
+
+	# POST: If a valid form was submitted
 	if form.validate_on_submit():
+		print("Submitted AdminLoginForm")
 		admin = Admin.query.filter_by(email=form.email.data).first()
 		if admin is None or not admin.check_password(form.password.data):
 			flash("Invalid username or password")
+			print("Invalid username or password")
 			return redirect(url_for("admin/login"))
-		login_user(admin, remember=False)
+		login_user(admin, remember=form.remember_me.data)
 		next_page = request.args.get("next")
 		if not next_page or url_parse(next_page).netloc != '':
 			next_page = url_for("admin/home")
+		print("next_page = {}".format(str(next_page)))
 		return redirect(next_page)
+
+	# GET: Renders the admin login template
 	return render_template("admin_login.html", form=form)
 
 @app.route("/admin/logout")
