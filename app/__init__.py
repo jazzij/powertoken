@@ -5,7 +5,7 @@ Last modified by Abigail Franz on 3/13/2018
 """
 
 from flask import Flask
-from flask.sessions import SecureCookieSession
+#from flask.sessions import SecureCookieSession
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -39,8 +39,8 @@ if not app.debug:
 		mail_handler.setLevel(logging.ERROR)
 		app.logger.addHandler(mail_handler)
 
-session = SecureCookieSession()
-session.permanent = True
-session.modified = True
+#session = SecureCookieSession()
+#session.permanent = True
+#session.modified = True
 
 from app import routes, models

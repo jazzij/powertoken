@@ -4,12 +4,12 @@ Created by Jasmine Jones\n
 Last modified by Abigail Franz on 3/13/2018
 """
 
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, session, url_for
 from flask_login import (
 	current_user, login_user, logout_user, login_required
 )
 from werkzeug.urls import url_parse
-from app import app, db, session
+from app import app, db
 from app.forms import (
 	AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
 )
@@ -20,7 +20,7 @@ from app.apis import login_to_wc, complete_fb_login
 @app.route("/index")
 @app.route("/home")
 def user_home():
-	if not session.get("username"):
+	if not session["username"]:
 		return redirect(url_for("user_login"))
 	else:
 		return render_template("user_home.html", username=session["username"])
