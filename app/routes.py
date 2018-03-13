@@ -126,7 +126,7 @@ def admin_login():
 	# POST: If a valid form was submitted
 	if form.validate_on_submit():
 		print("Submitted AdminLoginForm")
-		admin = Admin.query.filter_by(email=form.email.data).first()
+		admin = Admin.query.filter_by(username=form.username.data).first()
 		if admin is None or not admin.check_password(form.password.data):
 			flash("Invalid username or password")
 			print("Invalid username or password")
