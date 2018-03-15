@@ -1,15 +1,15 @@
 """
 Handles routing and form processing for the PowerToken Flask app.\n
 Created by Jasmine Jones\n
-Last modified by Abigail Franz on 3/13/2018
+Last modified by Abigail Franz on 3/15/2018
 """
 
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import (
 	current_user, login_user, logout_user, login_required
 )
 from werkzeug.urls import url_parse
-from app import app, db
+from app import app, db, session
 from app.forms import (
 	AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
 )
@@ -33,9 +33,10 @@ def user_login():
 	if form.validate_on_submit():
 		username = form.username.data
 		print(username)
-		user = User.query.filter_by(username=username).first()
 		session["username"] = username
 		session.modified = True
+		session.permanent = True
+		user = User.query.filter_by(username=username).first()
 
 		# If the user has not been added to the database, adds the user to the
 		# database
@@ -49,7 +50,8 @@ def user_login():
 		
 		# If the user exists in the database, and the WEconnect and Fitbit info
 		# is already filled out, skips the login process.
-		if (not user.wc_id is None) and (not user.wc_token is None):
+		if (not user.wc_id is None) and (not user.wc_token is None) and \
+			(not user.fb_token is None):
 			return redirect(url_for("user_home"))
 
 		# If the user exists in the database, but the WEconnect (or Fitbit)
@@ -67,17 +69,17 @@ def user_wc_login():
 	if form.validate_on_submit():
 		user = User.query.filter_by(username=session["username"]).first()
 		if user is None:
-			flash("Invalid user")
-			return redirect(url_for("user_login"))
+			return redirect(url_for("user_login"), errors=["Invalid user"])
 
 		# Gets WEconnect info and adds it to the database
 		email = form.email.data
 		password = form.password.data
-		print(email, password)
-		wc_id, wc_token = login_to_wc(email, password)
-		print(wc_id, wc_token)
-		user.wc_id = wc_id
-		user.wc_token = wc_token
+		result = login_to_wc(email, password)
+		if not result:
+			err = ["Incorrect email or password"]
+			return render_template("user_wc_login.html", form=form, errors=err)
+		user.wc_id = result[0]
+		user.wc_token = result[1]
 		db.session.commit()
 
 		# Redirects to the Fitbit login
@@ -90,10 +92,12 @@ def user_wc_login():
 def user_fb_login():
 	# If submitting the external form (POST)
 	if request.method == "POST":
+		if not "username" in session:
+			return redirect(url_for("user_login"))
+		print("Inside user_fb_login(), session['username'] =  {}".format(session["username"]))
 		user = User.query.filter_by(username=session["username"]).first()
 		if user is None:
-			flash("Invalid user")
-			return redirect(url_for("user_login"))
+			return redirect(url_for("user_login"), errors=["Invalid user"])
 		
 		# Gets FB info and adds it to db
 		fb_token = complete_fb_login(request.data)

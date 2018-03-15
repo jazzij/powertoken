@@ -22,7 +22,7 @@ def login_to_wc(email, password):
 	wc_id = str(jres["accessToken"]["userId"])
 	wc_token = str(jres["accessToken"]["id"])
 	print(wc_id, wc_token)
-	return wc_id, wc_token
+	return (wc_id, wc_token)
 
 def complete_fb_login(response_data):
 	"""

@@ -40,7 +40,7 @@ var processResponse = function(response) {
 // SEND token to server
 if (fbTok) {
     console.log("fbTok = " + fbTok)
-    fetch(homeURL + '/user_fb_login', {
+    fetch(callback, {
     	method: 'POST', 
 		mode: 'no-cors',
 		body: JSON.stringify({tok: fbTok})
