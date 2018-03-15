@@ -106,6 +106,7 @@ def user_fb_login():
 		db.session.commit()
 
 		# Redirects to welcome page when setup is finished
+		print("Will be redirecting to homepage...")
 		return redirect(url_for("user_home"))
 
 	# If requesting the redirect page (GET)

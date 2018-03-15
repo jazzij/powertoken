@@ -8,7 +8,7 @@ var fbTok;
 var clientID = '228N2H';
 var homeURL = 'https://powertoken.grouplens.org';
 var callback = homeURL + '/user_fb_login';
-var landingPage = homeURL + '/home';
+var landingPage = homeURL + '/';
 var authURI = 'https://www.fitbit.com/oauth2/authorize';
 var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
