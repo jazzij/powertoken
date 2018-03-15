@@ -33,7 +33,7 @@ var processResponse = function(response) {
 		throw new Error('Request failed' + response);
 	} else {
 		console.log("Switching to landing page from processResponse function");
-		window.location.href = landingPage;
+		window.location.href = homeURL;
 	}
 }
 

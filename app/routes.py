@@ -107,7 +107,7 @@ def user_fb_login():
 
 		# Redirects to welcome page when setup is finished
 		print("Will be redirecting to homepage...")
-		return redirect(url_for("user_home"))
+		return
 
 	# If requesting the redirect page (GET)
 	elif request.method == "GET":
@@ -122,9 +122,10 @@ def admin_home():
 	users = User.query.order_by(User.registered_on).all()
 	pt_users = []
 	for user in users:
-		last_log = user.logs[-1]
-		if last_log is None:
-			last_log = Log(daily_progress=0.0, weekly_progress=0.0)
+		last_log = Log(daily_progress=0.0, weekly_progress=0.0, step_count=0,
+			user_id=user.id)
+		if len(user.logs) > 0:
+			last_log = user.logs[-1]
 		pt_users.append({"user": user, "last_log": last_log})
 	return render_template("admin_home.html", pt_users=pt_users)
 
