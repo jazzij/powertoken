@@ -123,9 +123,10 @@ def admin_home():
 	pt_users = []
 	for user in users:
 		last_log = Log(daily_progress=0.0, weekly_progress=0.0, step_count=0,
-			user_id=user.id)
-		if len(user.logs) > 0:
-			last_log = user.logs[-1]
+			user=user)
+		logs = user.logs.all()
+		if len(logs) > 0:
+			last_log = logs[-1]
 		pt_users.append({"user": user, "last_log": last_log})
 	return render_template("admin_home.html", pt_users=pt_users)
 

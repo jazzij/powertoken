@@ -4,26 +4,30 @@
 		<p>Now enter your WEconnect info. Your information will not be stored or seen by the researchers.</p>
 		<form id="wc_login_form" action="" method="POST">
 			{{form.hidden_tag()}}
-			<div class="form-group">
-				<div>{{form.email.label}}</div>
-				<div>{{form.email}}</div>
+			<div class="row pt-form-group">
+				<div class="col-sm-4">{{form.email.label}}</div>
+				<div class="col-sm-8">{{form.email}}</div>
 			</div>
-			<div class="form-group">
-				<div>{{form.password.label}}</div>
-				<div>{{form.password}}</div>
+			<div class="row pt-form-group">
+				<div class="col-sm-4">{{form.password.label}}</div>
+				<div class="col-sm-8">{{form.password}}</div>
 			</div>
-			<div class="form-group">
-				<div>{{form.goal_period.label}}</div>
-				{% for subfield in form.goal_period %}
-					<div>{{subfield}}</div>
-					<div>{{subfield.label}}</div>
-				{% endfor %}
+			<div class="row pt-form-group">
+				<div class="col-sm-4">{{form.goal_period.label}}</div>
+				<div class="col-sm-8">
+					{% for subfield in form.goal_period %}
+						{{subfield}}
+						{{subfield.label}}<br />
+					{% endfor %}
+				</div>
 			</div>
-			<div class="form-group">
-				<div>&nbsp;</div>
-				<div>{{form.submit}}</div>
+			<div class="row pt-form-group">
+				<div class="col-sm-4">&nbsp;</div>
+				<div class="col-sm-8">{{form.submit}}</div>
 			</div>
 		</form>
-		<p class="warning">{{login_error}}</p>
+		{% for error in errors %}
+			<p class="warning">{{error}}</p>
+		{% endfor %}
 	</div>
 {% endblock %}
