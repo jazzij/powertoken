@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 3/15/2018.
 """
 
 from datetime import datetime
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
