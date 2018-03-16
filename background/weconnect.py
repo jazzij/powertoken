@@ -1,12 +1,14 @@
 """
-module weconnect\n
 This class contains the API calls to WEconnect (except for the login).\n
 Created by Abigail Franz\n
-Last modified by Abigail Franz on 2/16/2018
+Last modified by Abigail Franz on 3/16/2018
 """
 
 import datetime, json, logging, requests
-from common import is_valid
+from background.common import is_valid
+
+"""Format for datetimes received from WEconnect"""
+WC_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 class WeConnect:
 	"""

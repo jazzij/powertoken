@@ -1,12 +1,11 @@
 """
-module fitbit\n
 This class contains the API calls to Fitbit (except for the login).\n
 Created by Abigail Franz\n
-Last modified by Abigail Franz on 2/20/2018
+Last modified by Abigail Franz on 3/16/2018
 """
 
 import datetime, json, logging, requests
-from common import is_valid
+from background.common import is_valid
 
 class Fitbit:
 	"""

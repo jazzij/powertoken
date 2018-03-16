@@ -1,5 +1,4 @@
 """
-module common\n
 Functions common to both the weconnect and fitbit modules.\n
 Created by Abigail Franz on 2/16/2018\n
 Last modified by Abigail Franz on 2/20/2018
