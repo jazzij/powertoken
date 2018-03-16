@@ -9,9 +9,9 @@ import logging
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from background.weconnect import get_activities
-from background.models import Base, User, Log, Activity, DB_PATH
-from background.helpers import add_or_update_activity
+from weconnect import get_activities
+from models import Base, User, Log, Activity, DB_PATH
+from helpers import add_or_update_activity
 
 # Configures logging for the module
 logger = logging.getLogger("background.maintenance")
