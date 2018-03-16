@@ -6,22 +6,22 @@
             {{form.hidden_tag()}}
             <div class="row pt-form-group">
                 <div class="col-sm-4">{{form.username.label}}</div>
-                <div class="col-sm-8">{form.username(size=32)}}</div>
+                <div class="col-sm-8">{{form.username(size=32)}}</div>
             </div>
             <div class="row pt-form-group">
                 <div class="col-sm-4">{{form.password.label}}</div>
                 <div class="col-sm-8">{{form.password(size=32)}}</div>
             </div>
             <div class="row pt-form-group">
-                <div class="col-sm-4">{{form.remember_me()}}</div>
-                <div class="col-sm-8">{{form.remember_me.label}}</div>
+                {{form.remember_me()}}
+                {{form.remember_me.label}}
             </div>
             <div class="row pt-form-group">
                 <div class="col-sm-4">&nbsp;</div>
                 <div class="col-sm-8">{{form.submit()}}</div>
             </div>
         </form>
-        <a class="btn" href="{{url_for('admin_register')}}">
+        <a href="{{url_for('admin_register')}}">
             Click to register as an administrator.
         </a>
         {% for error in errors %}
