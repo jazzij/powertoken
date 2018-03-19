@@ -33,8 +33,9 @@ def add_or_update_activity(session, activity, user):
 		if existing:
 			modified = datetime.strptime(activity["dateModified"], WC_FORMAT)
 			if modified >= datetime.now() - timedelta(days=1):
-				existing = Activity(activity_id=act_id, start_time=st,
-					end_time=et, expiration=expiration, user=user)
+				existing.start_time = st
+				existing.end_time = et
+				existing.expiration = expiration
 				session.commit()
 				status = True
 			else:
