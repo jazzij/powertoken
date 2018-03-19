@@ -127,6 +127,7 @@ def admin_home():
 		logs = user.logs.all()
 		if len(logs) > 0:
 			last_log = logs[-1]
+			print("Last log is {}".format(last_log))
 		pt_users.append({"user": user, "last_log": last_log})
 	return render_template("admin_home.html", pt_users=pt_users)
 
@@ -183,7 +184,7 @@ def admin_progress_logs():
 @app.route("/admin/user_stats")
 @login_required
 def admin_user_stats():
-	users = User.query.order_by(Log.timestamp).all()
+	users = User.query.order_by(User.registered_on).all()
 	return render_template("admin_user_stats.html", users=users)
 
 @app.route("/admin/system_logs")

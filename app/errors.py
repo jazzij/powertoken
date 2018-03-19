@@ -4,7 +4,7 @@ Created by Abigail Franz on 3/12/2018\n
 Last modified by Abigail Franz on 3/13/2018
 """
 
-from flask import render_template
+from flask import redirect
 from app import app, db
 
 @app.errorhandler(404)
