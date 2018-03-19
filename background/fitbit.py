@@ -5,7 +5,7 @@ Last modified by Abigail Franz on 3/16/2018
 """
 
 import datetime, json, logging, requests
-from common import is_valid
+from common import is_valid, logfile
 
 class Fitbit:
 	"""
@@ -18,7 +18,7 @@ class Fitbit:
 	def __init__(self, fb_token, goal_period):
 		self._auth_headers = {'Authorization': 'Bearer ' + fb_token}
 		self._goal_period = goal_period
-		logging.basicConfig(filename="pt.log", level=logging.DEBUG, 
+		logging.basicConfig(filename=logfile, level=logging.DEBUG, 
 				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 
 	def change_step_goal(self, new_step_goal):

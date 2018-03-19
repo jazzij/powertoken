@@ -6,6 +6,8 @@ Last modified by Abigail Franz on 2/20/2018
 
 import requests
 
+logfile = "data/pt.log"
+
 def is_valid(response):
 	"""
 	Return a Boolean value indicating the success of an HTTP request.
