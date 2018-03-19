@@ -81,7 +81,7 @@ def maintain_activities():
 	# Adds new activities
 	added_count = 0
 	for user in users:
-		wc_acts = weconnect.get_activities(user.wc_id, user.wc_token)
+		wc_acts = get_activities(user.wc_id, user.wc_token)
 		for act in wc_acts:
 			was_added = add_or_update_activity(session, act, user)
 			if was_added:
