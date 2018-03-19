@@ -11,8 +11,18 @@
 			<tr>
 				<td>{{log.user.username}}</td>
 				<td>{{log.timestamp}}</td>
-				<td>{{log.daily_progress}}</td>
-				<td>{{log.weekly_progress}}</td>
+				<td>
+					<svg id="daily{{log.id}}" width="50" height="50"></svg>
+					<script>
+						var gauge = loadLiquidFillGauge("daily{{log.id}}", "{{log.daily_progress}}");
+					</script>
+				</td>
+				<td>
+					<svg id="weekly{{log.id}}" width="50" height="50"></svg>
+					<script>
+						var gauge = loadLiquidFillGauge("weekly{{log.id}}", "{{log.weekly_progress}}");
+					</script>
+				</td>
 			</tr>
 		{% endfor %}
 	</table>

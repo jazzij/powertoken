@@ -113,18 +113,28 @@ def user_fb_login():
 	elif request.method == "GET":
 		return render_template("user_fb_login.html")
 
+# Commenting out the login_required for ease of testing
 @app.route("/admin")
 @app.route("/admin/")
 @app.route("/admin/index")
 @app.route("/admin/home")
-@login_required
+#@login_required
 def admin_home():
 	users = User.query.order_by(User.registered_on).all()
 	pt_users = []
 	for user in users:
 		logs = user.logs.all()
-		last_log = logs[-1] if len(logs) > 0 else Log(daily_progress=0.0, weekly_progress=0.0, step_count=0, user=user)
-		pt_users.append({"user": user, "last_log": last_log})
+		last_log = logs[-1] if len(logs) > 0 else \
+			Log(daily_progress=0, weekly_progress=0, step_count=0, user=user)
+		pt_users.append({
+			"id": user.id,
+			"username": user.username,
+			"registered_on": user.registered_on,
+			"wc_status": "Current" if user.wc_id and user.wc_token else "Expired",
+			"fb_status": "Current" if user.fb_token else "Expired",
+			"daily_progress": last_log.daily_progress,
+			"weekly_progress": last_log.weekly_progress
+		})
 	return render_template("admin_home.html", pt_users=pt_users)
 
 @app.route("/admin/login", methods=["GET", "POST"])
