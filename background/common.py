@@ -4,10 +4,7 @@ Created by Abigail Franz on 2/16/2018\n
 Last modified by Abigail Franz on 2/20/2018
 """
 
-import logging, requests
-
-logging.basicConfig(filename="pt.log", level=logging.DEBUG, 
-		format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
+import requests
 
 def is_valid(response):
 	"""
