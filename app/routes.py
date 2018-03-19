@@ -4,6 +4,7 @@ Created by Jasmine Jones\n
 Last modified by Abigail Franz on 3/15/2018
 """
 
+from datetime import datetime
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import (
 	current_user, login_user, logout_user, login_required
@@ -129,11 +130,11 @@ def admin_home():
 		pt_users.append({
 			"id": user.id,
 			"username": user.username,
-			"registered_on": user.registered_on,
+			"registered_on": user.registered_on.strftime("%Y-%m-%d %I:%M:%S %p"),
 			"wc_status": "Current" if user.wc_id and user.wc_token else "Expired",
 			"fb_status": "Current" if user.fb_token else "Expired",
-			"daily_progress": last_log.daily_progress,
-			"weekly_progress": last_log.weekly_progress
+			"daily_progress": last_log.daily_progress * 100,
+			"weekly_progress": last_log.weekly_progress * 100
 		})
 	return render_template("admin_home.html", pt_users=pt_users)
 
@@ -182,18 +183,18 @@ def admin_register():
 	return render_template("admin_register.html", form=form)
 
 @app.route("/admin/progress_logs")
-@login_required
+#@login_required
 def admin_progress_logs():
 	logs = Log.query.order_by(Log.timestamp).all()
 	return render_template("admin_progress_logs.html", logs=logs)
 
 @app.route("/admin/user_stats")
-@login_required
+#@login_required
 def admin_user_stats():
 	users = User.query.order_by(User.registered_on).all()
 	return render_template("admin_user_stats.html", users=users)
 
 @app.route("/admin/system_logs")
-@login_required
+#@login_required
 def admin_system_logs():
 	return render_template("admin_system_logs.html")
