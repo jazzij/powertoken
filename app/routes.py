@@ -122,12 +122,8 @@ def admin_home():
 	users = User.query.order_by(User.registered_on).all()
 	pt_users = []
 	for user in users:
-		last_log = Log(daily_progress=0.0, weekly_progress=0.0, step_count=0,
-			user=user)
 		logs = user.logs.all()
-		if len(logs) > 0:
-			last_log = logs[-1]
-			print("Last log is {}".format(last_log))
+		last_log = logs[-1] if len(logs) > 0 else Log(daily_progress=0.0, weekly_progress=0.0, step_count=0, user=user)
 		pt_users.append({"user": user, "last_log": last_log})
 	return render_template("admin_home.html", pt_users=pt_users)
 
