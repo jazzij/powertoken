@@ -83,5 +83,5 @@ def get_users_with_current_activities(session):
 		if (st - margin).time() <= now and now <= (et + margin).time():
 			print(activity.user)
 			if not activity.user in users:
-				users.append(user)
+				users.append(activity.user)
 	return users
