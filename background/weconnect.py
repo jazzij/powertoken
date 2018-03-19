@@ -23,7 +23,7 @@ class WeConnect:
 		self._wc_id = wc_id
 		self._wc_token = wc_token
 		self._goal_period = goal_period
-		logging.basicConfig(filename="pt.log", level=logging.DEBUG, 
+		logging.basicConfig(filename=logfile, level=logging.DEBUG, 
 				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 
 	def poll_old(self):

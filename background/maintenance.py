@@ -83,7 +83,9 @@ def maintain_activities():
 	for user in users:
 		wc_acts = get_activities(user.wc_id, user.wc_token)
 		for act in wc_acts:
+			print(act)
 			was_added = add_or_update_activity(session, act, user)
+			print("Was it added? {}".format("Yes" if was_added else "No"))
 			if was_added:
 				added_count = added_count + 1
 	logger.info("\t\t%d activities added to the database.", added_count)
