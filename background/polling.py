@@ -9,10 +9,10 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from background.models import Base, User, Activity, Log, DB_PATH
-from background.weconnect import WeConnect
-from background.fitbit import Fitbit
-from background.helpers import get_users_with_current_activities
+from models import Base, User, Activity, Log, DB_PATH
+from weconnect import WeConnect
+from fitbit import Fitbit
+from helpers import get_users_with_current_activities
 
 # Configures logging for the module
 logger = logging.getLogger("background.polling")

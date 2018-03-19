@@ -4,8 +4,8 @@ Created by Abigail Franz on 3/16/2018
 """
 
 from datetime import datetime, timedelta, MAXYEAR
-from background.weconnect import WC_FORMAT
-from background.models import User, Activity
+from weconnect import WC_FORMAT
+from models import User, Activity
 
 def add_or_update_activity(session, activity, user):
 	"""
