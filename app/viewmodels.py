@@ -4,6 +4,7 @@ Created by Abigail Franz on 3/19/2018.\n
 """
 
 from datetime import datetime
+from app.models import Log
 
 class UserViewModel:
 	def __init__(self, user):
