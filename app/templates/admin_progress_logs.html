@@ -7,9 +7,9 @@
 			<th>Daily Progress</th>
 			<th>Weekly Progress</th>
 		</tr>
-		{% for log in logs %}
+		{% for log in log_vms %}
 			<tr>
-				<td>{{log.user.username}}</td>
+				<td>{{log.username}}</td>
 				<td>{{log.timestamp}}</td>
 				<td>
 					<svg id="daily{{log.id}}" width="50" height="50"></svg>

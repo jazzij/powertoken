@@ -1,36 +1,36 @@
 {% extends "admin_layout.html" %}
 {% block content %}
-<p>
-	<h3 class="mb-4 pt-lightweight">Recent Activity</h1>
-</p>
-<table class="table table-responsive-sm pt-table-striped">
-	<tr>
-		<th>Username</th>
-		<th>Registered On</th>
-		<th>WEconnect Status</th>
-		<th>Fitbit Status</th>
-		<th>Today's Progress</th>
-		<th>This Week's Progress</th>
-	</tr>
-	{% for pt_user in pt_users %}
-	<tr>
-		<td>{{pt_user.username}}</td>
-		<td>{{pt_user.registered_on}}</td>
-		<td>{{pt_user.wc_status}}</td>
-		<td>{{pt_user.fb_status}}</td>
-		<td>
-			<svg id="daily{{pt_user.id}}" width="50" height="50"></svg>
-			<script>
-				var gauge = loadLiquidFillGauge("daily{{pt_user.id}}", "{{pt_user.daily_progress}}");
-			</script>
-		</td>
-		<td>
-			<svg id="weekly{{pt_user.id}}" width="50" height="50"></svg>
-			<script>
-				var gauge = loadLiquidFillGauge("weekly{{pt_user.id}}", "{{pt_user.weekly_progress}}");
-			</script>
-		</td>
-	</tr>
-	{% endfor %}
-</table>
+	<p>
+		<h3 class="mb-4 pt-lightweight">Recent Activity</h1>
+	</p>
+	<table class="table table-responsive-sm pt-table-striped">
+		<tr>
+			<th>Username</th>
+			<th>Registered On</th>
+			<th>WEconnect Status</th>
+			<th>Fitbit Status</th>
+			<th>Today's Progress</th>
+			<th>This Week's Progress</th>
+		</tr>
+		{% for user in user_vms %}
+		<tr>
+			<td>{{user.username}}</td>
+			<td>{{user.registered_on}}</td>
+			<td>{{user.wc_status}}</td>
+			<td>{{user.fb_status}}</td>
+			<td>
+				<svg id="daily{{user.id}}" width="50" height="50"></svg>
+				<script>
+					var gauge = loadLiquidFillGauge("daily{{user.id}}", "{{user.daily_progress}}");
+				</script>
+			</td>
+			<td>
+				<svg id="weekly{{user.id}}" width="50" height="50"></svg>
+				<script>
+					var gauge = loadLiquidFillGauge("weekly{{user.id}}", "{{user.weekly_progress}}");
+				</script>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
 {% endblock %}

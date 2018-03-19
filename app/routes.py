@@ -16,6 +16,7 @@ from app.forms import (
 )
 from app.models import Admin, User, Log, Activity
 from app.apis import login_to_wc, complete_fb_login
+from app.viewmodels import UserViewModel, LogViewModel
 
 @app.route("/")
 @app.route("/index")
@@ -122,21 +123,10 @@ def user_fb_login():
 #@login_required
 def admin_home():
 	users = User.query.order_by(User.registered_on).all()
-	pt_users = []
+	user_vms = []
 	for user in users:
-		logs = user.logs.all()
-		last_log = logs[-1] if len(logs) > 0 else \
-			Log(daily_progress=0, weekly_progress=0, step_count=0, user=user)
-		pt_users.append({
-			"id": user.id,
-			"username": user.username,
-			"registered_on": user.registered_on.strftime("%Y-%m-%d %I:%M:%S %p"),
-			"wc_status": "Current" if user.wc_id and user.wc_token else "Expired",
-			"fb_status": "Current" if user.fb_token else "Expired",
-			"daily_progress": last_log.daily_progress * 100,
-			"weekly_progress": last_log.weekly_progress * 100
-		})
-	return render_template("admin_home.html", pt_users=pt_users)
+		user_vms.append(UserViewModel(user))
+	return render_template("admin_home.html", user_vms=user_vms)
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
@@ -186,7 +176,10 @@ def admin_register():
 #@login_required
 def admin_progress_logs():
 	logs = Log.query.order_by(Log.timestamp).all()
-	return render_template("admin_progress_logs.html", logs=logs)
+	log_vms = []
+	for log in logs:
+		log_vms.append(LogViewModel(log))
+	return render_template("admin_progress_logs.html", log_vms=log_vms)
 
 @app.route("/admin/user_stats")
 #@login_required
