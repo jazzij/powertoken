@@ -120,7 +120,7 @@ def user_fb_login():
 @app.route("/admin/")
 @app.route("/admin/index")
 @app.route("/admin/home")
-#@login_required
+@login_required
 def admin_home():
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
@@ -171,20 +171,20 @@ def admin_register():
 	return render_template("admin_register.html", form=form)
 
 @app.route("/admin/progress_logs")
-#@login_required
+@login_required
 def admin_progress_logs():
 	logs = Log.query.all()
 	log_vms = [LogViewModel(log) for log in logs]
 	return render_template("admin_progress_logs.html", log_vms=log_vms)
 
 @app.route("/admin/user_stats")
-#@login_required
+@login_required
 def admin_user_stats():
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
 	return render_template("admin_user_stats.html", user_vms=user_vms)
 
 @app.route("/admin/system_logs")
-#@login_required
+@login_required
 def admin_system_logs():
 	return render_template("admin_system_logs.html")
