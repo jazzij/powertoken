@@ -78,8 +78,9 @@ def user_wc_login():
 		password = form.password.data
 		result = login_to_wc(email, password)
 		if not result:
-			err = ["Incorrect email or password"]
-			return render_template("user_wc_login.html", form=form, errors=err)
+			print("Incorrect email or password")
+			errors = ["Incorrect email or password"]
+			return render_template("user_wc_login.html", form=form, errors=errors)
 		user.wc_id = result[0]
 		user.wc_token = result[1]
 		db.session.commit()
