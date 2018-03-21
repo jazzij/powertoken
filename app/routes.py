@@ -5,7 +5,7 @@ Last modified by Abigail Franz on 3/15/2018
 """
 
 from datetime import datetime
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, current_app
 from flask_login import (
 	current_user, login_user, logout_user, login_required
 )
@@ -72,7 +72,7 @@ def user_login():
 
 	# GET: renders the PowerToken login page
 	print("Received GET request for user_login page.")
-	return render_template("user_login.html", form=form, error=request.args.get("error"))
+	return render_template("user_login.html", form=form, errors=[request.args.get("error")])
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
