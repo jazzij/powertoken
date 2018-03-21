@@ -37,7 +37,6 @@ def user_login():
 	if form.validate_on_submit():
 		print("user_login form submitted.")
 		username = form.username.data
-		print(username)
 		session["username"] = username
 		session.modified = True
 		session.permanent = True
@@ -78,9 +77,12 @@ def user_wc_login():
 	# If submitting the form (POST)
 	if form.validate_on_submit():
 		print("wc_login form submitted.")
-		user = User.query.filter_by(username=session["username"]).first()
+		if "username" not in session:
+			print("'username' not in session.")
+			return redirect(url_for("user_login", error="Invalid user"))
+		user = User.query.filter_by(username=session.get("username")).first()
 		if user is None:
-			print("User with username {} doesn't exist. Redirecting to user_login.".format(session["username"]))
+			print("User with username {} doesn't exist. Redirecting to user_login.".format(session.get("username")))
 			return redirect(url_for("user_login"), error="Invalid user")
 
 		# Gets WEconnect info and adds it to the database
