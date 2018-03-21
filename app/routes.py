@@ -22,6 +22,8 @@ from app.viewmodels import UserViewModel, LogViewModel
 @app.route("/index")
 @app.route("/home")
 def user_home():
+	with app.app_context():
+		print(current_app.name)
 	if not "username" in session or not "authenticated" in session:
 		print("'username' or 'authenticated' not in session, so redirecting to login.")
 		return redirect(url_for("user_login"))
@@ -31,6 +33,8 @@ def user_home():
 
 @app.route("/user_login", methods=["GET", "POST"])
 def user_login():
+	with app.app_context():
+		print(current_app.name)
 	form = UserLoginForm()
 
 	# POST: processes the PowerToken login form
@@ -72,6 +76,8 @@ def user_login():
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
+	with app.app_context():
+		print(current_app.name)
 	form = UserWcLoginForm()
 
 	# If submitting the form (POST)
@@ -108,6 +114,8 @@ def user_wc_login():
 
 @app.route("/user_fb_login", methods=["GET", "POST"])
 def user_fb_login():
+	with app.app_context():
+		print(current_app.name)
 	# If submitting the external form (POST)
 	if request.method == "POST":
 		print("External fb_login POST data received.")

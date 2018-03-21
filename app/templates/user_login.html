@@ -18,6 +18,8 @@
 				<div class="col-sm-8">{{form.submit}}</div>
 			</div>
 		</form>
-		<p class="warning">{{error}}</p>
+		{% if not error is None %}
+			<p class="warning">{{error}}</p>
+		{% endif %}
 	</div>
 {% endblock %}
