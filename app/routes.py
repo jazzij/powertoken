@@ -38,8 +38,8 @@ def user_login():
 		print("user_login form submitted.")
 		username = form.username.data
 		session["username"] = username
-		session.modified = True
 		session.permanent = True
+		session.modified = True
 		user = User.query.filter_by(username=username).first()
 
 		# If the user has not been added to the database, adds the user to the

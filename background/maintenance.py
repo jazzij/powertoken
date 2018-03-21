@@ -2,7 +2,7 @@
 Script that makes sure the database is up-to-date.\n
 Meant to be run as a job in Crontab.\n
 Created by Abigail Franz on 2/28/2018.\n
-Modified by Abigail Franz on 3/15/2018.
+Modified by Abigail Franz on 3/21/2018.
 """
 
 import logging
@@ -92,6 +92,21 @@ def maintain_activities():
 
 	logger.info("\t...Done.")
 
+def maintain_logs():
+	"""
+	Makes sure no logs are assigned to "ghost users"
+	"""
+	logger.info("\tRunning activity maintenance...")
+
+	logs = session.query(Log).all()
+	users = session.query(User).all()
+	for log in logs:
+		if not log.user in users:
+			session.delete(log)
+			session.commit()
+
+	logger.info("\t...Done.")
+
 def maintain_admins():
 	"""
 	Go through the admins table of the database and check 1 thing:
@@ -106,5 +121,6 @@ if __name__ == "__main__":
 	logger.info("Running database maintenance...")
 	maintain_users()
 	maintain_activities()
+	maintain_logs()
 	maintain_admins()
 	logger.info("...Done.")
