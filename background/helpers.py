@@ -75,11 +75,11 @@ def get_users_with_current_activities(session):
 	"""
 	users = []
 	now = datetime.now().time()
+	margin = timedelta(minutes=15)
 	activities = session.query(Activity).all()
 	for activity in activities:
 		st = activity.start_time
 		et = activity.end_time
-		margin = timedelta(minutes=15)
 		if (st - margin).time() <= now and now <= (et + margin).time():
 			print(activity.user)
 			if not activity.user in users:
