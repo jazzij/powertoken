@@ -5,12 +5,14 @@ Last modified by Abigail Franz on 3/15/2018
 """
 
 from datetime import datetime
-from flask import flash, redirect, render_template, request, url_for, current_app
+from flask import (
+	flash, redirect, render_template, request, session, url_for
+)
 from flask_login import (
 	current_user, login_user, logout_user, login_required
 )
 from werkzeug.urls import url_parse
-from app import app, db, session
+from app import app, db
 from app.forms import (
 	AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
 )
@@ -22,19 +24,15 @@ from app.viewmodels import UserViewModel, LogViewModel
 @app.route("/index")
 @app.route("/home")
 def user_home():
-	with app.app_context():
-		print(current_app.name)
 	if not "username" in session or not "authenticated" in session:
 		print("'username' or 'authenticated' not in session, so redirecting to login.")
 		return redirect(url_for("user_login"))
 	else:
 		print("'username' and 'authenticated' in session, so showing the homepage,")
-		return render_template("user_home.html", username=session["username"])
+		return render_template("user_home.html", username=session.get("username"))
 
 @app.route("/user_login", methods=["GET", "POST"])
 def user_login():
-	with app.app_context():
-		print(current_app.name)
 	form = UserLoginForm()
 
 	# POST: processes the PowerToken login form
@@ -42,8 +40,6 @@ def user_login():
 		print("user_login form submitted.")
 		username = form.username.data
 		session["username"] = username
-		session.permanent = True
-		session.modified = True
 		user = User.query.filter_by(username=username).first()
 
 		# If the user has not been added to the database, adds the user to the
@@ -76,14 +72,12 @@ def user_login():
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
-	with app.app_context():
-		print(current_app.name)
 	form = UserWcLoginForm()
 
 	# If submitting the form (POST)
 	if form.validate_on_submit():
 		print("wc_login form submitted.")
-		if "username" not in session:
+		if not "username" in session:
 			print("'username' not in session.")
 			return redirect(url_for("user_login", error="Invalid user"))
 		user = User.query.filter_by(username=session.get("username")).first()
@@ -114,8 +108,6 @@ def user_wc_login():
 
 @app.route("/user_fb_login", methods=["GET", "POST"])
 def user_fb_login():
-	with app.app_context():
-		print(current_app.name)
 	# If submitting the external form (POST)
 	if request.method == "POST":
 		print("External fb_login POST data received.")
@@ -123,9 +115,9 @@ def user_fb_login():
 			print("No field 'username' in session. Redirecting to user_login.")
 			return redirect(url_for("user_login"), errors=["Invalid session"])
 		#print("Inside user_fb_login(), session['username'] =  {}".format(session["username"]))
-		user = User.query.filter_by(username=session["username"]).first()
+		user = User.query.filter_by(username=session.get("username")).first()
 		if user is None:
-			print("User with username {} doesn't exist. Redirecting to user_login.".format(session["username"]))
+			print("User with username {} doesn't exist. Redirecting to user_login.".format(session.get("username")))
 			return redirect(url_for("user_login"), errors=["Invalid user"])
 		
 		# Gets FB info and adds it to db
