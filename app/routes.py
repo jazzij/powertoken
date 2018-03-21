@@ -35,7 +35,7 @@ def user_login():
 
 	# POST: processes the PowerToken login form
 	if form.validate_on_submit():
-		print("user_login form submittedd.")
+		print("user_login form submitted.")
 		username = form.username.data
 		print(username)
 		session["username"] = username
@@ -69,7 +69,7 @@ def user_login():
 
 	# GET: renders the PowerToken login page
 	print("Received GET request for user_login page.")
-	return render_template("user_login.html", form=form)
+	return render_template("user_login.html", form=form, error=request.args.get("error"))
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
@@ -81,7 +81,7 @@ def user_wc_login():
 		user = User.query.filter_by(username=session["username"]).first()
 		if user is None:
 			print("User with username {} doesn't exist. Redirecting to user_login.".format(session["username"]))
-			return redirect(url_for("user_login"), errors=["Invalid user"])
+			return redirect(url_for("user_login"), error="Invalid user")
 
 		# Gets WEconnect info and adds it to the database
 		email = form.email.data
