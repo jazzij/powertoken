@@ -22,6 +22,7 @@ login.login_view = "admin_login"
 session = SecureCookieSession()
 session.permanent = True
 session.modified = True
+print("Created app and session objects.")
 
 if not app.debug:
 	if app.config["MAIL_SERVER"]:

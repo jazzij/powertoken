@@ -22,9 +22,11 @@ from app.viewmodels import UserViewModel, LogViewModel
 @app.route("/index")
 @app.route("/home")
 def user_home():
-	if not "username" in session:
+	if not "username" in session or not "authenticated" in session:
+		print("'username' or 'authenticated' not in session, so redirecting to login.")
 		return redirect(url_for("user_login"))
 	else:
+		print("'username' and 'authenticated' in session, so showing the homepage,")
 		return render_template("user_home.html", username=session["username"])
 
 @app.route("/user_login", methods=["GET", "POST"])
@@ -33,6 +35,7 @@ def user_login():
 
 	# POST: processes the PowerToken login form
 	if form.validate_on_submit():
+		print("user_login form submittedd.")
 		username = form.username.data
 		print(username)
 		session["username"] = username
@@ -43,24 +46,29 @@ def user_login():
 		# If the user has not been added to the database, adds the user to the
 		# database
 		if user is None:
+			print("User {} isn't in the db yet. Adding to db".format(username))
 			user = User(username=username)
 			db.session.add(user)
 			db.session.commit()
 
 			# Redirects to the WC login
+			print("Redirecting to WC login.")
+			return redirect(url_for("user_wc_login"))
+		
+		# If the user exists in the database, but the WEconnect (or Fitbit)
+		# info isn't filled out, redirects to WEconnect login.
+		if user.wc_id is None or user.wc_token is None or user.fb_token is None:
+			print("Not all the info is filled out for {}. Redirecting to WC login.".format(user))
 			return redirect(url_for("user_wc_login"))
 		
 		# If the user exists in the database, and the WEconnect and Fitbit info
 		# is already filled out, skips the login process.
-		if (not user.wc_id is None) and (not user.wc_token is None) and \
-			(not user.fb_token is None):
-			return redirect(url_for("user_home"))
-
-		# If the user exists in the database, but the WEconnect (or Fitbit)
-		# info isn't filled out, redirects to WEconnect login.
-		return redirect(url_for("user_wc_login"))
+		session["authenticated"] = True
+		print("All info is filled out for {}. Redirecting to home.".format(user))
+		return redirect(url_for("user_home"))
 
 	# GET: renders the PowerToken login page
+	print("Received GET request for user_login page.")
 	return render_template("user_login.html", form=form)
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
@@ -69,8 +77,10 @@ def user_wc_login():
 
 	# If submitting the form (POST)
 	if form.validate_on_submit():
+		print("wc_login form submitted.")
 		user = User.query.filter_by(username=session["username"]).first()
 		if user is None:
+			print("User with username {} doesn't exist. Redirecting to user_login.".format(session["username"]))
 			return redirect(url_for("user_login"), errors=["Invalid user"])
 
 		# Gets WEconnect info and adds it to the database
@@ -78,42 +88,50 @@ def user_wc_login():
 		password = form.password.data
 		result = login_to_wc(email, password)
 		if not result:
-			print("Incorrect email or password")
+			print("Incorrect WC email or password. Reloading wc_login page.")
 			errors = ["Incorrect email or password"]
 			return render_template("user_wc_login.html", form=form, errors=errors)
 		user.wc_id = result[0]
 		user.wc_token = result[1]
+		print("Updating {} with wc_id = {} and wc_token = {}".format(user, user.wc_id, user.wc_token))
 		db.session.commit()
 
 		# Redirects to the Fitbit login
+		print("Redirecting to fb_login.")
 		return redirect(url_for("user_fb_login"))
 
 	# If not submitting the form (GET)
+	print("Received GET request for wc_login page.")
 	return render_template("user_wc_login.html", form=form)
 
 @app.route("/user_fb_login", methods=["GET", "POST"])
 def user_fb_login():
 	# If submitting the external form (POST)
 	if request.method == "POST":
+		print("External fb_login POST data received.")
 		if not "username" in session:
-			return redirect(url_for("user_login"))
-		print("Inside user_fb_login(), session['username'] =  {}".format(session["username"]))
+			print("No field 'username' in session. Redirecting to user_login.")
+			return redirect(url_for("user_login"), errors=["Invalid session"])
+		#print("Inside user_fb_login(), session['username'] =  {}".format(session["username"]))
 		user = User.query.filter_by(username=session["username"]).first()
 		if user is None:
+			print("User with username {} doesn't exist. Redirecting to user_login.".format(session["username"]))
 			return redirect(url_for("user_login"), errors=["Invalid user"])
 		
 		# Gets FB info and adds it to db
 		fb_token = complete_fb_login(request.data)
-		print(fb_token)
 		user.fb_token = fb_token
+		print("Updating {} with fb_token = {}".format(user, user.fb_token))
 		db.session.commit()
 
 		# Redirects to welcome page when setup is finished
+		session["authenticated"] = True
 		print("Will be redirecting to homepage...")
-		return
+		return redirect(url_for("user_home"))
 
 	# If requesting the redirect page (GET)
 	elif request.method == "GET":
+		print("Received GET request for fb_login page.")
 		return render_template("user_fb_login.html")
 
 # Commenting out the login_required for ease of testing
