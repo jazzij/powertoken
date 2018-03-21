@@ -2,7 +2,7 @@
 {% block content %}
 	<div class="card">
 		<p>Now enter your WEconnect info. Your information will not be stored or seen by the researchers.</p>
-		<form id="wc_login_form" action="" method="POST">
+		<form id="wc_login_form" name="wc_login_form" action="" method="POST">
 			{{form.hidden_tag()}}
 			<div class="row pt-form-group">
 				<div class="col-sm-4">{{form.email.label}}</div>

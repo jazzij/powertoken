@@ -5,7 +5,7 @@ Last modified by Abigail Franz on 3/13/2018
 """
 
 from flask import Flask, session
-from flask.ext.session import Session
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
