@@ -82,8 +82,11 @@ def user_wc_login():
 	form = UserWcLoginForm()
 
 	# POST: Process the WEconnect login form.
-	if form.validate_on_submit():
+	if form.is_submitted():
 		print("wc_login form submitted.")
+
+		if not form.validate():
+			print("wc_login form did not validate.")
 
 		# If the username wasn't saved or the session expired, return to the
 		# original PowerToken login page.
