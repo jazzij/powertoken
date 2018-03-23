@@ -44,6 +44,6 @@ if (fbTok) {
     	method: 'POST', 
 		mode: 'no-cors',
 		body: JSON.stringify({tok: fbTok})
-    })
-    .then(processResponse)
+    });
+    //.then(processResponse)
 }
