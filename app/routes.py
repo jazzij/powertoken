@@ -235,7 +235,9 @@ def admin_user_stats():
 def admin_system_logs():
 	return render_template("admin_system_logs.html")
 
+"""
 @app.teardown_appcontext
 def teardown():
 	print("Tearing down appcontext")
 	app.do_teardown_appcontext()
+"""
