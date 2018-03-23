@@ -39,8 +39,10 @@ def user_login():
 	form = UserLoginForm()
 
 	# POST: processes the PowerToken login form
-	if form.validate_on_submit():
+	if form.is_submitted():
 		print("user_login form submitted.")
+		if not form.validate():
+			print("Form did not validate.")
 		username = form.username.data
 		session["username"] = username
 		user = User.query.filter_by(username=username).first()

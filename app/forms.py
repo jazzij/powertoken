@@ -41,6 +41,6 @@ class UserLoginForm(FlaskForm):
 class UserWcLoginForm(FlaskForm):
 	email = StringField("Email", validators=[InputRequired(), Email()])
 	password = PasswordField("Password", validators=[InputRequired()])
-	goal_period = RadioField("Goal Period", 
-		choices=[("daily", "daily"), ("weekly", "weekly")])
+	#goal_period = RadioField("Goal Period", 
+	#	choices=[("daily", "daily"), ("weekly", "weekly")])
 	submit = SubmitField("Next")

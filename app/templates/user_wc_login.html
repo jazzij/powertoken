@@ -2,7 +2,7 @@
 {% block content %}
 	<div class="card">
 		<p>Now enter your WEconnect info. Your information will not be stored or seen by the researchers.</p>
-		<form id="wc_login_form" name="wc_login_form" action="" method="post">
+		<form action="" method="post">
 			{{form.hidden_tag()}}
 			<div class="row pt-form-group">
 				<div class="col-sm-4">{{form.email.label}}</div>
@@ -10,8 +10,9 @@
 			</div>
 			<div class="row pt-form-group">
 				<div class="col-sm-4">{{form.password.label}}</div>
-				<div class="col-sm-8">{{form.password(size=64)}}</div>
+				<div class="col-sm-8">{{form.password(size=32)}}</div>
 			</div>
+			<!--
 			<div class="row pt-form-group">
 				<div class="col-sm-4">{{form.goal_period.label}}</div>
 				<div class="col-sm-8">
@@ -21,6 +22,7 @@
 					{% endfor %}
 				</div>
 			</div>
+			-->
 			<div class="row pt-form-group">
 				<div class="col-sm-4">&nbsp;</div>
 				<div class="col-sm-8">{{form.submit()}}</div>
