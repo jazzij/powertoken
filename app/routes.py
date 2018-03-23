@@ -24,9 +24,12 @@ from app.viewmodels import UserViewModel, LogViewModel
 @app.route("/index")
 @app.route("/home")
 def user_home():
+	# If the user is already logged in, display the homepage.
 	if not "username" in session or not "authenticated" in session:
 		print("'username' or 'authenticated' not in session, so redirecting to login.")
 		return redirect(url_for("user_login"))
+
+	# If the user isn't logged in, redirect to the PowerToken login.
 	else:
 		print("'username' and 'authenticated' in session, so showing the homepage,")
 		return render_template("user_home.html", username=session.get("username"))
@@ -36,101 +39,117 @@ def user_login():
 	form = UserLoginForm()
 
 	# POST: processes the PowerToken login form
-	if request.method == "POST":
-		if form.validate_on_submit():
-			print("user_login form submitted.")
-			username = form.username.data
-			session["username"] = username
-			user = User.query.filter_by(username=username).first()
+	if form.validate_on_submit():
+		print("user_login form submitted.")
+		username = form.username.data
+		session["username"] = username
+		user = User.query.filter_by(username=username).first()
 
-			# If the user has not been added to the database, adds the user to the
-			# database
-			if user is None:
-				print("User {} isn't in the db yet. Adding to db".format(username))
-				user = User(username=username)
-				db.session.add(user)
-				db.session.commit()
-
-				# Redirects to the WC login
-				print("Redirecting to WC login.")
-				return redirect(url_for("user_wc_login"))
+		# If the user has not been added to the database, add the user to the
+		# database and redirect to the WEconnect login.
+		if user is None:
+			print("User {} isn't in the db yet. Adding to db".format(username))
+			user = User(username=username)
+			db.session.add(user)
+			db.session.commit()
+			print("Redirecting to WC login.")
+			return redirect(url_for("user_wc_login"))
 			
-			# If the user exists in the database, but the WEconnect (or Fitbit)
-			# info isn't filled out, redirects to WEconnect login.
-			if user.wc_id is None or user.wc_token is None or user.fb_token is None:
-				print("Not all the info is filled out for {}. Redirecting to WC login.".format(user))
-				return redirect(url_for("user_wc_login"))
+		# If the user exists in the database, but the WEconnect (or Fitbit)
+		# info isn't filled out, redirect to the WEconnect login.
+		if any([not user.wc_id, not user.wc_id, not user.fb_token]):# user.wc_id is None or user.wc_token is None or user.fb_token is None:
+			print("Not all the info is filled out for {}. Redirecting to WC login.".format(user))
+			return redirect(url_for("user_wc_login"))
 			
-			# If the user exists in the database, and the WEconnect and Fitbit info
-			# is already filled out, skips the login process.
-			session["authenticated"] = True
-			print("All info is filled out for {}. Redirecting to home.".format(user))
-			return redirect(url_for("user_home"))
+		# If the user exists in the database, and the WEconnect and Fitbit info
+		# is already filled out, bypass the login process.
+		session["authenticated"] = True
+		print("All info is filled out for {}. Redirecting to home.".format(user))
+		return redirect(url_for("user_home"))
 
-	elif request.method == "GET":
-		# GET: renders the PowerToken login page
-		print("Received GET request for user_login page.")
-		return render_template("user_login.html", form=form, errors=[request.args.get("error")])
+	# GET: Render the PowerToken login page.
+	print("Received GET request for user_login page.")
+	errors = [request.args.get("error")] if request.args.get("error") else []
+	return render_template("user_login.html", form=form, errors=errors)
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
 	form = UserWcLoginForm()
 
-	# If submitting the form (POST)
-	if request.method == "POST":
-		if form.validate_on_submit():
-			print("wc_login form submitted.")
-			if not "username" in session:
-				print("'username' not in session.")
-				return redirect(url_for("user_login", error="Invalid user"))
-			user = User.query.filter_by(username=session.get("username")).first()
-			if user is None:
-				print("User with username {} doesn't exist. Redirecting to user_login.".format(session.get("username")))
-				return redirect(url_for("user_login"), error="Invalid user")
+	# POST: Process the WEconnect login form.
+	if form.validate_on_submit():
+		print("wc_login form submitted.")
 
-			# Gets WEconnect info and adds it to the database
-			email = form.email.data
-			password = form.password.data
-			result = login_to_wc(email, password)
-			if not result:
-				print("Incorrect WC email or password. Reloading wc_login page.")
-				errors = ["Incorrect email or password"]
-				return render_template("user_wc_login.html", form=form, errors=errors)
-			user.wc_id = result[0]
-			user.wc_token = result[1]
-			print("Updating {} with wc_id = {} and wc_token = {}".format(user, user.wc_id, user.wc_token))
-			db.session.commit()
+		# If the username wasn't saved or the session expired, return to the
+		# original PowerToken login page.
+		if not "username" in session:
+			print("'username' not in session.")
+			return redirect(url_for("user_login", error="Invalid session"))
 
-			# Redirects to the Fitbit login
-			print("Redirecting to fb_login.")
-			return redirect(url_for("user_fb_login"))
+		# Get the user with that username from the database.
+		user = User.query.filter_by(username=session.get("username")).first()
 
-	# If not submitting the form (GET)
-	elif request.method == "GET":
-		print("Received GET request for wc_login page.")
-		return render_template("user_wc_login.html", form=form)
+		# If the user with that username isn't in the database for whatever
+		# reason, go back to the PowerToken login page.
+		if user is None:
+			print("User with username {} doesn't exist. Redirecting to user_login.".format(session.get("username")))
+			return redirect(url_for("user_login"), error="Invalid user")
+
+		# If everything is okay so far, get WEconnect info from the form and
+		# login to external WEconnect server.
+		email = form.email.data
+		password = form.password.data
+		successful_result = login_to_wc(email, password)
+
+		# If the username or password is incorrect, prompt the user to re-enter
+		# credentials.
+		if not successful_result:
+			print("Incorrect WC email or password. Reloading wc_login page.")
+			errors = ["Incorrect email or password"]
+			return render_template("user_wc_login.html", form=form, errors=errors)
+
+		# If the login was successful, store the WEconnect ID and access token
+		# in the database, and redirect to the Fitbit login.
+		user.wc_id = successful_result[0]
+		user.wc_token = successful_result[1]
+		print("Updating {} with wc_id = {} and wc_token = {}".format(user, user.wc_id, user.wc_token))
+		db.session.commit()
+		print("Redirecting to fb_login.")
+		return redirect(url_for("user_fb_login"))
+
+	# GET: Render the WEconnect login page.
+	print("Received GET request for wc_login page.")
+	return render_template("user_wc_login.html", form=form)
 
 @app.route("/user_fb_login", methods=["GET", "POST"])
 def user_fb_login():
-	# If submitting the external form (POST)
+	# POST: Process response from external Fitbit server.
 	if request.method == "POST":
 		print("External fb_login POST data received.")
+
+		# If the username wasn't saved or the session expired, return to the
+		# original PowerToken login page.
 		if not "username" in session:
 			print("No field 'username' in session. Redirecting to user_login.")
 			return redirect(url_for("user_login"), errors=["Invalid session"])
-		#print("Inside user_fb_login(), session['username'] =  {}".format(session["username"]))
+
+		# Get the user with that username from the database.
 		user = User.query.filter_by(username=session.get("username")).first()
+
+		# If the user with that username isn't in the database for whatever
+		# reason, go back to the PowerToken login page.
 		if user is None:
 			print("User with username {} doesn't exist. Redirecting to user_login.".format(session.get("username")))
 			return redirect(url_for("user_login"), errors=["Invalid user"])
 		
-		# Gets FB info and adds it to db
+		# If everything is okay so far, extract the Fitbit token from the
+		# response data and add it to the database.
 		fb_token = complete_fb_login(request.data)
 		user.fb_token = fb_token
 		print("Updating {} with fb_token = {}".format(user, user.fb_token))
 		db.session.commit()
 
-		# Redirects to welcome page when setup is finished
+		# Redirect to welcome page when setup is finished
 		session["authenticated"] = True
 		print("Will be redirecting to homepage...")
 		return redirect(url_for("user_home"))
@@ -140,7 +159,6 @@ def user_fb_login():
 		print("Received GET request for fb_login page.")
 		return render_template("user_fb_login.html")
 
-# Commenting out the login_required for ease of testing
 @app.route("/admin")
 @app.route("/admin/")
 @app.route("/admin/index")

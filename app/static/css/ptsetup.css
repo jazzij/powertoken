@@ -23,8 +23,12 @@ header {
     text-align: center;
 }
 
-header .h1 {
+header h1 {
     font-size: xx-large;
+}
+
+header h3 {
+    font-size: medium;
 }
 
 .content  {
