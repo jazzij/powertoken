@@ -6,10 +6,8 @@ Last modified by Abigail Franz on 3/13/2018
 """
 
 from flask_wtf import FlaskForm
-from wtforms import (
-	StringField, PasswordField, BooleanField, SubmitField, RadioField
-)
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
+from wtforms.validators import InputRequired, Email, EqualTo, ValidationError
 from app.models import Admin
 
 class AdminLoginForm(FlaskForm):
@@ -37,12 +35,12 @@ class AdminRegistrationForm(FlaskForm):
 			raise ValidationError("Please use a different email address.")
 
 class UserLoginForm(FlaskForm):
-	username = StringField("Username", validators=[DataRequired()])
+	username = StringField("Username", validators=[InputRequired()])
 	submit = SubmitField("Next")
 
 class UserWcLoginForm(FlaskForm):
-	email = StringField("Email", validators=[DataRequired(), Email()])
-	password = PasswordField("Password", validators=[DataRequired()])
+	email = StringField("Email", validators=[InputRequired(), Email()])
+	password = PasswordField("Password", validators=[InputRequired()])
 	goal_period = RadioField("Goal Period", 
 		choices=[("daily", "daily"), ("weekly", "weekly")])
 	submit = SubmitField("Next")
