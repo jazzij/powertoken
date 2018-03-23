@@ -17,6 +17,8 @@ class Config(object):
 		"sqlite:///" + os.path.join(basedir, "data/pt.db")
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	SESSION_TYPE = "filesystem"
+	SESSION_PERMANENT = False
+	#PERMANENT_SESSION_LIFETIME = 300 # 300s = 5min
 	MAIL_SERVER = os.environ.get("MAIL_SERVER")
 	MAIL_PORT = int(os.environ.get("MAIL_PORT") or 25)
 	MAIL_USE_TLS = os.environ.get("MAIL_USERNAME")
