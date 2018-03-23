@@ -241,5 +241,3 @@ def teardown():
 	print("Tearing down appcontext")
 	app.do_teardown_appcontext()
 """
-
-@app.save_session()
