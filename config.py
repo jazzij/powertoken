@@ -18,8 +18,8 @@ class Config(object):
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
 	SESSION_TYPE = "filesystem"
 	PERMANENT_SESSION_LIFETIME = 300 # 5 min
-	#MAIL_SERVER = os.environ.get("MAIL_SERVER")
-	#MAIL_PORT = int(os.environ.get("MAIL_PORT") or 25)
-	#MAIL_USE_TLS = os.environ.get("MAIL_USERNAME")
-	#MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-	#ADMINS = ["franz322@umn.edu"] # Should eventually add Jasmine
+	MAIL_SERVER = os.environ.get("MAIL_SERVER")
+	MAIL_PORT = int(os.environ.get("MAIL_PORT") or 25)
+	MAIL_USE_TLS = os.environ.get("MAIL_USERNAME")
+	MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+	ADMINS = ["franz322@umn.edu"] # Should eventually add Jasmine
