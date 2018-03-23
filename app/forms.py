@@ -6,7 +6,9 @@ Last modified by Abigail Franz on 3/13/2018
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
+from wtforms import (
+	StringField, PasswordField, BooleanField, SubmitField, RadioField
+)
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models import Admin
 

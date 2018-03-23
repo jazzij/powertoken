@@ -69,8 +69,11 @@ def user_login():
 
 	# GET: Render the PowerToken login page.
 	print("Received GET request for user_login page.")
-	errors = [request.args.get("error")] if request.args.get("error") else []
-	return render_template("user_login.html", form=form, errors=errors)
+	error = request.args.get("error")
+	if error:
+		return render_template("user_login.html", form=form, error=error)
+	else:
+		return render_template("user_login.html", form=form)
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
@@ -93,7 +96,7 @@ def user_wc_login():
 		# reason, go back to the PowerToken login page.
 		if user is None:
 			print("User with username {} doesn't exist. Redirecting to user_login.".format(session.get("username")))
-			return redirect(url_for("user_login"), error="Invalid user")
+			return redirect(url_for("user_login", error="Invalid user"))
 
 		# If everything is okay so far, get WEconnect info from the form and
 		# login to external WEconnect server.
@@ -131,7 +134,7 @@ def user_fb_login():
 		# original PowerToken login page.
 		if not "username" in session:
 			print("No field 'username' in session. Redirecting to user_login.")
-			return redirect(url_for("user_login"), errors=["Invalid session"])
+			return redirect(url_for("user_login", error="Invalid session"))
 
 		# Get the user with that username from the database.
 		user = User.query.filter_by(username=session.get("username")).first()
@@ -140,7 +143,7 @@ def user_fb_login():
 		# reason, go back to the PowerToken login page.
 		if user is None:
 			print("User with username {} doesn't exist. Redirecting to user_login.".format(session.get("username")))
-			return redirect(url_for("user_login"), errors=["Invalid user"])
+			return redirect(url_for("user_login", error="Invalid user"))
 		
 		# If everything is okay so far, extract the Fitbit token from the
 		# response data and add it to the database.
@@ -231,3 +234,8 @@ def admin_user_stats():
 @login_required
 def admin_system_logs():
 	return render_template("admin_system_logs.html")
+
+@app.teardown_appcontext
+def teardown():
+	print("Tearing down appcontext")
+	app.do_teardown_appcontext()
