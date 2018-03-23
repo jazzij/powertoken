@@ -11,17 +11,17 @@ from wtforms.validators import InputRequired, Email, EqualTo, ValidationError
 from app.models import Admin
 
 class AdminLoginForm(FlaskForm):
-	username = StringField("Username", validators=[DataRequired()])
-	password = PasswordField("Password", validators=[DataRequired()])
+	username = StringField("Username", validators=[InputRequired()])
+	password = PasswordField("Password", validators=[InputRequired()])
 	remember_me = BooleanField("Remember Me")
 	submit = SubmitField("Sign In")
 
 class AdminRegistrationForm(FlaskForm):
-	username = StringField("Username", validators=[DataRequired()])
-	email = StringField("Email", validators=[DataRequired(), Email()])
-	password = PasswordField("Password", validators=[DataRequired()])
+	username = StringField("Username", validators=[InputRequired()])
+	email = StringField("Email", validators=[InputRequired(), Email()])
+	password = PasswordField("Password", validators=[InputRequired()])
 	password2 = PasswordField(
-		"Repeat Password", validators=[DataRequired(), EqualTo("password")])
+		"Repeat Password", validators=[InputRequired(), EqualTo("password")])
 	submit = SubmitField("Register")
 
 	def validate_username(self, username):
