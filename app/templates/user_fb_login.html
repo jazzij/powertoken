@@ -20,12 +20,15 @@
 	var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
 	function redirect() {
+		console.log("Inside redirect() function");
 		// CHECK for returned code i.e. url#code, if no hash there, then redirect to auth site
 		if (!window.location.hash) {
+			console.log("!window.location.hash");
 			console.log("Redirecting to Fitbit auth site")
 			window.location.replace(authURI+'?response_type=token&client_id='+clientID+'&redirect_uri='+callback
 				+'&scope=activity%20location%20profile%20settings');
 		} else {
+			console.log(window.location.hash);
 			console.log("Getting access token from window.location.hash")
 			var fragmentQueryParameters = {};
 			window.location.hash.slice(1).replace(
