@@ -7,7 +7,6 @@ Last modified by Abigail Franz on 3/13/2018
 import json, requests
 
 def login_to_wc(email, password):
-	print(email, password)
 	"""
 	Log user into WEconnect, produce an ID and access token that will last 90
 	days. Return False if the login was unsuccessful; otherwise, return the ID
@@ -21,7 +20,6 @@ def login_to_wc(email, password):
 	jres = result.json()
 	wc_id = str(jres["accessToken"]["userId"])
 	wc_token = str(jres["accessToken"]["id"])
-	print(wc_id, wc_token)
 	return (wc_id, wc_token)
 
 def complete_fb_login(response_data):

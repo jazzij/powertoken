@@ -9,8 +9,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import db, login
 
-#GoalPeriod = Enum("daily", "weekly")
-
 @login.user_loader
 def load_admin(id):
 	return Admin.query.get(int(id))

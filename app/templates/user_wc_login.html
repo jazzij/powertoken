@@ -17,7 +17,7 @@
 				<div class="col-sm-8">{{ form.submit() }}</div>
 			</div>
 		</form>
-		{% for error in errors %}
+		{% if error %}
 			<p class="warning">{{ error }}</p>
 		{% endfor %}
 	</div>

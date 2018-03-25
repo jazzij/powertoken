@@ -35,10 +35,10 @@ class AdminRegistrationForm(FlaskForm):
 			raise ValidationError("Please use a different email address.")
 
 class UserLoginForm(FlaskForm):
-	username = StringField("Username", validators=[DataRequired(message="Username not provided")])
+	username = StringField("Username", validators=[DataRequired()])
 	submit = SubmitField("Next")
 
 class UserWcLoginForm(FlaskForm):
-	email = StringField("Email", validators=[DataRequired(message="Email not provided."), Email(message="Invalid email")])
-	password = PasswordField("Password", validators=[DataRequired(message="Password not provided.")])
+	email = StringField("Email", validators=[DataRequired(), Email()])
+	password = PasswordField("Password", validators=[DataRequired()])
 	submit = SubmitField("Next")

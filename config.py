@@ -1,12 +1,14 @@
 """
 Contains the configuration class for the Flask app.\n
 Created by Abigail Franz on 3/12/2018\n
-Last modified by Abigail Franz on 3/13/2018
+Last modified by Abigail Franz on 3/25/2018
 """
 
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+# Retrieve the CSRF token
 skey = ""
 with open("csrf") as fp:
 	skey = fp.read().strip()
