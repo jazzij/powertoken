@@ -59,9 +59,12 @@ def user_login():
 			
 		# If the user exists in the database, but the WEconnect (or Fitbit)
 		# info isn't filled out, redirect to the WEconnect login.
-		if any([not user.wc_id, not user.wc_id, not user.fb_token]):# user.wc_id is None or user.wc_token is None or user.fb_token is None:
+		if any([not user.wc_id, not user.wc_token, not user.fb_token]):# user.wc_id is None or user.wc_token is None or user.fb_token is None:
 			print("Not all the info is filled out for {}. Redirecting to WC login.".format(user))
 			return redirect(url_for("user_wc_login", username=username))
+
+		if user.wc_id and user.wc_token and not user.fb_token:
+			return redirect(url_for("user_fb_login", username=username))
 			
 		# If the user exists in the database, and the WEconnect and Fitbit info
 		# is already filled out, bypass the login process.
