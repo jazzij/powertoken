@@ -3,7 +3,7 @@
 
 <div class="block-1">
 	You will be redirected to the Fitbit login page shortly...
-	<button onclick="redirect">Click to redirect</button>
+	<button id="redirect">Click to redirect</button>
 </div>
 
 <!-- {#
@@ -19,7 +19,9 @@
 	var authURI = 'https://www.fitbit.com/oauth2/authorize';
 	var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
-	function redirect() {
+	document.getElementById("redirect").addEventListener("click", redirect);
+
+	var redirect = function() {
 		console.log("Inside redirect() function");
 		// CHECK for returned code i.e. url#code, if no hash there, then redirect to auth site
 		if (!window.location.hash) {
