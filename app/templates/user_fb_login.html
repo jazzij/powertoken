@@ -19,9 +19,7 @@
 	var authURI = 'https://www.fitbit.com/oauth2/authorize';
 	var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 
-	document.getElementById("redirect").addEventListener("click", redirect);
-
-	var redirect = function() {
+	document.getElementById("redirect").addEventListener("click", function() {
 		console.log("Inside redirect() function");
 		// CHECK for returned code i.e. url#code, if no hash there, then redirect to auth site
 		if (!window.location.hash) {
@@ -40,8 +38,7 @@
 			fbTok = fragmentQueryParameters.access_token;
 		}
 		sendTok();
-	}
-	
+	});
 
 	var processResponse = function(response) {
 		if (!response.ok) {
