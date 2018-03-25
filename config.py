@@ -7,12 +7,15 @@ Last modified by Abigail Franz on 3/13/2018
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+skey = ""
+with open("csrf") as fp:
+	skey = fp.read().strip()
 
 class Config(object):
 	"""
 	Name-value pairs for the Flask app configuration.
 	"""
-	SECRET_KEY = os.environ.get("SECRET_KEY") or os.urandom(12)
+	SECRET_KEY = os.environ.get("SECRET_KEY") or skey
 	SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or \
 		"sqlite:///" + os.path.join(basedir, "data/pt.db")
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
