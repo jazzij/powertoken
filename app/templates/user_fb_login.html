@@ -41,7 +41,6 @@
 			throw new Error('Request failed' + response);
 		} else {
 			console.log("Switching to landing page from processResponse function");
-			print(username);
 			window.location.href = homeURL + "?username=" + username;
 		}
 	}

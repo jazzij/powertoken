@@ -4,8 +4,7 @@ Created by Abigail Franz on 3/12/2018\n
 Last modified by Abigail Franz on 3/13/2018
 """
 
-from flask import Flask, session
-from flask_session import Session
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
@@ -15,12 +14,11 @@ from logging.handlers import SMTPHandler
 
 app = Flask(__name__)
 app.config.from_object(Config)
-Session(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = "admin_login"
-print("Created app and session objects.")
+print("Created app.")
 
 if not app.debug:
 	if app.config["MAIL_SERVER"]:

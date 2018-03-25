@@ -5,9 +5,7 @@ Last modified by Abigail Franz on 3/15/2018
 """
 
 from datetime import datetime
-from flask import (
-	flash, redirect, render_template, request, session, url_for
-)
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import (
 	current_user, login_user, logout_user, login_required
 )
@@ -102,8 +100,8 @@ def user_wc_login():
 		# If the username wasn't saved, return to the original PowerToken login
 		# page.
 		if username is None:
-			print("'username' not in session.")
-			return redirect(url_for("user_login", error="Invalid session"))
+			print("username is None.")
+			return redirect(url_for("user_login", error="Invalid username"))
 
 		# Get the user with that username from the database.
 		user = User.query.filter_by(username=username).first()
@@ -152,8 +150,8 @@ def user_fb_login():
 		# If the username wasn't saved, return to the original PowerToken login
 		# page.
 		if username is None:
-			print("No field 'username' in session. Redirecting to user_login.")
-			return redirect(url_for("user_login", error="Invalid session"))
+			print("username is None. Redirecting to user_login.")
+			return redirect(url_for("user_login", error="Invalid username"))
 
 		# Get the user with that username from the database.
 		user = User.query.filter_by(username=username).first()
