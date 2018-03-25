@@ -162,10 +162,8 @@ def user_fb_login():
 		print("Updating {} with fb_token = {}".format(user, user.fb_token))
 		db.session.commit()
 
-		# Redirect to welcome page when setup is finished
-		session["authenticated"] = True
-		print("Will be redirecting to homepage...")
-		return redirect(url_for("user_home", username=username))
+		# This code will never be called but must be present
+		return render_template("user_home.html", username=username)
 
 	# If requesting the redirect page (GET)
 	elif request.method == "GET":
