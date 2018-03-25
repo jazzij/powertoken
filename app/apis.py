@@ -30,4 +30,4 @@ def complete_fb_login(response_data):
 	"""
 	data_utf = response_data.decode("utf-8")
 	data_json = json.loads(data_utf)
-	return data_json["tok"]
+	return data_json["tok"], data_json["username"]
