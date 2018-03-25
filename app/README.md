@@ -35,9 +35,9 @@ If the client appends "/admin" to the URL (https://powertoken.grouplens.org/admi
 
 One way to start the Flask server is to run `python powertoken.py` from the parent directory. The server will serve all webpages as part of the app. Check your server output to see what port it's running on (usually something like localhost:5000). We have ours set to run on an Apache/2.4.18 (Ubuntu) Server at powertoken.grouplens.org:443.
 
-In `routes.py` you will see a collection of methods that are mapped to URLs (routes). You shouldn't try to manually enter these URLs because some require HTTP data.
+In [routes.py](routes.py) you will see a collection of methods that are mapped to URLs (routes). You shouldn't try to manually enter these URLs because some require HTTP data.
 
-In the `/templates` folder, you will see a collection of HTML files. These are served and modified by the Python code. The templates with the `user_` prefix are part of the user-facing application, and the templates with the `admin_` prefix are part of the admin-facing application. The `user_fb_login.html` file contains JavaScript that logs the user into Fitbit, goes through the OAuth process, and sends an access code back to the server via the POST method of the `/fb_login` route.
+In the [templates](templates) folder, you will see a collection of HTML files. These are served and modified by the Python code. The templates with the "user_" prefix are part of the user-facing application, and the templates with the "admin_" prefix are part of the admin-facing application. The [user_fb_login.html](templates/user_fb_login.html) file contains JavaScript that logs the user into Fitbit, goes through the OAuth process, and sends an access code back to the server via the POST method of the `/fb_login` route.
 
 Similar to the routes, manually entering an HTML template might not yield the behavior you expect, because some of the templates are not hard-coded HTML, but populated by the Python code as they are served.
 
@@ -51,25 +51,25 @@ The information entered by the user is not saved, only the access tokens and IDs
 
 ## Admin Notes:
 
-`routes.py` handles the routing for the admin portion of the application as well.
+[routes.py](routes.py) handles the routing for the admin portion of the application as well.
 
 
 ## Running in Gunicorn
 
-While running the application directly using `python powertoken.py` is fine for testing, in a production setting you will want to run the Flask app in Gunicorn. In the parent directory (on the same level as `powertoken.py`), you will see the file `wsgi.py`. You can start Gunicorn with the following command:
+While running the application directly using `python powertoken.py` is fine for testing, in a production setting you will want to run the Flask app in Gunicorn. In the parent directory (on the same level as [powertoken.py](../powertoken.py), you will see the file [wsgi.py](../wsgi.py). From this directory, you can start Gunicorn with the following command:
 
 `gunicorn --bind 127.0.0.1:5000 wsgi --workers 3`
 
 You can vary the number of workers depending on the expected workload of the application. The important thing is that Gunicorn allows the application to serve multiple clients at the same time.
 
-You might want to automate the process of starting Gunicorn by placing the command in a Bash file titled something like `run_powertoken.sh`.
+You might want to automate the process of starting Gunicorn by placing the command in a Bash script.
 
 
 ## Tips:
 
 It's best to use a virtualenv to setup Flask; see the Flask documentation for details.
 
-Using the Fitbit API requires additional setup--if you don't have an account and app set up, see the Web API quickstart. This app uses implicit OATH flow (implemented with JavaScript / HTML), saves the access token to a JSON-based database on the server, and completes all subsequent API calls in Python.
+Using the Fitbit API requires additional setup--if you don't have an account and app set up, see the Web API quickstart. This app uses implicit OAuth flow (implemented with JavaScript/HTML), saves the access token to a database on the server, and completes all subsequent API calls in Python.
 
 You may want to keep the Flask server running even when you close your SSH session. In this case, the command `nohup python routes.py &` should do the trick. Should you want to kill the process, you will have to do so manually.
 
