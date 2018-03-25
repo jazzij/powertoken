@@ -14,7 +14,8 @@
 	var fbTok;
 	var clientID = '228N2H';
 	var homeURL = 'https://powertoken.grouplens.org';
-	var callback = homeURL + "/user_fb_login?username={{username}}";
+	var callback = homeURL + "/user_fb_login";
+	var state = "state='username={{username}}'";
 	var landingPage = homeURL + '/';
 	var authURI = 'https://www.fitbit.com/oauth2/authorize';
 	var authTokenReq = 'https://api.fitbit.com/oauth2/token';
@@ -26,7 +27,7 @@
 			console.log("!window.location.hash");
 			console.log("Redirecting to Fitbit auth site")
 			window.location.replace(authURI+'?response_type=token&client_id='+clientID+'&redirect_uri='+callback
-				+'&scope=activity%20location%20profile%20settings');
+				+'&scope=activity%20location%20profile%20settings&state='+state);
 		} else {
 			console.log(window.location.hash);
 			console.log("Getting access token from window.location.hash")
