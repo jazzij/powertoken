@@ -15,7 +15,9 @@
 	</head>
 	<body>
 		<nav class="navbar navbar-expand navbar-light pt-navbar">
-			<a class="sidebar-toggle mr-3 pt-hamburger"><i class="fa fa-bars"></i></a>
+			<a class="sidebar-toggle mr-3 pt-hamburger">
+				<i class="fa fa-bars"></i>
+			</a>
 		
 			<a class="navbar-brand pt-title" href="{{url_for('admin_home')}}" style="font-family: 'Kaushan Script', cursive">
 				PowerToken <sub>/Admin</sub>
@@ -44,14 +46,28 @@
 				</ul>
 			</div>
 		</nav>
-		
 		<div class="d-flex">
 			<nav class="sidebar bg-dark pt-tb-gradient">
 				<ul class="list-unstyled">
-					<li><a href="{{url_for('admin_home')}}"><i class="fa fa-fw fa-home"></i> Home</a></li>
-					<li><a href="{{url_for('admin_user_stats')}}"><i class="fa fa-fw fa-users"></i> User Stats</a></li>
-					<li><a href="{{url_for('admin_progress_logs')}}"><i class="fa fa-fw fa-chart-pie"></i> Progress Logs</a></li>
-					<li><a href="{{url_for('admin_system_logs')}}"><i class="fa fa-fw fa-database"></i> System Logs</a></li>
+					<li>
+						<a href="{{url_for('admin_home')}}">
+							<i class="fa fa-fw fa-home"></i> Home
+						</a>
+					</li>
+					<li>
+						<a href="{{url_for('admin_user_stats')}}">
+							<i class="fa fa-fw fa-users"></i> User Stats
+						</a>
+					</li>
+					<li>
+						<a href="{{url_for('admin_progress_logs')}}">
+							<i class="fa fa-fw fa-chart-pie"></i> Progress Logs</a>
+						</li>
+					<li>
+						<a href="{{url_for('admin_system_logs')}}">
+							<i class="fa fa-fw fa-database"></i> System Logs
+						</a>
+					</li>
 					<li>
 						<a href="#submenu1" data-toggle="collapse">
 							<i class="fa fa-fw fa-code"></i> Documentation
@@ -65,13 +81,11 @@
 					<li><a href="#"><i class="fa fa-fw fa-question-circle"></i> Help</a></li>
 				</ul>
 			</nav>
-		
 			<div class="content p-4">
 				{% block content %}
 				{% endblock %}
 			</div>
-		</div>		
-
+		</div>
 		<script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
 		<script src="{{url_for('static', filename='js/popper.min.js')}}"></script>
 		<script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>

@@ -61,7 +61,8 @@ class Log(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 	def __repr__(self):
-		return "<Log {}>".format(self.id)
+		timestr = self.timestamp.strftime("%Y-%m-%d %I:%M %p")
+		return "<Log {} at {}>".format(self.user.username, timestr)
 
 class Activity(db.Model):
 	"""

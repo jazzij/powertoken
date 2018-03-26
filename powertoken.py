@@ -1,6 +1,6 @@
 """
 PowerToken Flask entry point.\n
-Can be run from the command line with "flask run" or "python powertoken".\n
+Can be run from the command line with `flask run` or `python powertoken`.\n
 Created by Abigail Franz on 3/12/2018\n
 Last modified by Abigail Franz on 3/13/2018
 """

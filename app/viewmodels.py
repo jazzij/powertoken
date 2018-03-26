@@ -42,4 +42,4 @@ class LogViewModel:
 		self.step_count = log.step_count
 
 	def __repr__(self):
-		return "<LogViewModel {}>".format(self.id)
+		return "<LogViewModel {} at {}>".format(self.username, self.timestamp)

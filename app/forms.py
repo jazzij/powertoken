@@ -1,8 +1,8 @@
 """
 Contains the form classes for the admin registration and login, the user login,
 and the user WEconnect login.\n
-Created by Abigail Franz on 3/12/2018\n
-Last modified by Abigail Franz on 3/13/2018
+Created by Abigail Franz on 3/12/2018.\n
+Last modified by Abigail Franz on 3/13/2018.
 """
 
 from flask_wtf import FlaskForm

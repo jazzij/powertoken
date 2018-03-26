@@ -1,6 +1,7 @@
 """
 Contains some helper functions for the background scripts.
 Created by Abigail Franz on 3/16/2018
+Last modified by Abigail Franz on 3/26/2018
 """
 
 from datetime import datetime, timedelta, MAXYEAR
@@ -11,9 +12,12 @@ def add_or_update_activity(session, activity, user):
 	"""
 	Insert new activity row into the database if it doesn't already exist and
 	is not expired. If it exists but has been updated, update it in the
-	database. Param "activity" is JSON object returned from WEconnect API
-	endpoint. Return True if activity was inserted or updated and False if it 
+	database. Return True if activity was inserted or updated and False if it 
 	was not.
+
+	:param sqlalchemy.orm.session.Session session: the database session\n
+	:param dict activity: an activity from WEconnect in JSON format\n
+	:param background.models.User user: the user to which the activity belongs
 	"""
 	# Determines the start and end times and expiration date (if any)
 	st, et, expiration = extract_params(activity)
@@ -54,6 +58,8 @@ def extract_params(activity):
 	"""
 	Given a JSON activity object from WEconnect, extract the important
 	parameters (start time, end time, and expiration date).
+
+	:param dict activity: an activity from WEconnect in JSON format
 	"""
 	# Determines the start and end times
 	ts = datetime.strptime(activity["dateStart"], WC_FORMAT)
@@ -72,6 +78,8 @@ def get_users_with_current_activities(session):
 	"""
 	Get a list of all the users who have activities starting or ending within
 	the next 15 minutes.
+
+	:param sqlalchemy.orm.session.Session session: the database session
 	"""
 	users = []
 	now = datetime.now().time()
@@ -85,3 +93,18 @@ def get_users_with_current_activities(session):
 			if not activity.user in users:
 				users.append(activity.user)
 	return users
+
+def get_yesterdays_progress(session, user):
+	"""
+	Get the daily_progress component from yesterday's last log.
+
+	:param sqlalchemy.orm.session.Session session: the database session\n
+	:param background.models.User user: the user for which to get progress
+	"""
+	yesterdays_logs = []
+	yesterday = datetime.now() - timedelta(days=1)
+	start = datetime(yesterday.year, yesterday.month, yesterday.day, 0, 0)
+	end = datetime(yesterday.year, yesterday.month, yesterday.day, 23, 59)
+	yest_log = user.logs.filter(Log.timestamp > start, Log.timestamp < end).\
+		order_by(Log.timestamp.desc()).first()
+	return yest_log.daily_progress

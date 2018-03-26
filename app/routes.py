@@ -1,7 +1,7 @@
 """
 Handles routing and form processing for the PowerToken Flask app.\n
-Created by Jasmine Jones\n
-Last modified by Abigail Franz on 3/25/2018
+Created by Jasmine Jones.\n
+Last modified by Abigail Franz on 3/25/2018.
 """
 
 from datetime import datetime

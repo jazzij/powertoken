@@ -1,3 +1,9 @@
+/*
+ * Styles for admin dashboard template
+ * Makes use of Bootstrap and Font Awesome
+ * From https://github.com/kjdion84/bsadmin
+ */
+
 .navbar-dark .navbar-nav .nav-link, .navbar-dark .navbar-text {
     color: rgba(255, 255, 255, .75);
 }

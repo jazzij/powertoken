@@ -1,3 +1,9 @@
+/*
+ * Script for admin dashboard template
+ * Makes use of jQuery
+ * From https://github.com/kjdion84/bsadmin
+ */
+
 $(document).ready(function () {
     // toggle sidebar when button clicked
     $('.sidebar-toggle').on('click', function () {

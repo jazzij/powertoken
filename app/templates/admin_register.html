@@ -1,7 +1,7 @@
 {% extends "user_layout.html" %}
 {% block content %}
     <h1>Register</h1>
-    <form action="" method="POST">
+    <form action="" method="post">
         {{form.hidden_tag()}}
         <div class="row pt-form-group">
             <div class="col-sm-4">{{form.username.label}}</div>
@@ -24,7 +24,7 @@
             <div class="col-sm-8">{{form.submit()}}</div>
         </div>
     </form>
-    <a class="btn" href="{{url_for('admin_login')}}">
+    <a href="{{url_for('admin_login')}}">
         Already have an account? Click here to login.
     </a>
     {% for error in errors %}

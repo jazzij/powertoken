@@ -10,11 +10,13 @@ from common import is_valid, logfile
 """Format for datetimes received from WEconnect"""
 WC_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
+"""Base URL for WEconnect API calls"""
+BASE_URL = "https://palalinq.herokuapp.com/api"
+
 class WeConnect:
 	"""
 	Class encapsulating the WEconnect API calls.
 	"""
-	base_url = "https://palalinq.herokuapp.com/api"
 	_wc_id = ""
 	_wc_token = ""
 	_goal_period = ""
@@ -25,17 +27,6 @@ class WeConnect:
 		self._goal_period = goal_period
 		logging.basicConfig(filename=logfile, level=logging.DEBUG, 
 				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
-
-	def poll_old(self):
-		"""
-		Poll WEconnect for changes in progress. -1 denotes a failed request.
-		"""
-		start, end = "", ""
-		if self._goal_period == "daily":
-			start, end = self._get_today()
-		elif self._goal_period == "weekly":
-			start, end = self._get_week()
-		return self._get_progress(start, end)
 
 	def poll(self):
 		"""
@@ -52,15 +43,15 @@ class WeConnect:
 		Get a list of progress for all activities within a specified time
 		range. Dates in format YYYY-MM-dd.
 		"""
-		url = format("%s/People/%s/activities/progress?access_token=%s&from=%s&to=%s"
-				% (self.base_url, self._wc_id, self._wc_token, from_date, to_date))
+		url = "{}/People/{}/activities/progress?access_token={}&from={}&to={}".\
+				format(BASE_URL, self._wc_id, self._wc_token, from_date, to_date)
 		response = requests.get(url)
 		if is_valid(response):
 			progress = response.json()
 			completed = float(progress["events"]["completed"])
 			total = float(progress["events"]["total"])
 
-			# Handles the case where total = 0
+			# Handles the case where total = 0, to avoid division by 0
 			if total == 0:
 				return 0
 
@@ -97,8 +88,10 @@ class WeConnect:
 		return start, end
 
 def get_activities(wc_id, wc_token):
-	url = format("https://palalinq.herokuapp.com/api/people/%s/activities?access_token=%s" 
-		% (wc_id, wc_token))
+	"""
+	Static function to fetch all activities for a user with given ID and token.
+	"""
+	url = "{}/people/{}/activities?access_token={}".format(BASE_URL, wc_id, wc_token)
 	response = requests.get(url)
 	if is_valid(response):
 		return response.json()

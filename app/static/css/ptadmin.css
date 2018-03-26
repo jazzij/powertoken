@@ -1,3 +1,8 @@
+/*
+ * PowerToken-specific styles for the admin dashboard
+ * Created by Abigail Franz
+ */
+
 .pt-lr-gradient {
     background: linear-gradient(to right, #0099FF 25%, #00FF99);
         background: -moz-linear-gradient(to right, #0099FF 25%, #00FF99);

@@ -1,7 +1,7 @@
 """
 Contains the API calls for the WEconnect and Fitbit logins.\n
-Created by Abigail Franz on 3/13/2018\n
-Last modified by Abigail Franz on 3/13/2018
+Created by Abigail Franz on 3/13/2018\.n
+Last modified by Abigail Franz on 3/13/2018.
 """
 
 import json, requests
