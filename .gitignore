@@ -5,4 +5,7 @@ logs/*
 migrations/*
 venv/*
 csrf
+*.bat
+*.ini
 *.pyc
+*.sh
