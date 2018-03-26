@@ -39,6 +39,7 @@ def maintain_users():
 
 	# Removes incomplete user rows from the database
 	users = session.query(User).all()
+	print(users)
 	del_count = 0
 	for user in users:
 		if not all([user.username, user.wc_id, user.wc_token, user.fb_token]):
@@ -89,7 +90,6 @@ def maintain_activities():
 	for user in users:
 		wc_acts = get_activities(user.wc_id, user.wc_token)
 		for act in wc_acts:
-			print(act)
 			status = add_or_update_activity(session, act, user)
 			if status == "Inserted":
 				added_count += 1
@@ -109,7 +109,7 @@ def maintain_logs():
 	"""
 	Makes sure no logs are assigned to "ghost users"
 	"""
-	logger.info("\tRunning activity maintenance...")
+	logger.info("\tRunning log maintenance...")
 
 	logs = session.query(Log).all()
 	users = session.query(User).all()
