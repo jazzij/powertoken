@@ -48,10 +48,10 @@ def maintain_users():
 		logger.info("\t\t%d incomplete users removed from the database", del_count)
 
 	# Makes sure all access tokens are current
-	users = session.query(User).all()
-	for user in users:
-		# Determine if WC token is expired
-		# Determine if FB token is expired
+	#users = session.query(User).all()
+	#for user in users:
+	#	Determine if WC token is expired
+	#	Determine if FB token is expired
 	logger.warning("\t\tToken expiration check not implemented.")
 
 	logger.info("\t...Done.")
