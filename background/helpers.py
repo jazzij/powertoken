@@ -12,8 +12,8 @@ def add_or_update_activity(session, activity, user):
 	"""
 	Insert new activity row into the database if it doesn't already exist and
 	is not expired. If it exists but has been updated, update it in the
-	database. Return True if activity was inserted or updated and False if it 
-	was not.
+	database. Return "Inserted" if activity was inserted, "Updated" if updated,
+	and False if neither.
 
 	:param sqlalchemy.orm.session.Session session: the database session\n
 	:param dict activity: an activity from WEconnect in JSON format\n
@@ -23,7 +23,7 @@ def add_or_update_activity(session, activity, user):
 	st, et, expiration = extract_params(activity)
 	act_id = activity["activityId"]
 
-	# Boolean indicating whether or not the activity was inserted/updated
+	# Flag indicating whether or not the activity was inserted/updated
 	status = False
 
 	# Ignores the activity if it's already expired
@@ -41,7 +41,7 @@ def add_or_update_activity(session, activity, user):
 				existing.end_time = et
 				existing.expiration = expiration
 				session.commit()
-				status = True
+				status = "Updated"
 			else:
 				status = False
 		else:
@@ -50,7 +50,7 @@ def add_or_update_activity(session, activity, user):
 				expiration=expiration, user=user)
 			session.add(new)
 			session.commit()
-			status = True
+			status = "Inserted"
 
 	return status
 

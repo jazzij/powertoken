@@ -36,7 +36,7 @@ def poll_and_update():
 	owns them to a list. Then poll all the users in the list for progress.
 	"""
 	users = get_users_with_current_activities(session)
-	if users is None:
+	if users is None or len(users) == 0:
 		logger.info("No current activities. Returning.")
 		return
 	for user in users:
@@ -54,19 +54,20 @@ def poll_and_update():
 		# If the poll request succeeded, updates Fitbit and adds a new entry to
 		# the logs.
 		if progress == -1:
-			logger.error("\tCouldn't get progress for user %s.", user.username)
+			logger.error("\tCouldn't get progress for %s.", user)
 		elif progress == 0:
-			logger.info("\tUser %s has no progress yet today.", user.username)
+			logger.info("\t%s has no progress yet today.", user)
 		else:
 			step_count = fb.reset_and_update(progress)
 			if step_count == -1:
-				logger.error("\tCouldn't update Fitbit for user %s.", user.username)
+				logger.error("\tCouldn't update Fitbit for %s.", user)
 			else:
 				log = Log(daily_progress = daily_progress, 
 						weekly_progress = weekly_progress,
 						step_count = step_count, user = user)
 				session.add(log)
 				session.commit()
+				logger.info("\tUpdated progress for %s.", user)
 
 if __name__ == "__main__":
 	logger.info("Running the poll-and-update loop...")

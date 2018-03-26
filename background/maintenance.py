@@ -2,7 +2,7 @@
 Script that makes sure the database is up-to-date.\n
 Meant to be run as a job in Crontab.\n
 Created by Abigail Franz on 2/28/2018.\n
-Modified by Abigail Franz on 3/21/2018.
+Modified by Abigail Franz on 3/26/2018.
 """
 
 import logging
@@ -39,17 +39,20 @@ def maintain_users():
 
 	# Removes incomplete user rows from the database
 	users = session.query(User).all()
+	del_count = 0
 	for user in users:
 		if not all([user.username, user.wc_id, user.wc_token, user.fb_token]):
 			session.delete(user)
 			session.commit()
+	if del_count > 0:
+		logger.info("\t\t%d incomplete users removed from the database", del_count)
 
 	# Makes sure all access tokens are current
 	users = session.query(User).all()
 	for user in users:
 		# Determine if WC token is expired
 		# Determine if FB token is expired
-		logger.warning("\t\tToken expiration check not implemented.")
+	logger.warning("\t\tToken expiration check not implemented.")
 
 	logger.info("\t...Done.")
 
@@ -61,6 +64,7 @@ def maintain_activities():
 	3. If users have added/updated activities, those are added to the database.
 	"""
 	logger.info("\tRunning activity maintenance...")
+	del_count = 0
 
 	# Makes sure activities aren't assigned to "ghost users"
 	activities = session.query(Activity).all()
@@ -69,6 +73,7 @@ def maintain_activities():
 		if not act.user in users:
 			session.delete(act)
 			session.commit()
+			del_count += 1
 
 	# Makes sure no activities are expired
 	activities = session.query(Activity).all()
@@ -77,18 +82,26 @@ def maintain_activities():
 		if act.expiration <= now:
 			session.delete(act)
 			session.commit()
+			del_count += 1
 
 	# Adds new activities
-	added_count = 0
+	added_count, updated_count = 0, 0
 	for user in users:
 		wc_acts = get_activities(user.wc_id, user.wc_token)
 		for act in wc_acts:
 			print(act)
-			was_added = add_or_update_activity(session, act, user)
-			print("Was it added? {}".format("Yes" if was_added else "No"))
-			if was_added:
-				added_count = added_count + 1
-	logger.info("\t\t%d activities added to the database.", added_count)
+			status = add_or_update_activity(session, act, user)
+			if status == "Inserted":
+				added_count += 1
+			elif status == "Updated":
+				updated_count += 1
+
+	if del_count > 0:
+		logger.info("\t\t%d activities removed from the database.", del_count)
+	if added_count > 0:
+		logger.info("\t\t%d activities added to the database.", added_count)
+	if updated_count > 0:
+		logger.info("\t\t%d activities updated in the database.", updated_count)
 
 	logger.info("\t...Done.")
 
@@ -100,10 +113,14 @@ def maintain_logs():
 
 	logs = session.query(Log).all()
 	users = session.query(User).all()
+	del_count = 0
 	for log in logs:
 		if not log.user in users:
 			session.delete(log)
 			session.commit()
+			del_count += 1
+	if del_count > 0:
+		logger.info("\t\t%d logs removed from the database.", del_count)
 
 	logger.info("\t...Done.")
 
