@@ -1,5 +1,6 @@
 """
-Contains the API calls for the WEconnect and Fitbit logins.\n
+Contains the API call for the WEconnect login and a related helper that
+processes the response from the Fitbit API endpoint.\n
 Created by Abigail Franz on 3/13/2018\.n
 Last modified by Abigail Franz on 3/13/2018.
 """

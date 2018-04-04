@@ -1,12 +1,12 @@
 """
-Contains some helper functions for the background scripts.
-Created by Abigail Franz on 3/16/2018
-Last modified by Abigail Franz on 3/26/2018
+Contains some helper functions for the background scripts.\n
+Created by Abigail Franz on 3/16/2018.\n
+Last modified by Abigail Franz on 3/26/2018.
 """
 
 from datetime import datetime, timedelta, MAXYEAR
-from weconnect import WC_FORMAT
 from models import User, Activity
+from weconnect import WC_FORMAT
 
 def add_or_update_activity(session, activity, user):
 	"""

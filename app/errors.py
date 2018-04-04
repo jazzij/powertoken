@@ -1,7 +1,7 @@
 """
 Handles errors encountered by the PowerToken Flask app.\n
-Created by Abigail Franz on 3/12/2018\n
-Last modified by Abigail Franz on 3/26/2018
+Created by Abigail Franz on 3/12/2018.\n
+Last modified by Abigail Franz on 3/26/2018.
 """
 
 from flask import render_template

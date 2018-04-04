@@ -8,11 +8,14 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Retrieve the CSRF token
+# Retrieve the CSRF token from a file on the server. Make sure this file isn't
+# world-readable!
 skey = ""
 with open("csrf") as fp:
 	skey = fp.read().strip()
 
+# TODO: Configure the mail server and add administrator email addresses in the
+# ADMINS field.
 class Config(object):
 	"""
 	Name-value pairs for the Flask app configuration.
@@ -25,4 +28,4 @@ class Config(object):
 	MAIL_PORT = int(os.environ.get("MAIL_PORT") or 25)
 	MAIL_USE_TLS = os.environ.get("MAIL_USERNAME")
 	MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-	ADMINS = ["franz322@umn.edu"] # Should eventually add Jasmine
+	ADMINS = []

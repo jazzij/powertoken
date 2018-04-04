@@ -13,6 +13,6 @@ This project uses the Fitbit Web API and the WEconnect API (in alpha) to transfo
 Researchers are affiliated with the GroupLens Center for Social and Human-Centered Computing. 
 
 
-For info, check out our website at [GroupLens](https://grouplens.org).
+For more info, check out our website at [GroupLens](https://grouplens.org).
 
 The code for this project is licensed under the MIT License.

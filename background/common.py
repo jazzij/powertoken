@@ -1,7 +1,7 @@
 """
-Functions common to both the weconnect and fitbit modules.\n
-Created by Abigail Franz on 2/16/2018\n
-Last modified by Abigail Franz on 2/20/2018
+Functions common to both the WEconnect and Fitbit modules.\n
+Created by Abigail Franz on 2/16/2018.\n
+Last modified by Abigail Franz on 2/20/2018.
 """
 
 import requests

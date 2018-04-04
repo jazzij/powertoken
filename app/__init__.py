@@ -1,7 +1,7 @@
 """
-PowerToken Flask app initialization module.\n
-Created by Abigail Franz on 3/12/2018\n
-Last modified by Abigail Franz on 3/13/2018
+Initializes the PowerToken Flask app variables.\n
+Created by Abigail Franz on 3/12/2018.\n
+Last modified by Abigail Franz on 3/13/2018.
 """
 
 from flask import Flask
@@ -19,6 +19,8 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = "admin_login"
 
+# TODO: Set up mail server so that administrators get an email in the event of
+# a system failure. (This code currently does nothing).
 if not app.debug:
 	if app.config["MAIL_SERVER"]:
 		auth = None
@@ -38,4 +40,5 @@ if not app.debug:
 		mail_handler.setLevel(logging.ERROR)
 		app.logger.addHandler(mail_handler)
 
+# Leave at the bottom of the file!
 from app import routes, errors, models

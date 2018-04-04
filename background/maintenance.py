@@ -1,6 +1,6 @@
 """
 Script that makes sure the database is up-to-date.\n
-Meant to be run as a job in Crontab.\n
+Meant to be run as a job in CronTab.\n
 Created by Abigail Franz on 2/28/2018.\n
 Modified by Abigail Franz on 3/26/2018.
 """
@@ -39,7 +39,6 @@ def maintain_users():
 
 	# Removes incomplete user rows from the database
 	users = session.query(User).all()
-	print(users)
 	del_count = 0
 	for user in users:
 		if not all([user.username, user.wc_id, user.wc_token, user.fb_token]):
@@ -48,11 +47,12 @@ def maintain_users():
 	if del_count > 0:
 		logger.info("\t\t%d incomplete users removed from the database", del_count)
 
-	# Makes sure all access tokens are current
-	#users = session.query(User).all()
-	#for user in users:
-	#	Determine if WC token is expired
-	#	Determine if FB token is expired
+	# TODO: Make sure all access tokens are current
+	users = session.query(User).all()
+	for user in users:
+		#Determine if WC token is expired
+		#Determine if FB token is expired
+		pass
 	logger.warning("\t\tToken expiration check not implemented.")
 
 	logger.info("\t...Done.")

@@ -1,8 +1,10 @@
 """
 PowerToken Flask entry point.\n
-Can be run from the command line with `flask run` or `python powertoken`.\n
-Created by Abigail Franz on 3/12/2018\n
-Last modified by Abigail Franz on 3/13/2018
+Can be run from the command line with `flask run` or `python powertoken.py`. 
+However, the preferred way of running the script is through Gunicorn, which
+uses the script [wsgi.py](wsgi.py).\n
+Created by Abigail Franz on 3/12/2018.\n
+Last modified by Abigail Franz on 3/13/2018.
 """
 
 from app import app, db

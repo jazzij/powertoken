@@ -3,6 +3,7 @@
  * Created by Abigail Franz
  */
 
+ /* Left-to-right blue-green gradient background */
 .pt-lr-gradient {
     background: linear-gradient(to right, #0099FF 25%, #00FF99);
         background: -moz-linear-gradient(to right, #0099FF 25%, #00FF99);
@@ -10,6 +11,8 @@
         background: -webkit-linear-gradient(to right, #0099FF 25%, #00FF99);
     color: white;
 }
+
+ /* Top-to-bottom blue-green gradient background */
 .pt-tb-gradient {
     background: linear-gradient(to bottom, #0099FF, #00FF99);
     background: -moz-linear-gradient(to bottom, #0099FF, #00FF99);
@@ -18,6 +21,7 @@
     color: white;
 }
 
+/* Styles specific to the navbar on the admin dashboard */
 .pt-navbar {
     background: white;
     padding-bottom: 1em;
@@ -47,6 +51,7 @@
     color: rgba(255, 255, 255, 1.0);
 }
 
+/* Styles specific to the tables on the admin dashboard */
 .pt-table-striped th, .pt-table-striped td {
     text-align: center;
     align-content: center;
@@ -58,10 +63,10 @@
     background-color: #0099FF55;
 }
 
+/* Other classes for formatting text and tables */
 .pt-hide-overflow {
     text-overflow: ellipsis;
 }
-
 .pt-lightweight {
     font-weight: 200;
 }

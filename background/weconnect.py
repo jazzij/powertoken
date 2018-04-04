@@ -1,16 +1,16 @@
 """
 This class contains the API calls to WEconnect (except for the login).\n
-Created by Abigail Franz\n
-Last modified by Abigail Franz on 3/16/2018
+Created by Abigail Franz.\n
+Last modified by Abigail Franz on 3/16/2018.
 """
 
 import datetime, json, logging, requests
 from common import is_valid, logfile
 
-"""Format for datetimes received from WEconnect"""
+# Format for datetimes received from WEconnect
 WC_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-"""Base URL for WEconnect API calls"""
+# Base URL for WEconnect API calls
 BASE_URL = "https://palalinq.herokuapp.com/api"
 
 class WeConnect:

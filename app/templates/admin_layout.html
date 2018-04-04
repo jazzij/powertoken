@@ -1,5 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,16 +68,15 @@
 						</a>
 					</li>
 					<li>
-						<a href="#submenu1" data-toggle="collapse">
-							<i class="fa fa-fw fa-code"></i> Documentation
+						<a href="{{url_for('admin_instructions')}}">
+							<i class="fa fa-fw fa-list-ol"></i> Setup Instructions
 						</a>
-						<ul id="submenu1" class="list-unstyled collapse">
-							<li><a href="#">Setup Instructions</a></li>
-							<li><a href="#">Submenu Item</a></li>
-							<li><a href="#">Submenu Item</a></li>
-						</ul>
 					</li>
-					<li><a href="#"><i class="fa fa-fw fa-question-circle"></i> Help</a></li>
+					<li>
+						<a href="{{url_for('admin_help')}}">
+							<i class="fa fa-fw fa-question-circle"></i> Help
+						</a>
+					</li>
 				</ul>
 			</nav>
 			<div class="content p-4">

@@ -10,9 +10,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login
-from app.forms import (
-	AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
-)
+from app.forms import AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
 from app.models import Admin, User, Log, Activity
 from app.viewmodels import UserViewModel, LogViewModel
 
@@ -150,39 +148,39 @@ def admin_home():
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
-	print("Called admin_login()")
 	if current_user.is_authenticated:
 		return redirect(url_for("admin_home"))
 	form = AdminLoginForm()
 
 	# POST: If a valid form was submitted
 	if form.validate_on_submit():
-		print("Submitted AdminLoginForm")
 		admin = Admin.query.filter_by(username=form.username.data).first()
 		if admin is None or not admin.check_password(form.password.data):
-			flash("Invalid username or password")
-			print("Invalid username or password")
 			return redirect(url_for("admin_login"))
 		login_user(admin, remember=form.remember_me.data)
 		next_page = request.args.get("next")
 		if not next_page or url_parse(next_page).netloc != '':
 			next_page = url_for("admin_home")
-		print("next_page = {}".format(str(next_page)))
 		return redirect(next_page)
 
-	# GET: Renders the admin login template
+	# GET: Renders the admin login template.
 	return render_template("admin_login.html", form=form)
 
 @app.route("/admin/logout")
 def admin_logout():
 	logout_user()
-	return redirect(url_for("admin_home"))
+	return redirect(url_for("admin_login"))
 
 @app.route("/admin/register", methods=["GET", "POST"])
 def admin_register():
+	# If a user who's already logged in tries to register, sends him/her to the
+	# homepage.
 	if current_user.is_authenticated:
 		return redirect(url_for("admin_home"))
+
 	form = AdminRegistrationForm()
+
+	# POST: Processes the admin registration form.
 	if form.validate_on_submit():
 		admin = Admin(username=form.username.data, email=form.email.data)
 		admin.set_password(form.password.data)
@@ -190,6 +188,8 @@ def admin_register():
 		db.session.commit()
 		login_user(admin, remember=False)
 		return redirect(url_for("admin_home"))
+
+	# GET: Renders the admin login template.
 	return render_template("admin_register.html", form=form)
 
 @app.route("/admin/progress_logs")
@@ -210,3 +210,20 @@ def admin_user_stats():
 @login_required
 def admin_system_logs():
 	return render_template("admin_system_logs.html")
+
+# TODO: Put PowerToken setup instructions here (or just link to the document,
+# which can be found in the GroupLens Google Drive under Meetings >
+# ProDUCT Lab > Projects > PowerToken Wearables).
+@app.route("/admin/help")
+@login_required
+def admin_help():
+	return "Not implemented."
+
+# TODO: Create some kind of help page, maybe with instructions on how to
+# troubleshoot the PowerToken system. This should be more for study
+# administrators than system administrators (i.e. more practical than 
+# technical).
+@app.route("/admin/help")
+@login_required
+def admin_help():
+	return "Not implemented."

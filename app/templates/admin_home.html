@@ -11,24 +11,24 @@
 			<th>This Week's Progress</th>
 		</tr>
 		{% for user in user_vms %}
-		<tr>
-			<td>{{user.username}}</td>
-			<td>{{user.registered_on}}</td>
-			<td>{{user.wc_status}}</td>
-			<td>{{user.fb_status}}</td>
-			<td>
-				<svg id="daily{{user.id}}" width="50" height="50"></svg>
-				<script>
-					var gauge = loadLiquidFillGauge("daily{{user.id}}", "{{user.daily_progress}}");
-				</script>
-			</td>
-			<td>
-				<svg id="weekly{{user.id}}" width="50" height="50"></svg>
-				<script>
-					var gauge = loadLiquidFillGauge("weekly{{user.id}}", "{{user.weekly_progress}}");
-				</script>
-			</td>
-		</tr>
+			<tr>
+				<td>{{user.username}}</td>
+				<td>{{user.registered_on}}</td>
+				<td>{{user.wc_status}}</td>
+				<td>{{user.fb_status}}</td>
+				<td>
+					<svg id="daily{{user.id}}" width="50" height="50"></svg>
+					<script>
+						var gauge = loadLiquidFillGauge("daily{{user.id}}", "{{user.daily_progress}}");
+					</script>
+				</td>
+				<td>
+					<svg id="weekly{{user.id}}" width="50" height="50"></svg>
+					<script>
+						var gauge = loadLiquidFillGauge("weekly{{user.id}}", "{{user.weekly_progress}}");
+					</script>
+				</td>
+			</tr>
 		{% endfor %}
 	</table>
 {% endblock %}

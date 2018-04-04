@@ -1,26 +1,26 @@
 """
 Script that runs the main PowerToken function: poll WEconnect and update Fitbit.
-Meant to be run in Crontab, probably every 15 minutes.
-Created by Abigail Franz on 2/28/2018
-Last modified by Abigail Franz on 3/16/2018
+Meant to be run in Crontab, probably every 5-15 minutes.\n
+Created by Abigail Franz on 2/28/2018.\n
+Last modified by Abigail Franz on 3/16/2018.
 """
 
-import logging
 from datetime import datetime, timedelta
+from logging import getLogger, FileHandler, Formatter
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, User, Activity, Log, DB_PATH
-from weconnect import WeConnect
 from fitbit import Fitbit
 from helpers import get_users_with_current_activities
+from models import Base, User, Activity, Log, DB_PATH
+from weconnect import WeConnect
 
 # Configures logging for the module
-logger = logging.getLogger("background.polling")
+logger = getLogger("background.polling")
 logger.setLevel(logging.INFO)
 logpath = "/export/scratch/powertoken/data/background.polling.log"
-handler = logging.FileHandler(logpath)
+handler = FileHandler(logpath)
 handler.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
+formatter = Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
