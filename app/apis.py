@@ -25,16 +25,37 @@ def login_to_wc(email, password):
 
 def get_wc_activities(wc_id, wc_token):
 	url = "https://palalinq.herokuapp.com/api/people/{}/activities?access_token={}".\
-			format(BASE_URL, wc_id, wc_token)
+			format(wc_id, wc_token)
 	response = requests.get(url)
 	if response.status_code == 200:
 		parsed = response.json()
 		acts = []
 		for item in parsed:
-			acts.append({"id": item["activityId"], "name": item["name"]})
+			expiration = extract_expiration(item)
+			if expiration > datetime.now():
+				acts.append({"id": item["activityId"], "name": item["name"]})
 		return acts
 	else:
 		return []
+
+def extract_expiration(activity):
+	"""
+	Given a JSON activity object from WEconnect, extract expiration.
+
+	:param dict activity: an activity from WEconnect in JSON format
+	"""
+	# Determines the start and end times
+	ts = datetime.strptime(activity["dateStart"], "%Y-%m-%dT%H:%M:%S.%fZ")
+	te = ts + timedelta(minutes=activity["duration"])
+
+	# Determines the expiration date (if any)
+	expiration = datetime(MAXYEAR, 12, 31)
+	if activity["repeat"] == "never":
+		expiration = te
+	if activity["repeatEnd"] != None:
+		expiration = datetime.strptime(activity["repeatEnd"], "%Y-%m-%dT%H:%M:%S.%fZ")
+
+	return expiration
 
 def complete_fb_login(response_data):
 	"""
