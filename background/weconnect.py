@@ -96,4 +96,4 @@ def get_activities(wc_id, wc_token):
 	if is_valid(response):
 		return response.json()
 	else:
-		return None
+		return []

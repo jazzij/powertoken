@@ -9,7 +9,7 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.apis import login_to_wc, complete_fb_login
+from app.apis import login_to_wc, complete_fb_login, get_wc_activities
 from app.forms import AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
 from app.models import Admin, User, Log, Activity
 from app.viewmodels import UserViewModel, LogViewModel
@@ -135,6 +135,24 @@ def user_fb_login():
 	elif request.method == "GET":
 		username = request.args.get("username")
 		return render_template("user_fb_login.html", username=username)
+
+@app.route("/user_activities", methods=["GET", "POST"])
+def user_activities():
+	if request.method == "GET":
+		username = request.args.get("username")
+		user = User.query.filter_by(username=username).first()
+		acts = get_wc_activities(user.wc_id, user.wc_token)
+		return render_template("user_activities.html", username=username, acts=acts)
+	elif request.method == "POST":
+		result = request.form
+		username = ""
+		for key, value in result.iteritems():
+			if key == "username":
+				username = value
+			else:
+				act = Activity.query.filter_by(activity_id=key).first()
+				act.weight = value
+		return redirect(url_for("user_home", username=username))
 
 @app.route("/admin")
 @app.route("/admin/")

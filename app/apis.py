@@ -1,6 +1,6 @@
 """
-Contains the API call for the WEconnect login and a related helper that
-processes the response from the Fitbit API endpoint.\n
+Contains the API calls for WEconnect and a helper that
+processes the login response from the Fitbit API endpoint.\n
 Created by Abigail Franz on 3/13/2018\.n
 Last modified by Abigail Franz on 3/13/2018.
 """
@@ -22,6 +22,19 @@ def login_to_wc(email, password):
 	wc_id = str(jres["accessToken"]["userId"])
 	wc_token = str(jres["accessToken"]["id"])
 	return (wc_id, wc_token)
+
+def get_wc_activities(wc_id, wc_token):
+	url = "https://palalinq.herokuapp.com/api/people/{}/activities?access_token={}".\
+			format(BASE_URL, wc_id, wc_token)
+	response = requests.get(url)
+	if response.status_code == 200:
+		parsed = response.json()
+		acts = []
+		for item in parsed:
+			acts.append({"id": item["activityId"], "name": item["name"]})
+		return acts
+	else:
+		return []
 
 def complete_fb_login(response_data):
 	"""
