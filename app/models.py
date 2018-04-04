@@ -73,6 +73,7 @@ class Activity(db.Model):
 	start_time = db.Column(db.DateTime, index=True)
 	end_time = db.Column(db.DateTime, index=True)
 	expiration = db.Column(db.DateTime, index=True)
+	weight = db.Column(db.Integer)
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 	def __repr__(self):
