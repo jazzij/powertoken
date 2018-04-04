@@ -70,6 +70,7 @@ class Activity(Base):
 	start_time = Column(DateTime, index=True)
 	end_time = Column(DateTime, index=True)
 	expiration = Column(DateTime, index=True)
+	weight = Column(Integer)
 	user_id = Column(Integer, ForeignKey("user.id"))
 
 	def __repr__(self):
