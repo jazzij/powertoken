@@ -214,9 +214,9 @@ def admin_system_logs():
 # TODO: Put PowerToken setup instructions here (or just link to the document,
 # which can be found in the GroupLens Google Drive under Meetings >
 # ProDUCT Lab > Projects > PowerToken Wearables).
-@app.route("/admin/help")
+@app.route("/admin/instructions")
 @login_required
-def admin_help():
+def admin_instructions():
 	return "Not implemented."
 
 # TODO: Create some kind of help page, maybe with instructions on how to
