@@ -6,6 +6,7 @@ Last modified by Abigail Franz on 3/13/2018.
 """
 
 import json, requests
+from datetime import datetime
 
 def login_to_wc(email, password):
 	"""
