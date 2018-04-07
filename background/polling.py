@@ -2,11 +2,11 @@
 Script that runs the main PowerToken function: poll WEconnect and update Fitbit.
 Meant to be run in Crontab, probably every 5-15 minutes.\n
 Created by Abigail Franz on 2/28/2018.\n
-Last modified by Abigail Franz on 3/16/2018.
+Last modified by Abigail Franz on 4/6/2018.
 """
 
 from datetime import datetime, timedelta
-from logging import getLogger, FileHandler, Formatter
+from logging import getLogger, FileHandler, Formatter, INFO
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fitbit import Fitbit
