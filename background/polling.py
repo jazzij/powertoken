@@ -16,10 +16,10 @@ from weconnect import WeConnect
 
 # Configures logging for the module
 logger = getLogger("background.polling")
-logger.setLevel(logging.INFO)
+logger.setLevel(INFO)
 logpath = "/export/scratch/powertoken/data/background.polling.log"
 handler = FileHandler(logpath)
-handler.setLevel(logging.INFO)
+handler.setLevel(INFO)
 formatter = Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
