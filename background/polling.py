@@ -34,8 +34,14 @@ def poll_and_update():
 	"""
 	If any activities start or end within the next 15 minutes, add the user who 
 	owns them to a list. Then poll all the users in the list for progress.
+
+	As of 4/6/2018, I'm changing it to poll all the users. I was having trouble
+	with only polling when I have upcoming or in-progress activities, as I don't
+	always "check in" when I'm supposed to. We can always change it back if we
+	need to.
 	"""
-	users = get_users_with_current_activities(session)
+	#users = get_users_with_current_activities(session)
+	users = session.query(User).all()
 	if users is None or len(users) == 0:
 		logger.info("No current activities. Returning.")
 		return
