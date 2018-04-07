@@ -4,7 +4,7 @@ Created by Abigail Franz on 2/16/2018.\n
 Last modified by Abigail Franz on 2/20/2018.
 """
 
-import requests
+import logging, requests
 
 logfile = "data/pt.log"
 
