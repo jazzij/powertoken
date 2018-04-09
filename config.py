@@ -28,4 +28,4 @@ class Config(object):
 	MAIL_PORT = int(os.environ.get("MAIL_PORT") or 25)
 	MAIL_USE_TLS = os.environ.get("MAIL_USERNAME")
 	MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-	ADMINS = []
+	ADMINS = ["franz322@umn.edu"]

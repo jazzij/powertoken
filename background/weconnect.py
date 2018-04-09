@@ -7,6 +7,16 @@ Last modified by Abigail Franz on 3/16/2018.
 import datetime, json, logging, requests
 from common import is_valid, logfile
 
+# Configures logging for the module
+logger = logging.getLogger("background.weconnect")
+logger.setLevel(logging.WARNING)
+logpath = "data/background.weconnect.log"
+handler = logging.FileHandler(logpath)
+handler.setLevel(logging.WARNING)
+formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
 # Format for datetimes received from WEconnect
 WC_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -25,8 +35,6 @@ class WeConnect:
 		self._wc_id = wc_id
 		self._wc_token = wc_token
 		self._goal_period = goal_period
-		logging.basicConfig(filename=logfile, level=logging.DEBUG, 
-				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
 
 	def poll(self):
 		"""
@@ -58,7 +66,7 @@ class WeConnect:
 			percent = completed / total
 			return percent
 		else:
-			logging.error("Couldn't get WEconnect progress.")
+			logger.error("Couldn't get WEconnect progress.")
 			return -1
 
 	def _get_week(self):
@@ -96,4 +104,5 @@ def get_activities(wc_id, wc_token):
 	if is_valid(response):
 		return response.json()
 	else:
+		logger.error("Couldn't get list of activities.")
 		return None
