@@ -64,14 +64,14 @@ You can vary the number of workers depending on the expected workload of the app
 
 You might want to automate the process of starting Gunicorn by placing the command in a Bash script. My Bash script takes the following form:
 
-`#!/bin/bash
-cd /export/scratch/powertoken
-. venv/bin/activate
-export MAIL_SERVER=smtp.googlemail.com
-export MAIL_PORT=587
-export MAIL_USE_TLS=1
-export MAIL_USERNAME="<email_address>"
-export MAIL_PASSWORD="<email_password>"
+`#!/bin/bash  
+cd /export/scratch/powertoken  
+. venv/bin/activate  
+export MAIL_SERVER=smtp.googlemail.com  
+export MAIL_PORT=587  
+export MAIL_USE_TLS=1  
+export MAIL_USERNAME="<email_address>"  
+export MAIL_PASSWORD="<email_password>"  
 gunicorn --bind 127.0.0.1:5000 wsgi --workers 3`
 
 
