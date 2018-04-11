@@ -28,11 +28,6 @@ def user_home():
 	else:
 		return render_template("user_home.html", username=username)
 
-@app.route("/error")
-def error():
-	raise RuntimeError("Dummy error message.")
-	return "Dummy error page."
-
 @app.route("/user_login", methods=["GET", "POST"])
 def user_login():
 	form = UserLoginForm()
