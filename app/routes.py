@@ -98,7 +98,12 @@ def user_wc_login():
 		# in the database, and redirect to the Fitbit login.
 		user.wc_id = successful_result[0]
 		user.wc_token = successful_result[1]
-		db.session.commit()
+		try:
+			db.session.commit()
+		except:
+			error = `A user with the same WEconnect credentials already exists
+					in the database.`
+			return render_template("user_wc_login.html", form=form, error=error)
 		return redirect(url_for("user_fb_login", username=username))
 
 	# GET: Render the WEconnect login page.

@@ -38,7 +38,8 @@ def poll_and_update():
 	As of 4/6/2018, I'm changing it to poll all the users. I was having trouble
 	with only polling when I have upcoming or in-progress activities, as I don't
 	always "check in" when I'm supposed to. We can always change it back if we
-	need to.
+	need to by uncommenting the first line (below this) and commenting out the
+	second.
 	"""
 	#users = get_users_with_current_activities(session)
 	users = session.query(User).all()
