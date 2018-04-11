@@ -101,8 +101,7 @@ def user_wc_login():
 		try:
 			db.session.commit()
 		except:
-			error = `A user with the same WEconnect credentials already exists
-					in the database.`
+			error = "A user with the same WEconnect credentials already exists"
 			return render_template("user_wc_login.html", form=form, error=error)
 		return redirect(url_for("user_fb_login", username=username))
 
