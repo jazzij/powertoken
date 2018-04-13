@@ -45,6 +45,7 @@ class User(db.Model):
 	fb_token = db.Column(db.String(256))
 	logs = db.relationship("Log", backref="user", lazy="dynamic")
 	activities = db.relationship("Activity", backref="user", lazy="dynamic")
+	errors = db.relationship("Error", backref="user", lazy="dynamic")
 
 	def __repr__(self):
 		return "<User {}>".format(self.username)
@@ -78,3 +79,16 @@ class Activity(db.Model):
 
 	def __repr__(self):
 		return "<Activity {}>".format(self.activity_id)
+
+class Error(db.Model):
+	"""
+	Represents an error that occurred somewhere in the background scripts.
+	"""
+	id = db.Column(db.Integer, primary_key=True)
+	origin = db.Column(db.String(256))
+	message = db.Column(db.String(256))
+	traceback = db.Column(db.String(1048))
+	user_id = db.Column(db.Integer, ForeignKey("user.id"))
+
+	def __repr__(self):
+		return "<Error '{}' for user {}>".format(self.message, self.user.username)

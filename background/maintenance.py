@@ -9,9 +9,9 @@ import logging
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from weconnect import get_activities
 from models import Base, User, Log, Activity, DB_PATH
 from helpers import add_or_update_activity
+from weconnect import get_activities
 
 # Configures logging for the module
 logger = logging.getLogger("background.maintenance")
@@ -89,6 +89,10 @@ def maintain_activities():
 	added_count, updated_count = 0, 0
 	for user in users:
 		wc_acts = get_activities(user.wc_id, user.wc_token)
+		if wc_acts is None:
+			error = Error()
+			session.add(error)
+			session.commit()
 		for act in wc_acts:
 			status = add_or_update_activity(session, act, user)
 			if status == "Inserted":
