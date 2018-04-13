@@ -88,7 +88,7 @@ class Error(db.Model):
 	origin = db.Column(db.String(256))
 	message = db.Column(db.String(256))
 	traceback = db.Column(db.String(1048))
-	user_id = db.Column(db.Integer, ForeignKey("user.id"))
+	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 	def __repr__(self):
 		return "<Error '{}' for user {}>".format(self.message, self.user.username)
