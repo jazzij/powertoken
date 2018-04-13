@@ -47,7 +47,7 @@ def poll_and_update():
 		logger.info("No current activities. Returning.")
 		return
 	for user in users:
-		wc = WeConnect(user.wc_id, user.wc_token, user.goal_period)
+		wc = WeConnect(user, session)
 		fb = Fitbit(user, session)
 		
 		# Gets progress (as a decimal percentage) from WEconnect.

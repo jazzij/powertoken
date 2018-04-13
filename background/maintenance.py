@@ -88,7 +88,7 @@ def maintain_activities():
 	# Adds new activities
 	added_count, updated_count = 0, 0
 	for user in users:
-		wc_acts = get_activities(user.wc_id, user.wc_token)
+		wc_acts = get_activities(user, session)
 		for act in wc_acts:
 			status = add_or_update_activity(session, act, user)
 			if status == "Inserted":
