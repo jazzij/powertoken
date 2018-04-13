@@ -1,11 +1,12 @@
 """
 This class contains the API calls to WEconnect (except for the login).\n
 Created by Abigail Franz.\n
-Last modified by Abigail Franz on 3/16/2018.
+Last modified by Abigail Franz on 4/13/2018.
 """
 
 import datetime, json, logging, requests
 from common import is_valid, logfile
+from models import Error
 
 # Configures logging for the module
 logger = logging.getLogger("background.weconnect")
@@ -21,7 +22,7 @@ logger.addHandler(handler)
 WC_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 # Base URL for WEconnect API calls
-BASE_URL = "https://palalinq.herokuapp.com/api"
+BASE_URL = "https://palalinq.herokuapp.com/api/people"
 
 class WeConnect:
 	"""
@@ -31,14 +32,16 @@ class WeConnect:
 	_wc_token = ""
 	_goal_period = ""
     
-	def __init__(self, wc_id, wc_token, goal_period):
-		self._wc_id = wc_id
-		self._wc_token = wc_token
-		self._goal_period = goal_period
+	def __init__(self, user, session):
+		#self._wc_id = wc_id
+		#self._wc_token = wc_token
+		#self._goal_period = goal_period
+		self._user = user
+		self._session = session
 
 	def poll(self):
 		"""
-		Poll WEconnect for changes in progress. -1 denotes a failed request.
+		Poll WEconnect for changes in progress. None denotes a failed request.
 		"""
 		start, end = self._get_today()
 		daily_progress = self._get_progress(start, end)
@@ -51,8 +54,8 @@ class WeConnect:
 		Get a list of progress for all activities within a specified time
 		range. Dates in format YYYY-MM-dd.
 		"""
-		url = "{}/People/{}/activities/progress?access_token={}&from={}&to={}".\
-				format(BASE_URL, self._wc_id, self._wc_token, from_date, to_date)
+		url = "{}/{}/activities/progress?access_token={}&from={}&to={}".format(
+			BASE_URL, self._user.wc_id, self._user.wc_token, from_date, to_date)
 		response = requests.get(url)
 		if is_valid(response):
 			progress = response.json()
@@ -66,8 +69,16 @@ class WeConnect:
 			percent = completed / total
 			return percent
 		else:
+			error = Error(
+				summary = "Couldn't get WEconnect progress.",
+				origin = "background/weconnect.py, in _get_progress",
+				message = response.json()["error"]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
 			logger.error("Couldn't get WEconnect progress.")
-			return -1
+			return None
 
 	def _get_week(self):
 		"""
@@ -95,14 +106,23 @@ class WeConnect:
 				% (today.year, today.month, today.day, 23, 59, 59))
 		return start, end
 
-def get_activities(wc_id, wc_token):
+def get_activities(user, session):
 	"""
 	Static function to fetch all activities for a user with given ID and token.
 	"""
-	url = "{}/people/{}/activities?access_token={}".format(BASE_URL, wc_id, wc_token)
+	url = "{}/{}/activities?access_token={}".format(BASE_URL, user.wc_id,
+			user.wc_token)
 	response = requests.get(url)
 	if is_valid(response):
 		return response.json()
 	else:
+		error = Error(
+			summary = "Couldn't get list of activities.",
+			origin = "background/weconnect.py, in _get_activities",
+			message = response.json()["error"]["message"],
+			user = self._user
+		)
+		self._session.add(error)
+		self._session.commit()
 		logger.error("Couldn't get list of activities.")
 		return None

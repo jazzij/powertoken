@@ -1,7 +1,7 @@
 """
 Contains the models to be used with the SQLAlchemy database interface.\n
 Created by Abigail Franz on 3/12/2018.\n
-Last modified by Abigail Franz on 3/13/2018.
+Last modified by Abigail Franz on 4/13/2018.
 """
 
 from datetime import datetime
@@ -85,6 +85,8 @@ class Error(db.Model):
 	Represents an error that occurred somewhere in the background scripts.
 	"""
 	id = db.Column(db.Integer, primary_key=True)
+	timestamp = db.Column(db.DateTime, default=datetime.now())
+	summary = db.Column(db.String(64))
 	origin = db.Column(db.String(256))
 	message = db.Column(db.String(256))
 	traceback = db.Column(db.String(1048))

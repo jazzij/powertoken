@@ -48,7 +48,7 @@ def poll_and_update():
 		return
 	for user in users:
 		wc = WeConnect(user.wc_id, user.wc_token, user.goal_period)
-		fb = Fitbit(user.fb_token, user.goal_period)
+		fb = Fitbit(user, session)
 		
 		# Gets progress (as a decimal percentage) from WEconnect.
 		progress = 0.0
@@ -60,13 +60,13 @@ def poll_and_update():
 
 		# If the poll request succeeded, updates Fitbit and adds a new entry to
 		# the logs.
-		if progress == -1:
+		if progress is None:
 			logger.error("\tCouldn't get progress for %s.", user)
 		elif progress == 0:
 			logger.info("\t%s has no progress yet today.", user)
 		else:
 			step_count = fb.reset_and_update(progress)
-			if step_count == -1:
+			if step_count is None:
 				logger.error("\tCouldn't update Fitbit for %s.", user)
 			else:
 				log = Log(daily_progress = daily_progress, 

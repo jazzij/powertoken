@@ -2,7 +2,7 @@
 Contains the models to be used with the SQLAlchemy database interface.\n
 Meant to be used by the background scripts, not the Flask app.\n
 Created by Abigail Franz on 3/12/2018.\n
-Last modified by Abigail Franz on 3/15/2018.
+Last modified by Abigail Franz on 4/13/2018.
 """
 
 from datetime import datetime
@@ -83,6 +83,8 @@ class Error(Base):
 	"""
 	__tablename__ = "error"
 	id = Column(Integer, primary_key=True)
+	timestamp = Column(DateTime, default=datetime.now())
+	summary = Column(String(64))
 	origin = Column(String(256))
 	message = Column(String(256))
 	traceback = Column(String(1048))
