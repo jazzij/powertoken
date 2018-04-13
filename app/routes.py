@@ -11,7 +11,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login
 from app.forms import AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
-from app.models import Admin, User, Log, Activity
+from app.models import Admin, User, Log, Activity, Error
 from app.viewmodels import UserViewModel, LogViewModel
 
 @app.route("/")
@@ -213,7 +213,8 @@ def admin_user_stats():
 @app.route("/admin/system_logs")
 @login_required
 def admin_system_logs():
-	return render_template("admin_system_logs.html")
+	syslogs = Error.query.all()
+	return render_template("admin_system_logs.html", syslogs=syslogs)
 
 # TODO: Put PowerToken setup instructions here (or just link to the document,
 # which can be found in the GroupLens Google Drive under Meetings >
