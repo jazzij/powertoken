@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 4/13/2018.
 """
 
 from datetime import datetime
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -42,6 +42,7 @@ class User(Base):
 	logs = relationship("Log", backref="user", lazy="dynamic")
 	activities = relationship("Activity", backref="user", lazy="dynamic")
 	errors = relationship("Error", backref="user", lazy="dynamic")
+	days = relationship("Day", backref="user", lazy="dynamic")
 
 	def __repr__(self):
 		return "<User {}>".format(self.username)
@@ -73,6 +74,7 @@ class Activity(Base):
 	expiration = Column(DateTime, index=True)
 	weight = Column(Integer)
 	user_id = Column(Integer, ForeignKey("user.id"))
+	days_activities = relationship("DaysActivities", backref="activity", lazy="dynamic")
 
 	def __repr__(self):
 		return "<Activity {}>".format(self.activity_id)
@@ -92,3 +94,19 @@ class Error(Base):
 
 	def __repr__(self):
 		return "<Error '{}' for user {}>".format(self.message, self.user.username)
+
+class Day(Base):
+	"""
+	Represents a day of progress (which activities are completed, etc).
+	"""
+	__tablename__ = "day"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime, index=True)
+	user_id = Column(Integer, ForeignKey("user.id"))
+	days_activities = relationship("DaysActivities", backref="day", lazy="dynamic")
+
+class DaysActivities(Base):
+	__tablename__ "daysactivities"
+	completed = Column(Boolean)
+	day_id = Column(Integer, ForeignKey("day.id"))
+	activity_id = Column(Integer, ForeignKey("activity.id"))
