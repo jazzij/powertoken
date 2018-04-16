@@ -1,6 +1,6 @@
 from app import db
 from app.models import User, Activity, Day, DaysActivities
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def get_possible_score(day):
     """day is of type Day"""
