@@ -18,12 +18,18 @@ class UserViewModel:
 		self.wc_id = user.wc_id
 		self.wc_status = "Current" if user.wc_id and user.wc_token else "Expired"
 		self.fb_status = "Current" if user.fb_token else "Expired"
-		self.daily_progress, self.weekly_progress = self.__last_progress__(user)
+		self.daily_progress, self.weekly_progress = self._todays_last_progress(user)
 
-	def __last_progress__(self, user):
+	def _todays_last_progress(self, user):
 		logs = user.logs.all()
+
+		# If the user has no logs, or has made no progress today, return a Log
+		# object with 0 for all the progress values.
 		last_log = logs[-1] if len(logs) > 0 else \
 			Log(daily_progress=0, weekly_progress=0, step_count=0, user=user)
+		if last_log.timestamp.day != datetime.now().day:
+			last_log = Log(daily_progress=0, weekly_progress=0, step_count=0)
+			
 		return last_log.daily_progress * 100, last_log.weekly_progress * 100
 
 	def __repr__(self):

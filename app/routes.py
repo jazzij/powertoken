@@ -199,7 +199,7 @@ def admin_register():
 @app.route("/admin/progress_logs")
 @login_required
 def admin_progress_logs():
-	logs = Log.query.all()
+	logs = Log.query.order_by(Log.timestamp.desc()).all()
 	log_vms = [LogViewModel(log) for log in logs]
 	return render_template("admin_progress_logs.html", log_vms=log_vms)
 
