@@ -107,6 +107,7 @@ class Day(db.Model):
 	days_activities = db.relationship("DaysActivities", backref="day", lazy="dynamic")
 
 class DaysActivities(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
 	completed = db.Column(db.Boolean)
 	day_id = db.Column(db.Integer, db.ForeignKey("day.id"))
 	activity_id = db.Column(db.Integer, db.ForeignKey("activity.id"))

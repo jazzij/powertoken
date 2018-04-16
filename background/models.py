@@ -107,6 +107,7 @@ class Day(Base):
 
 class DaysActivities(Base):
 	__tablename__ "daysactivities"
+	id = Column(Integer, primary_key=True)
 	completed = Column(Boolean)
 	day_id = Column(Integer, ForeignKey("day.id"))
 	activity_id = Column(Integer, ForeignKey("activity.id"))
