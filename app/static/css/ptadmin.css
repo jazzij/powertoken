@@ -63,6 +63,12 @@
     background-color: #0099FF55;
 }
 
+.pt-err-table td {
+    text-align: left;
+    font-size: 0.75em;
+    text-overflow: ellipsis;
+}
+
 /* Other classes for formatting text and tables */
 .pt-hide-overflow {
     text-overflow: ellipsis;

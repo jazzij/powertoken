@@ -16,7 +16,8 @@
 		var authUri = 'https://www.fitbit.com/oauth2/authorize';
 		var authTokenReq = 'https://api.fitbit.com/oauth2/token';
 		var authUrl = `${authUri}?response_type=token&client_id=${clientId}
-				&redirect_uri=${callback}&scope=activity&state=${state}`;
+				&redirect_uri=${callback}&expires_in=31536000
+				&scope=activity&state=${state}`;
 
 		// CHECK for returned code (i.e. url#code). If no hash there, then 
 		// redirect to auth site.

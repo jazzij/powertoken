@@ -4,7 +4,7 @@ Created by Abigail Franz on 2/16/2018.\n
 Last modified by Abigail Franz on 2/20/2018.
 """
 
-import requests
+import logging, requests
 
 logfile = "data/pt.log"
 
@@ -13,8 +13,8 @@ def is_valid(response):
 	Return a Boolean value indicating the success of an HTTP request.
 	"""
 	if response.status_code >= 300:
-		logging.error(format(" Request could not be completed. Error: %d %s" 
-				% (response.status_code, response.text)))
+		logging.error(format(" Request could not be completed. Error: %d" 
+				% (response.status_code,)))
 		return False
 	else:
 		return True

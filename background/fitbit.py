@@ -1,35 +1,43 @@
 """
 This class contains the API calls to Fitbit (except for the login).\n
 Created by Abigail Franz.\n
-Last modified by Abigail Franz on 3/16/2018.
+Last modified by Abigail Franz on 4/13/2018.
 """
 
 import datetime, json, logging, requests
 from common import is_valid, logfile
+from models import Error
+
+# Configures logging for the module
+logger = logging.getLogger("background.fitbit")
+logger.setLevel(logging.WARNING)
+logpath = "data/background.fitbit.log"
+handler = logging.FileHandler(logpath)
+handler.setLevel(logging.WARNING)
+formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 class Fitbit:
 	"""
 	Class encapsulating the Fitbit API calls.
 	"""
 	base_url = 'https://api.fitbit.com/1/user/-'
-	_auth_headers = {}
-	_goal_period = ""
 
-	def __init__(self, fb_token, goal_period):
-		self._auth_headers = {'Authorization': 'Bearer ' + fb_token}
-		self._goal_period = goal_period
-		logging.basicConfig(filename=logfile, level=logging.DEBUG, 
-				format="%(asctime)s: %(message)s", datefmt="%m/%d/%Y %I:%M:%S %p")
+	def __init__(self, user, session):
+		self._user = user
+		self._session = session
+		self._auth_headers = {'Authorization': 'Bearer ' + user.fb_token}
 
 	def change_step_goal(self, new_step_goal):
 		"""
 		Change the step goal to new_step_goal and return a Boolean indicating
 		success.
 		"""
-		url = format("%s/activities/goals/%s.json" 
-				% (self.base_url, self._goal_period))
+		url = "{}/activities/goals/{}.json".format(self.base_url,
+				self._user.goal_period)
 		params = {
-			"period" : self._goal_period,
+			"period" : self._user.goal_period,
 			"type" : "steps",
 			"value" : new_step_goal
 		}
@@ -38,7 +46,15 @@ class Fitbit:
 			new_goal = response.json()["goals"]["steps"]
 			return True
 		else:
-			logging.error("Couldn't change the step goal")
+			error = Error(
+				summary = "Couldn't change the step goal.",
+				origin = "background/fitbit.py, in _change_step_goals",
+				message = response.json()["errors"][0]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
+			logger.error("Couldn't change the step goal.")
 			return False
 
 	def update(self, percent):
@@ -52,8 +68,8 @@ class Fitbit:
 		if success:
 			return new_steps
 		else:
-			logging.error("Couldn't update Fitbit")
-			return -1
+			logger.error("Couldn't update Fitbit")
+			return None
 
 	def reset_and_update(self, percent):
 		"""
@@ -74,12 +90,20 @@ class Fitbit:
 		the request is unsuccessful, return an empty list.
 		"""
 		current_date = self._get_current_date()
-		url = format("%s/activities/date/%s.json" % (self.base_url, current_date))
+		url = "{}/activities/date/{}.json".format(self.base_url, current_date)
 		response = requests.get(url, headers=self._auth_headers)
 		if is_valid(response):
 			return response.json()["activities"]
 		else:
-			logging.error("Couldn't get today's step activities")
+			error = Error(
+				summary = "Couldn't get today's step activities.",
+				origin = "background/fitbit.py, in _get_daily_step_activities",
+				message = response.json()["errors"][0]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
+			logger.error("Couldn't get today's step activities")
 			return []
 
 	# Helper - returns a list of all the activities the user has completed this
@@ -91,25 +115,41 @@ class Fitbit:
 		"""
 		sunday = self._get_sunday()
 		current_date = self._get_current_date()
-		url = format("%s/activities/steps/date/%s/%s.json" 
-					% (self.base_url, sunday, current_date))
+		url = "{}/activities/steps/date/{}/{}.json".format(self.base_url,
+				sunday, current_date)
 		response = requests.get(url, headers=self._auth_headers)
 		if is_valid(response):
 			return response.json()["activities-log-steps"]
 		else:
-			logging.error("Couldn't get this week's step activities")
+			error = Error(
+				summary = "Couldn't get this week's step activities.",
+				origin = "background/fitbit.py, in _get_weekly_step_activities",
+				message = response.json()["errors"][0]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
+			logger.error("Couldn't get this week's step activities")
 			return []
 
 	def _delete_activity(self, log_id):
 		"""
 		Delete an activity and return a Boolean indicating success.
 		"""
-		url = format("%s/activities/%s.json" % (self.base_url, str(log_id)))
+		url = "{}/activities/{}.json".format(self.base_url, str(log_id))
 		response = requests.delete(url, headers=self._auth_headers)
 		if response.status_code == 204:
 			return True
 		else:
-			logging.error(format(" Activity %d was not successfully deleted." % (log_id,)))
+			error = Error(
+				summary = "Activity {} was not successfully deleted".format(log_id),
+				origin = "background/fitbit.py, in _delete_activity",
+				message = response.json()["errors"][0]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
+			logger.error("Activity {} was not successfully deleted.".format(log_id))
 			return False
 
 	def _get_step_goal(self):
@@ -117,35 +157,51 @@ class Fitbit:
 		Get the user's step goal. If the request is unsuccessful, return a
 		default value of 1 million.
 		"""
-		url =  format("%s/activities/goals/%s.json" 
-				% (self.base_url, self._goal_period))
+		url = "{}/activities/goals/{}.json".format(self.base_url, 
+				self._user.goal_period)
 		response = requests.get(url, headers=self._auth_headers)
 		if is_valid(response):
 			return response.json()["goals"]["steps"]
 		else:
-			logging.warning("Couldn't get step goal. Using 1000000 as default.")
+			error = Error(
+				summary = "Couldn't get step goal. Using 1,000,000 as default.",
+				origin = "background/fitbit.py, in _get_step_goal",
+				message = response.json()["errors"][0]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
+			logger.warning("Couldn't get step goal. Using 1000000 as default.")
 			return 1000000
 
 	def _get_current_steps(self):
 		"""
 		Get today's current step count. If the request is unsuccessful, return
-		-1.
+		None.
 		"""
 		date = self._get_current_date()
-		url = format("%s/activities/date/%s.json" % (self.base_url, date))
+		url = "{}/activities/date/{}.json".format(self.base_url, date)
 		response = requests.get(url, headers=self._auth_headers)
 		if is_valid(response):
 			return response.json()["summary"]["steps"]
 		else:
-			logging.error("Couldn't get today's step count")
-			return -1
+			error = Error(
+				summary = "Couldn't get today's step count.",
+				origin = "background/fitbit.py, in _get_current_steps",
+				message = response.json()["errors"][0]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
+			logger.error("Couldn't get today's step count")
+			return None
 		
 	def _log_step_activity(self, new_step_count):
 		"""
 		Log a walking activity containing the number of steps specified in
 		new_step_count. Return a Boolean indicating success.
 		"""
-		url = format("%s/activities.json" % (self.base_url,))
+		url = "{}/activities.json".format(self.base_url)
 		params = {
 			"activityId" : '90013',
 			"startTime" : self._get_current_time(),
@@ -158,7 +214,15 @@ class Fitbit:
 		if is_valid(response):
 			return True
 		else:
-			logging.error("Couldn't log step activity")
+			error = Error(
+				summary = "Couldn't log step activity.",
+				origin = "background/fitbit.py, in _log_step_activity",
+				message = response.json()["errors"][0]["message"],
+				user = self._user
+			)
+			self._session.add(error)
+			self._session.commit()
+			logger.error("Couldn't log step activity")
 			return False
 
 	def _get_current_date(self):

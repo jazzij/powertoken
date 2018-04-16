@@ -2,11 +2,11 @@
 Script that runs the main PowerToken function: poll WEconnect and update Fitbit.
 Meant to be run in Crontab, probably every 5-15 minutes.\n
 Created by Abigail Franz on 2/28/2018.\n
-Last modified by Abigail Franz on 3/16/2018.
+Last modified by Abigail Franz on 4/6/2018.
 """
 
 from datetime import datetime, timedelta
-from logging import getLogger, FileHandler, Formatter
+from logging import getLogger, FileHandler, Formatter, INFO
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fitbit import Fitbit
@@ -16,10 +16,10 @@ from weconnect import WeConnect
 
 # Configures logging for the module
 logger = getLogger("background.polling")
-logger.setLevel(logging.INFO)
+logger.setLevel(INFO)
 logpath = "/export/scratch/powertoken/data/background.polling.log"
 handler = FileHandler(logpath)
-handler.setLevel(logging.INFO)
+handler.setLevel(INFO)
 formatter = Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
@@ -34,14 +34,21 @@ def poll_and_update():
 	"""
 	If any activities start or end within the next 15 minutes, add the user who 
 	owns them to a list. Then poll all the users in the list for progress.
+
+	As of 4/6/2018, I'm changing it to poll all the users. I was having trouble
+	with only polling when I have upcoming or in-progress activities, as I don't
+	always "check in" when I'm supposed to. We can always change it back if we
+	need to by uncommenting the first line (below this) and commenting out the
+	second.
 	"""
-	users = get_users_with_current_activities(session)
+	#users = get_users_with_current_activities(session)
+	users = session.query(User).all()
 	if users is None or len(users) == 0:
 		logger.info("No current activities. Returning.")
 		return
 	for user in users:
-		wc = WeConnect(user.wc_id, user.wc_token, user.goal_period)
-		fb = Fitbit(user.fb_token, user.goal_period)
+		wc = WeConnect(user, session)
+		fb = Fitbit(user, session)
 		
 		# Gets progress (as a decimal percentage) from WEconnect.
 		progress = 0.0
@@ -53,13 +60,13 @@ def poll_and_update():
 
 		# If the poll request succeeded, updates Fitbit and adds a new entry to
 		# the logs.
-		if progress == -1:
+		if progress is None:
 			logger.error("\tCouldn't get progress for %s.", user)
 		elif progress == 0:
 			logger.info("\t%s has no progress yet today.", user)
 		else:
 			step_count = fb.reset_and_update(progress)
-			if step_count == -1:
+			if step_count is None:
 				logger.error("\tCouldn't update Fitbit for %s.", user)
 			else:
 				log = Log(daily_progress = daily_progress, 

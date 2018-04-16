@@ -11,7 +11,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login, get_wc_activities
 from app.forms import AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
-from app.models import Admin, User, Log, Activity
+from app.models import Admin, User, Log, Activity, Error
 from app.viewmodels import UserViewModel, LogViewModel
 
 @app.route("/")
@@ -98,7 +98,11 @@ def user_wc_login():
 		# in the database, and redirect to the Fitbit login.
 		user.wc_id = successful_result[0]
 		user.wc_token = successful_result[1]
-		db.session.commit()
+		try:
+			db.session.commit()
+		except:
+			error = "A user with the same WEconnect credentials already exists"
+			return render_template("user_wc_login.html", form=form, error=error)
 		return redirect(url_for("user_fb_login", username=username))
 
 	# GET: Render the WEconnect login page.
@@ -213,7 +217,7 @@ def admin_register():
 @app.route("/admin/progress_logs")
 @login_required
 def admin_progress_logs():
-	logs = Log.query.all()
+	logs = Log.query.order_by(Log.timestamp.desc()).all()
 	log_vms = [LogViewModel(log) for log in logs]
 	return render_template("admin_progress_logs.html", log_vms=log_vms)
 
@@ -227,7 +231,8 @@ def admin_user_stats():
 @app.route("/admin/system_logs")
 @login_required
 def admin_system_logs():
-	return render_template("admin_system_logs.html")
+	syslogs = Error.query.all()
+	return render_template("admin_system_logs.html", syslogs=syslogs)
 
 # TODO: Put PowerToken setup instructions here (or just link to the document,
 # which can be found in the GroupLens Google Drive under Meetings >

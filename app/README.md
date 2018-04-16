@@ -1,8 +1,8 @@
 # PowerToken Flask App 
-### (Last Update, 3/25/2018)
+### (Last Update, 4/9/2018)
 
 
-## Dependencies:
+## Dependencies
 
 * Python 2.7 (but should be compatible with Python 3)
 * Flask 0.12.2 (http://flask.pocoo.org/)
@@ -17,7 +17,7 @@
 * WEconnect Web API (documentation not available to the public)
 
 
-## Client Side (User):
+## Client Side (User)
 
 The user navigates to the URL on which the application is hosted (currently https://powertoken.grouplens.org/). If he is not logged in, he will be redirected to the login page. He enters the username we gave him into the form field and clicks "NEXT". If he has already signed up with PowerToken, he is redirected to the homepage and is good to go.
 
@@ -26,12 +26,12 @@ If the user has never logged into PowerToken before, she is redirected to the WE
 Back on the homepage, the user will see a welcome message. He is good to go!
 
 
-## Client Side (Admin):
+## Client Side (Admin)
 
 If the client appends "/admin" to the URL (https://powertoken.grouplens.org/admin), she is redirected to the administrator portion of the application. This area is protected by an authentication process.
 
 
-## Server Side:
+## Server Side
 
 One way to start the Flask server is to run `python powertoken.py` from the parent directory. The server will serve all webpages as part of the app. Check your server output to see what port it's running on (usually something like localhost:5000). We have ours set to run on an Apache/2.4.18 (Ubuntu) Server at powertoken.grouplens.org:443.
 
@@ -49,7 +49,7 @@ Other than the Fitbit login, the user setup code is written in Python, found in 
 
 The information entered by the user is not saved, only the access tokens and IDs received from the APIs.
 
-## Admin Notes:
+## Admin Notes
 
 [routes.py](routes.py) handles the routing for the admin portion of the application as well.
 
@@ -62,10 +62,24 @@ While running the application directly using `python powertoken.py` is fine for 
 
 You can vary the number of workers depending on the expected workload of the application. The important thing is that Gunicorn allows the application to serve multiple clients at the same time.
 
-You might want to automate the process of starting Gunicorn by placing the command in a Bash script.
+You might want to automate the process of starting Gunicorn by placing the command in a Bash script. My Bash script takes the following form:
+
+```bash
+#!/bin/bash
+cd /export/scratch/powertoken
+. venv/bin/activate
+export MAIL_SERVER=smtp.googlemail.com
+export MAIL_PORT=587
+export MAIL_USE_TLS=1
+export MAIL_USERNAME="<email_address>"
+export MAIL_PASSWORD="<email_password>"
+gunicorn --bind 127.0.0.1:5000 wsgi --workers 3
+```
+
+You will probably want to create a new email address to use as your mail server. See [part 7](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-error-handling) of Miguel Grinberg's excellent Flask tutorial for more details.
 
 
-## Tips:
+## Tips
 
 It's best to use a virtualenv to setup Flask; see the Flask documentation for details.
 
