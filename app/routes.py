@@ -1,7 +1,7 @@
 """
 Handles routing and form processing for the PowerToken Flask app.\n
 Created by Jasmine Jones.\n
-Last modified by Abigail Franz on 3/25/2018.
+Last modified by Abigail Franz on 4/16/2018.
 """
 
 from datetime import datetime
@@ -156,6 +156,7 @@ def user_activities():
 			else:
 				act = Activity.query.filter_by(activity_id=key).first()
 				act.weight = value
+				db.session.commit()
 		return redirect(url_for("user_home", username=username))
 
 @app.route("/admin")

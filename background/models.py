@@ -2,7 +2,7 @@
 Contains the models to be used with the SQLAlchemy database interface.\n
 Meant to be used by the background scripts, not the Flask app.\n
 Created by Abigail Franz on 3/12/2018.\n
-Last modified by Abigail Franz on 4/13/2018.
+Last modified by Abigail Franz on 4/16/2018.
 """
 
 from datetime import datetime
@@ -69,10 +69,12 @@ class Activity(Base):
 	__tablename__ = "activity"
 	id = Column(Integer, primary_key=True)
 	activity_id = Column(Integer, index=True, unique=True)
+	name = Column(String(256))
 	start_time = Column(DateTime, index=True)
 	end_time = Column(DateTime, index=True)
 	expiration = Column(DateTime, index=True)
-	weight = Column(Integer)
+	repeat = db.Column(db.String(32), default="never")
+	weight = Column(Integer, default=1)
 	user_id = Column(Integer, ForeignKey("user.id"))
 	days_activities = relationship("DaysActivities", backref="activity", lazy="dynamic")
 

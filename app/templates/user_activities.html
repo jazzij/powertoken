@@ -10,10 +10,10 @@
             <input type="hidden" value="{{username}}" />
             {% for act in acts %}
                 <div class="row pt-form-group">
-                    <div class="col-sm-6">{{act["name"]}}</div>
+                    <div class="col-sm-6">{{act.name}}</div>
                     <div class="col-sm-6">
-                        <select name="{{act['id']}}">
-                            <option value="1">1</option>
+                        <select name="{{act.activity_id}}">
+                            <option value="1" selected>1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>

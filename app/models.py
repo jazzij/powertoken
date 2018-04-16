@@ -1,7 +1,7 @@
 """
 Contains the models to be used with the SQLAlchemy database interface.\n
 Created by Abigail Franz on 3/12/2018.\n
-Last modified by Abigail Franz on 4/13/2018.
+Last modified by Abigail Franz on 4/16/2018.
 """
 
 from datetime import datetime
@@ -72,10 +72,12 @@ class Activity(db.Model):
 	"""
 	id = db.Column(db.Integer, primary_key=True)
 	activity_id = db.Column(db.Integer, index=True, unique=True)
+	name = db.Column(db.String(256))
 	start_time = db.Column(db.DateTime, index=True)
 	end_time = db.Column(db.DateTime, index=True)
 	expiration = db.Column(db.DateTime, index=True)
-	weight = db.Column(db.Integer)
+	repeat = db.Column(db.String(32), default="never")
+	weight = db.Column(db.Integer, default=1)
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 	days_activities = db.relationship("DaysActivities", backref="activity", lazy="dynamic")
 

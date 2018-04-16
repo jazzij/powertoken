@@ -2,11 +2,13 @@
 Contains the API calls for WEconnect and a helper that
 processes the login response from the Fitbit API endpoint.\n
 Created by Abigail Franz on 3/13/2018\.n
-Last modified by Abigail Franz on 3/13/2018.
+Last modified by Abigail Franz on 4/16/2018.
 """
 
 import json, requests
 from datetime import datetime, timedelta, MAXYEAR
+from app import db
+from app.models import Activity
 
 def login_to_wc(email, password):
 	"""
@@ -32,31 +34,37 @@ def get_wc_activities(wc_id, wc_token):
 		parsed = response.json()
 		acts = []
 		for item in parsed:
-			expiration = extract_expiration(item)
-			if expiration > datetime.now():
-				acts.append({"id": item["activityId"], "name": item["name"]})
+			activity = wc_json_to_db(activity)
+			if activity.expiration > datetime.now():
+				db.session.add(activity)
+				db.session.commit()
+				acts.append(activity)
 		return acts
 	else:
 		return []
 
-def extract_expiration(activity):
+def wc_json_to_db(wc_act):
 	"""
-	Given a JSON activity object from WEconnect, extract expiration.
+	Given a JSON activity object from WEconnect, convert it to an Activity
+	object compatible with the database.
 
-	:param dict activity: an activity from WEconnect in JSON format
+	:param dict wc_act: an activity from WEconnect in JSON format
 	"""
 	# Determines the start and end times
-	ts = datetime.strptime(activity["dateStart"], "%Y-%m-%dT%H:%M:%S.%fZ")
-	te = ts + timedelta(minutes=activity["duration"])
+	ts = datetime.strptime(wc_act["dateStart"], "%Y-%m-%dT%H:%M:%S.%fZ")
+	te = ts + timedelta(minutes=wc_act["duration"])
 
 	# Determines the expiration date (if any)
 	expiration = datetime(MAXYEAR, 12, 31)
-	if activity["repeat"] == "never":
+	if wc_act["repeat"] == "never":
 		expiration = te
-	if activity["repeatEnd"] != None:
-		expiration = datetime.strptime(activity["repeatEnd"], "%Y-%m-%dT%H:%M:%S.%fZ")
+	if wc_act["repeatEnd"] != None:
+		expiration = datetime.strptime(wc_act["repeatEnd"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
-	return expiration
+	activity = Activity(activity_id=wc_act["activityId"], name=wc_act["name"],
+			start_time=ts, end_time=te, expiration=expiration,
+			repeat=wc_act["repeat"])
+	return activity
 
 def complete_fb_login(response_data):
 	"""
