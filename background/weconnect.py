@@ -120,9 +120,9 @@ def get_activities(user, session):
 			summary = "Couldn't get list of activities.",
 			origin = "background/weconnect.py, in _get_activities",
 			message = response.json()["error"]["message"],
-			user = self._user
+			user = user
 		)
-		self._session.add(error)
-		self._session.commit()
+		session.add(error)
+		session.commit()
 		logger.error("Couldn't get list of activities.")
-		return None
+		return []
