@@ -62,7 +62,7 @@ daysacts = [
     DaysActivities(completed=True, day=days[5], activity=acts[4]),
     DaysActivities(completed=True, day=days[5], activity=acts[6]),
     DaysActivities(completed=True, day=days[5], activity=acts[7]),
-    DaysActivities(completed=True, day=days[5], activity=acts[8])
+    DaysActivities(completed=True, day=days[5], activity=acts[8]),
     DaysActivities(completed=True, day=days[5], activity=acts[10]),
     DaysActivities(completed=True, day=days[6], activity=acts[0]), # Tues
     DaysActivities(completed=False, day=days[6], activity=acts[4]),
