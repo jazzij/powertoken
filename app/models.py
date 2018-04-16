@@ -46,6 +46,7 @@ class User(db.Model):
 	logs = db.relationship("Log", backref="user", lazy="dynamic")
 	activities = db.relationship("Activity", backref="user", lazy="dynamic")
 	errors = db.relationship("Error", backref="user", lazy="dynamic")
+	days = db.relationship("Day", backref="user", lazy="dynamic")
 
 	def __repr__(self):
 		return "<User {}>".format(self.username)
@@ -76,6 +77,7 @@ class Activity(db.Model):
 	expiration = db.Column(db.DateTime, index=True)
 	weight = db.Column(db.Integer)
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+	days_activities = db.relationship("DaysActivities", backref="activity", lazy="dynamic")
 
 	def __repr__(self):
 		return "<Activity {}>".format(self.activity_id)
@@ -94,3 +96,17 @@ class Error(db.Model):
 
 	def __repr__(self):
 		return "<Error '{}' for user {}>".format(self.message, self.user.username)
+
+class Day(db.Model):
+	"""
+	Represents a day of progress (which activities are completed, etc).
+	"""
+	id = db.Column(db.Integer, primary_key=True)
+	date = db.Column(db.DateTime, index=True)
+	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+	days_activities = db.relationship("DaysActivities", backref="day", lazy="dynamic")
+
+class DaysActivities(db.Model):
+	completed = db.Column(db.Boolean)
+	day_id = db.Column(db.Integer, db.ForeignKey("day.id"))
+	activity_id = db.Column(db.Integer, db.ForeignKey("activity.id"))
