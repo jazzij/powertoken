@@ -80,6 +80,16 @@ class WeConnect:
 			logger.error("Couldn't get WEconnect progress.")
 			return None
 
+	def _get_days_activities(self, day):
+		""" day is of type app.models.Day """
+		start = day.date.strftime("%Y-%m-%dT00:00:00")
+		end = day.date.strftime("%Y-%m-%dT23:59:59")
+		url = "{}/{}/activities-with-events?from={}&to={}&access_token={}".format(
+				BASE_URL, self._user.wc_id, start, end, self._user.wc_token)
+		response = requests.get(url)
+		if is_valid(response):
+			print(response.json())
+
 	def _get_week(self):
 		"""
 		Return two formatted strings representing the date of the past Sunday
