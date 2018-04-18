@@ -78,8 +78,9 @@ def get_days_progress_2(day):
 	for act in day_4_ago.days_activities:
 		score += act.completed * (act.activity.weight - 4) if act.activity.weight > 3 else 0
 
-	print("score: {}".format(score))
-	return float(score) / float(get_possible_score(day))
+	possible_score = get_possible_score(day)
+	print("score: {}/{}".format(score, possible_score))
+	return float(score) / float(possible_score)
 
 for i in range(8, 15):
 	day = Day.query.filter_by(date=datetime(2018, 4, i)).first()
