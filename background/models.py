@@ -73,7 +73,7 @@ class Activity(Base):
 	start_time = Column(DateTime, index=True)
 	end_time = Column(DateTime, index=True)
 	expiration = Column(DateTime, index=True)
-	repeat = db.Column(db.String(32), default="never")
+	repeat = Column(String(32), default="never")
 	weight = Column(Integer, default=1)
 	user_id = Column(Integer, ForeignKey("user.id"))
 	days_activities = relationship("DaysActivities", backref="activity", lazy="dynamic")
@@ -108,7 +108,7 @@ class Day(Base):
 	days_activities = relationship("DaysActivities", backref="day", lazy="dynamic")
 
 class DaysActivities(Base):
-	__tablename__ "daysactivities"
+	__tablename__ = "daysactivities"
 	id = Column(Integer, primary_key=True)
 	completed = Column(Boolean)
 	day_id = Column(Integer, ForeignKey("day.id"))

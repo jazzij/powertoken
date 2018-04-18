@@ -1,5 +1,6 @@
 from app import db
 from app.models import User, Activity, Day, DaysActivities
+from background.weconnect import WeConnect
 from datetime import datetime, timedelta
 
 # Map user's entered weights of 1 - 5 to weights of 6 - 10.
@@ -82,6 +83,12 @@ def get_days_progress_2(day):
 	print("score: {}/{}".format(score, possible_score))
 	return float(score) / float(possible_score)
 
-for i in range(8, 15):
-	day = Day.query.filter_by(date=datetime(2018, 4, i)).first()
-	print(get_days_progress_2(day))
+#for i in range(8, 15):
+#	day = Day.query.filter_by(date=datetime(2018, 4, i)).first()
+#	print(get_days_progress_2(day))
+
+user = User.query.get(2)
+wc = WeConnect(user, db.session)
+day = Day(date=datetime.now(), user=user)
+activities = wc._get_days_activities(day)
+print(activities)
