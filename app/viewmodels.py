@@ -18,7 +18,16 @@ class UserViewModel:
 		self.wc_id = user.wc_id
 		self.wc_status = "Current" if user.wc_id and user.wc_token else "Expired"
 		self.fb_status = "Current" if user.fb_token else "Expired"
+		self.last_check_in = _last_check_in(self, user) 
 		self.daily_progress, self.weekly_progress = self._todays_last_progress(user)
+
+	def _last_check_in(self, user):
+		logs = user.logs.all()
+		last_log = logs[-1] if len(logs) > 0 else None
+		if last_log is None:
+			return "Never"
+		else:
+			return last_log.timestamp.strftime("%Y-%m-%d %I:%M %p")
 
 	def _todays_last_progress(self, user):
 		logs = user.logs.all()
