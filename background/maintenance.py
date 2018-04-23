@@ -10,6 +10,7 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Base, User, Log, Activity, DB_PATH
+from fitbit import Fitbit
 from helpers import add_or_update_activity
 from weconnect import get_activities
 
@@ -54,6 +55,10 @@ def maintain_users():
 		#Determine if FB token is expired
 		pass
 	logger.warning("\t\tToken expiration check not implemented.")
+
+	for user in users:
+		fb = Fitbit(user, session)
+		fb.change_step_goal(1000000)
 
 	logger.info("\t...Done.")
 

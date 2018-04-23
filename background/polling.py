@@ -58,23 +58,29 @@ def poll_and_update():
 		else:
 			progress = weekly_progress
 
-		# If the poll request succeeded, updates Fitbit and adds a new entry to
-		# the logs.
+		# If the poll request succeeded and the user has new progress, updates
+		# Fitbit and adds a new entry to the logs.
 		if progress is None:
 			logger.error("\tCouldn't get progress for %s.", user)
 		elif progress == 0:
 			logger.info("\t%s has no progress yet today.", user)
 		else:
-			step_count = fb.reset_and_update(progress)
-			if step_count is None:
-				logger.error("\tCouldn't update Fitbit for %s.", user)
-			else:
-				log = Log(daily_progress = daily_progress, 
-						weekly_progress = weekly_progress,
-						step_count = step_count, user = user)
-				session.add(log)
-				session.commit()
-				logger.info("\tUpdated progress for %s.", user)
+			# Looks in the logs to see if that progress has already been
+			# recorded.
+			today = datetime.now().strftime("%Y-%m-%d%%")
+			existing = user.logs.filter(Log.timestamp.like(today)).\
+					filter(Log.daily_progress == progress).count()
+			if not existing:
+				step_count = fb.reset_and_update(progress)
+				if step_count is None:
+					logger.error("\tCouldn't update Fitbit for %s.", user)
+				else:
+					log = Log(daily_progress = daily_progress, 
+							weekly_progress = weekly_progress,
+							step_count = step_count, user = user)
+					session.add(log)
+					session.commit()
+					logger.info("\tUpdated progress for %s.", user)
 
 if __name__ == "__main__":
 	logger.info("Running the poll-and-update loop...")
