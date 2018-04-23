@@ -34,7 +34,7 @@ def get_wc_activities(wc_id, wc_token):
 		parsed = response.json()
 		acts = []
 		for item in parsed:
-			activity = wc_json_to_db(activity)
+			activity = wc_json_to_db(item)
 			if activity.expiration > datetime.now():
 				db.session.add(activity)
 				db.session.commit()

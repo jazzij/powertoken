@@ -63,19 +63,19 @@ def get_days_progress_2(day):
 	for act in day.days_activities:
 		score += act.completed * act.activity.weight
 
-	day_1_ago = Day.query.filter_by(date=(day.date - timedelta(1))).first()
+	day_1_ago = day.user.days.filter_by(date=(day.date - timedelta(1))).first()
 	for act in day_1_ago.days_activities:
 		score += act.completed * (act.activity.weight - 1)
 
-	day_2_ago = Day.query.filter_by(date=(day.date - timedelta(2))).first()
+	day_2_ago = day.user.days.filter_by(date=(day.date - timedelta(2))).first()
 	for act in day_2_ago.days_activities:
 		score += act.completed * (act.activity.weight - 2) if act.activity.weight > 1 else 0
 
-	day_3_ago = Day.query.filter_by(date=(day.date - timedelta(3))).first()
+	day_3_ago = day.user.days.filter_by(date=(day.date - timedelta(3))).first()
 	for act in day_3_ago.days_activities:
 		score += act.completed * (act.activity.weight - 3) if act.activity.weight > 2 else 0
 
-	day_4_ago = Day.query.filter_by(date=(day.date - timedelta(4))).first()
+	day_4_ago = day.user.days.filter_by(date=(day.date - timedelta(4))).first()
 	for act in day_4_ago.days_activities:
 		score += act.completed * (act.activity.weight - 4) if act.activity.weight > 3 else 0
 
