@@ -26,15 +26,15 @@ def login_to_wc(email, password):
 	wc_token = str(jres["accessToken"]["id"])
 	return (wc_id, wc_token)
 
-def get_wc_activities(wc_id, wc_token):
+def get_wc_activities(user):
 	url = "https://palalinq.herokuapp.com/api/people/{}/activities?access_token={}".\
-			format(wc_id, wc_token)
+			format(user.wc_id, user.wc_token)
 	response = requests.get(url)
 	if response.status_code == 200:
 		parsed = response.json()
 		acts = []
 		for item in parsed:
-			activity = wc_json_to_db(item)
+			activity = wc_json_to_db(item, user)
 			if activity.expiration > datetime.now():
 				db.session.add(activity)
 				db.session.commit()
@@ -43,7 +43,7 @@ def get_wc_activities(wc_id, wc_token):
 	else:
 		return []
 
-def wc_json_to_db(wc_act):
+def wc_json_to_db(wc_act, user):
 	"""
 	Given a JSON activity object from WEconnect, convert it to an Activity
 	object compatible with the database.
@@ -63,7 +63,7 @@ def wc_json_to_db(wc_act):
 
 	activity = Activity(activity_id=wc_act["activityId"], name=wc_act["name"],
 			start_time=ts, end_time=te, expiration=expiration,
-			repeat=wc_act["repeat"])
+			repeat=wc_act["repeat"], user=user)
 	return activity
 
 def complete_fb_login(response_data):

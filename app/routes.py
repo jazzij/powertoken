@@ -145,15 +145,13 @@ def user_activities():
 	if request.method == "GET":
 		username = request.args.get("username")
 		user = User.query.filter_by(username=username).first()
-		acts = get_wc_activities(user.wc_id, user.wc_token)
+		acts = get_wc_activities(user)
 		return render_template("user_activities.html", username=username, acts=acts)
 	elif request.method == "POST":
 		result = request.form
-		username = ""
+		username = request.form["username"]
 		for key, value in result.iteritems():
-			if key == "username":
-				username = value
-			else:
+			if key != "username":
 				act = Activity.query.filter_by(activity_id=key).first()
 				act.weight = value
 				db.session.commit()
