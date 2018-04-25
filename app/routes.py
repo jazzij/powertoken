@@ -162,8 +162,9 @@ def user_activities():
 	user = User.query.filter_by(username=username).first()
 	acts = get_wc_activities(user)
 	for act in acts:
-		act_form = ActivityForm(act.activity_id, act.name)
-		form.activities._add_entry(formdata=act_form)
+		form.activities._add_entry()
+		form.activities.entries[-1].act_id.data = act.activity_id
+		form.activities.entries[-1].name.data = act.name
 	return render_template("user_activities.html", form=form)
 
 @app.route("/admin")
