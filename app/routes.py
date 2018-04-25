@@ -96,7 +96,8 @@ def user_wc_login():
 			return render_template("user_wc_login.html", form=form, error=error)
 
 		# If the login was successful, store the WEconnect ID and access token
-		# in the database, and redirect to the Fitbit login.
+		# in the database, pull the user's WEconnect activities into the
+		# database, and redirect to the Fitbit login.
 		user.wc_id = successful_result[0]
 		user.wc_token = successful_result[1]
 		try:
@@ -104,6 +105,7 @@ def user_wc_login():
 		except:
 			error = "A user with the same WEconnect credentials already exists"
 			return render_template("user_wc_login.html", form=form, error=error)
+		get_wc_activities(user)
 		return redirect(url_for("user_fb_login", username=username))
 
 	# GET: Render the WEconnect login page.
@@ -143,7 +145,12 @@ def user_fb_login():
 
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
-	form = UserActivityForm()
+	username = request.args.get("username")
+	if username:
+		user = User.query.filter_by(username=username).first()
+		activities = user.activities.all()
+	form = UserActivityForm() if username else UserActivityForm(activities)
+	
 	if form.validate_on_submit():
 		username = form.username.data
 		print(username)
@@ -157,15 +164,7 @@ def user_activities():
 		#		db.session.commit()
 		return redirect(url_for("user_home", username=username))
 
-	username = request.args.get("username")
-	form.username.data = username
-	user = User.query.filter_by(username=username).first()
-	acts = get_wc_activities(user)
-	for act in acts:
-		form.activities._add_entry()
-		#form.activities.entries[-1].act_id.data = act.activity_id
-		#form.activities.entries[-1].name.data = act.name
-	return render_template("user_activities.html", form=form)
+	return render_template("user_activities.html", form=form, acts=acts)
 
 @app.route("/admin")
 @app.route("/admin/")

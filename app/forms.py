@@ -51,5 +51,17 @@ class ActivityForm(FlaskForm):
 
 class UserActivityForm(FlaskForm):
 	username = HiddenField("Username")
-	activities = FieldList(FormField(ActivityForm))
 	submit = SubmitField("Next")
+
+	def __init__(self, activities=None, username=None):
+		if activities:
+			self.activities = FieldList(FormField(ActivityForm), min_entries=len(activities))
+			i = 0
+			for entry in self.activities.entries:
+				entry.data["act_id"] = activities[i].activity_id
+				entry.data["name"] = activities[i].name
+				i += 1
+		else:
+			self.activities = FieldList(FormField(ActivityForm))
+		if username:
+			username.data = username

@@ -12,8 +12,8 @@
             {% for activity in form.activities %}
                 <div class="row pt-form-group">
                     {{activity.act_id()}}
-                    <div class="col-sm-4">{{activity.name.data}}</div>
-                    <div class="col-sm-8">{{activity.weight()}}</div>
+                    <div class="col-sm-8">{{activity.name.data}}</div>
+                    <div class="col-sm-4">{{activity.weight()}}</div>
                 </div>
             {% endfor %}
             <div class="row pt-form-group">
