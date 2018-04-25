@@ -163,8 +163,8 @@ def user_activities():
 	acts = get_wc_activities(user)
 	for act in acts:
 		form.activities._add_entry()
-		form.activities.entries[-1].act_id.data = act.activity_id
-		form.activities.entries[-1].name.data = act.name
+		#form.activities.entries[-1].act_id.data = act.activity_id
+		#form.activities.entries[-1].name.data = act.name
 	return render_template("user_activities.html", form=form)
 
 @app.route("/admin")
