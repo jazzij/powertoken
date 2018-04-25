@@ -150,7 +150,7 @@ def user_activities():
 		user = User.query.filter_by(username=username).first()
 		activities = user.activities.all()
 	form = UserActivityForm() if username else UserActivityForm(activities)
-	
+
 	if form.validate_on_submit():
 		username = form.username.data
 		print(username)
@@ -164,7 +164,7 @@ def user_activities():
 		#		db.session.commit()
 		return redirect(url_for("user_home", username=username))
 
-	return render_template("user_activities.html", form=form, acts=acts)
+	return render_template("user_activities.html", form=form)
 
 @app.route("/admin")
 @app.route("/admin/")
