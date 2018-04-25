@@ -44,12 +44,12 @@ class UserWcLoginForm(FlaskForm):
 	password = PasswordField("Password", validators=[DataRequired()])
 	submit = SubmitField("Next")
 
-class UserActivityForm(FlaskForm):
-	username = HiddenField("Username")
-	activities = FieldList(FormField(ActivityForm), min_entries=2)
-	submit = SubmitField("Next")
-
 class ActivityForm(FlaskForm):
 	activity_id = HiddenField("ActivityId")
 	activity_name = StringField("Name")
 	weight = IntegerField("Weight")
+
+class UserActivityForm(FlaskForm):
+	username = HiddenField("Username")
+	activities = FieldList(FormField(ActivityForm), min_entries=2)
+	submit = SubmitField("Next")
