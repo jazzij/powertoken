@@ -10,7 +10,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login, get_wc_activities
-from app.forms import AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm
+from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
+		UserWcLoginForm, UserActivityForm)
 from app.models import Admin, User, Log, Activity, Error
 from app.viewmodels import UserViewModel, LogViewModel
 
@@ -142,20 +143,27 @@ def user_fb_login():
 
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
-	if request.method == "GET":
-		username = request.args.get("username")
-		user = User.query.filter_by(username=username).first()
-		acts = get_wc_activities(user)
-		return render_template("user_activities.html", username=username, acts=acts)
-	elif request.method == "POST":
-		result = request.form
-		username = request.form["username"]
-		for key, value in result.iteritems():
-			if key != "username":
-				act = Activity.query.filter_by(activity_id=key).first()
-				act.weight = value
-				db.session.commit()
+	form = UserActivityForm()
+
+	if form.validate_on_submit():
+		username = form.username.data
+		print(username)
+		for entry in form.activities.entries:
+			print(entry.data["activity_id"])
+			print(entry.data["activity_name"])
+			print(entry.data["weight"])
+		#for key, value in result.iteritems():
+		#	if key != "username":
+		#		act = Activity.query.filter_by(activity_id=key).first()
+		#		act.weight = value
+		#		db.session.commit()
 		return redirect(url_for("user_home", username=username))
+
+	username = request.args.get("username")
+	form.username.data = username
+	user = User.query.filter_by(username=username).first()
+	acts = get_wc_activities(user)
+	return render_template("user_activities.html", form=form)
 
 @app.route("/admin")
 @app.route("/admin/")

@@ -6,7 +6,8 @@ Last modified by Abigail Franz on 3/13/2018.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
+from wtforms import (StringField, PasswordField, BooleanField, SubmitField, 
+	RadioField, HiddenField, FieldList, FormField, IntegerField)
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models import Admin
 
@@ -42,3 +43,13 @@ class UserWcLoginForm(FlaskForm):
 	email = StringField("Email", validators=[DataRequired(), Email()])
 	password = PasswordField("Password", validators=[DataRequired()])
 	submit = SubmitField("Next")
+
+class UserActivityForm(FlaskForm):
+	username = HiddenField("Username")
+	activities = FieldList(FormField(ActivityForm), min_entries=2)
+	submit = SubmitField("Next")
+
+class ActivityForm(FlaskForm):
+	activity_id = HiddenField("ActivityId")
+	activity_name = StringField("Name")
+	weight = IntegerField("Weight")
