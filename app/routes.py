@@ -11,7 +11,7 @@ from werkzeug.urls import url_parse
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login, get_wc_activities
 from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
-		UserWcLoginForm, UserActivityForm)
+		UserWcLoginForm, UserActivityForm, ActivityForm)
 from app.models import Admin, User, Log, Activity, Error
 from app.viewmodels import UserViewModel, LogViewModel
 
@@ -144,13 +144,11 @@ def user_fb_login():
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
 	form = UserActivityForm()
-
 	if form.validate_on_submit():
 		username = form.username.data
 		print(username)
 		for entry in form.activities.entries:
-			print(entry.data["activity_id"])
-			print(entry.data["activity_name"])
+			print(entry.data["act_id"])
 			print(entry.data["weight"])
 		#for key, value in result.iteritems():
 		#	if key != "username":
@@ -163,6 +161,9 @@ def user_activities():
 	form.username.data = username
 	user = User.query.filter_by(username=username).first()
 	acts = get_wc_activities(user)
+	for act in acts:
+		act_form = ActivityForm(act.activity_id, act.name)
+		form.activities._add_entry(formdata=act_form)
 	return render_template("user_activities.html", form=form)
 
 @app.route("/admin")

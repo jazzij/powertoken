@@ -45,11 +45,14 @@ class UserWcLoginForm(FlaskForm):
 	submit = SubmitField("Next")
 
 class ActivityForm(FlaskForm):
-	activity_id = HiddenField("ActivityId")
-	activity_name = StringField("Name")
+	act_id = HiddenField("ActivityId")
+	name = StringField("Name")
 	weight = IntegerField("Weight")
+	def __init__(self, act_id, act_name):
+		self.act_id.data = act_id
+		self.name.data = act_name
 
 class UserActivityForm(FlaskForm):
 	username = HiddenField("Username")
-	activities = FieldList(FormField(ActivityForm), min_entries=2)
+	activities = FieldList(FormField(ActivityForm))
 	submit = SubmitField("Next")
