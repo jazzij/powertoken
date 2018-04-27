@@ -146,10 +146,12 @@ def user_fb_login():
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
 	username = request.args.get("username")
-	if username:
-		user = User.query.filter_by(username=username).first()
-		activities = user.activities.all()
-	form = UserActivityForm() if username else UserActivityForm(activities, username)
+	if username is None:
+		return redirect(url_for("user_login", error="Invalid username"))
+
+	user = User.query.filter_by(username=username).first()
+	activities = user.activities.all()
+	form = UserActivityForm(activities)
 
 	if form.validate_on_submit():
 		username = form.username.data

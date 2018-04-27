@@ -8,7 +8,6 @@
         </p>
 		<form action="" method="post">
             {{form.hidden_tag()}}
-            {{form.username()}}
             {% for activity in form.activities %}
                 <div class="row pt-form-group">
                     <div class="col-sm-8">{{activity.label}}</div>

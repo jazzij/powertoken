@@ -52,13 +52,12 @@ class ActivityForm(FlaskForm):
 		self.weight = SelectField(choices=choices, _prefix=activity.act_id)
 
 class UserActivityForm(FlaskForm):
-	username = StringField("Username")
 	activities = []
 	_choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
 	submit = SubmitField("Next")
 
-	def __init__(self, activities=[], username=None):
-		self.username.data = username
+	def __init__(self, activities=[]):
+		super(UserActivityForm, self).__init__()
 		for act in activities:
 			act_field = SelectField(label=act.name, choices=_choices, 
 					_prefix=act.activity_id)
