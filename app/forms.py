@@ -10,7 +10,7 @@ from wtforms import (StringField, PasswordField, BooleanField, SubmitField,
 	RadioField, HiddenField, FieldList, FormField, IntegerField, SelectField)
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app import db
-from app.models import Admin, Activity
+from app.models import Admin, Activity, User
 
 class AdminLoginForm(FlaskForm):
 	username = StringField("Username", validators=[DataRequired()])
