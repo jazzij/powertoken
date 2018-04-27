@@ -150,7 +150,7 @@ def user_activities():
 		return redirect(url_for("user_login", error="Invalid username"))
 
 	user = User.query.filter_by(username=username).first()
-	activities = user.activities.all()
+	form = UserActivityForm(obj=user)
 	form.activities.min_entries = len(user.activities.all())
 
 	if form.validate_on_submit():
