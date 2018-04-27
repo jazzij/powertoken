@@ -149,19 +149,17 @@ def user_activities():
 	if username:
 		user = User.query.filter_by(username=username).first()
 		activities = user.activities.all()
-	form = UserActivityForm() if username else UserActivityForm(activities)
+	form = UserActivityForm() if username else UserActivityForm(activities, username)
 
 	if form.validate_on_submit():
 		username = form.username.data
 		print(username)
-		for entry in form.activities.entries:
-			print(entry.data["act_id"])
-			print(entry.data["weight"])
-		#for key, value in result.iteritems():
-		#	if key != "username":
-		#		act = Activity.query.filter_by(activity_id=key).first()
-		#		act.weight = value
-		#		db.session.commit()
+		for key, value in form.activities.iteritems():
+			if key != "username":
+				print(key, value)
+				#act = Activity.query.filter_by(activity_id=key).first()
+				#act.weight = value
+				#db.session.commit()
 		return redirect(url_for("user_home", username=username))
 
 	return render_template("user_activities.html", form=form)

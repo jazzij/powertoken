@@ -7,7 +7,7 @@ Last modified by Abigail Franz on 3/13/2018.
 
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, BooleanField, SubmitField, 
-	RadioField, HiddenField, FieldList, FormField, IntegerField)
+	RadioField, HiddenField, FieldList, FormField, IntegerField, SelectField)
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from app.models import Admin
 
@@ -45,23 +45,22 @@ class UserWcLoginForm(FlaskForm):
 	submit = SubmitField("Next")
 
 class ActivityForm(FlaskForm):
-	act_id = HiddenField("ActivityId")
-	name = StringField("Name")
-	weight = IntegerField("Weight")
+	def __init__(self, activity):
+		self.act_id = HiddenField(_prefix=activity.act_id)
+		self.act_id.data = activity.act_id
+		self.name = activity.name
+		choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
+		self.weight = SelectField(choices=choices, _prefix=activity.act_id)
 
 class UserActivityForm(FlaskForm):
 	username = HiddenField("Username")
 	submit = SubmitField("Next")
+	activities = []
+	_choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
 
-	def __init__(self, activities=None, username=None):
-		if activities:
-			self.activities = FieldList(FormField(ActivityForm), min_entries=len(activities))
-			i = 0
-			for entry in self.activities.entries:
-				entry.data["act_id"] = activities[i].activity_id
-				entry.data["name"] = activities[i].name
-				i += 1
-		else:
-			self.activities = FieldList(FormField(ActivityForm))
-		if username:
-			username.data = username
+	def __init__(self, activities=[], username=None):
+		self.username.data = username
+		for act in activities:
+			act_field = SelectField(label=act.name, choices=_choices, 
+					_prefix=act.activity_id)
+			self.activities.append(act_field)
