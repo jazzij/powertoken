@@ -14,7 +14,6 @@ from app.models import Admin
 class AdminLoginForm(FlaskForm):
 	username = StringField("Username", validators=[DataRequired()])
 	password = PasswordField("Password", validators=[DataRequired()])
-	remember_me = BooleanField("Remember Me")
 	submit = SubmitField("Sign In")
 
 class AdminRegistrationForm(FlaskForm):
@@ -53,10 +52,10 @@ class ActivityForm(FlaskForm):
 		self.weight = SelectField(choices=choices, _prefix=activity.act_id)
 
 class UserActivityForm(FlaskForm):
-	username = HiddenField("Username")
-	submit = SubmitField("Next")
+	username = StringField("Username")
 	activities = []
 	_choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
+	submit = SubmitField("Next")
 
 	def __init__(self, activities=[], username=None):
 		self.username.data = username
