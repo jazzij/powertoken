@@ -70,7 +70,7 @@ class ModelFieldList(FieldList):
 			db.session.delete(getattr(obj, name).pop())
 		super(ModelFieldList, self).populate_obj(obj, name)
 
-class ActivityForm(Form):
+class ActivityForm(FlaskForm):
 	activity_id = HiddenField("Activity ID")
 	name = StringField("Name")
 	weight = SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']])
