@@ -53,11 +53,11 @@ class ActivityForm(FlaskForm):
 
 class UserActivityForm(FlaskForm):
 	activities = []
-	_choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
 	submit = SubmitField("Next")
 
 	def __init__(self, activities=[]):
 		super(UserActivityForm, self).__init__()
+		_choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
 		for act in activities:
 			act_field = SelectField(label=act.name, choices=_choices, 
 					_prefix=act.activity_id)
