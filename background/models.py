@@ -69,11 +69,11 @@ class Activity(Base):
 	__tablename__ = "activity"
 	id = Column(Integer, primary_key=True)
 	activity_id = Column(Integer, index=True, unique=True)
-	name = Column(String(256))
+	activity_name = Column(String(256))
 	start_time = Column(DateTime, index=True)
 	end_time = Column(DateTime, index=True)
 	expiration = Column(DateTime, index=True)
-	repeat = Column(String(32), default="never")
+	weekdays = Column(String(9))
 	weight = Column(Integer, default=1)
 	user_id = Column(Integer, ForeignKey("user.id"))
 	days_activities = relationship("DaysActivities", backref="activity", lazy="dynamic")

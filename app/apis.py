@@ -61,9 +61,9 @@ def wc_json_to_db(wc_act, user):
 	if wc_act["repeatEnd"] != None:
 		expiration = datetime.strptime(wc_act["repeatEnd"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
-	activity = Activity(activity_id=wc_act["activityId"], name=wc_act["name"],
+	activity = Activity(activity_id=wc_act["activityId"], activity_name=wc_act["name"],
 			start_time=ts, end_time=te, expiration=expiration,
-			repeat=wc_act["repeat"], user=user)
+			weekdays="SMTWThFSa", user=user)
 	return activity
 
 def complete_fb_login(response_data):
