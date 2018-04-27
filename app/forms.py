@@ -73,7 +73,7 @@ class ModelFieldList(FieldList):
 class ActivityForm(Form):
 	activity_id = HiddenField("Activity ID")
 	name = StringField("Name")
-	weight = SelectField("Weight", choices=[(c, c) for c in [1', '2', '3', '4', '5']])
+	weight = SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']])
 	def __init__(self, csrf_enabled=False, *args, **kwargs):
 		super(ActivityForm, self).__init__(csrf_enabled=False, *args, **kwargs)
 
