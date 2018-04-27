@@ -37,7 +37,8 @@ class UserViewModel:
 		last_log = logs[-1] if len(logs) > 0 else \
 			Log(daily_progress=0, weekly_progress=0, step_count=0, user=user)
 		if last_log.timestamp is None or last_log.timestamp.day != datetime.now().day:
-			last_log = Log(daily_progress=0, weekly_progress=0, step_count=0)
+			last_log = Log(daily_progress=0, weekly_progress=last_log.weekly_progress, 
+					step_count=0)
 			
 		return last_log.daily_progress * 100, last_log.weekly_progress * 100
 
