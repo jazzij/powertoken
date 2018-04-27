@@ -55,27 +55,27 @@ class ActivityForm(FlaskForm):
 """
 
 class ModelFieldList(FieldList):
-    def __init__(self, *args, **kwargs):         
-        self.model = kwargs.pop("model", None)
-        super(ModelFieldList, self).__init__(*args, **kwargs)
-        if not self.model:
-            raise ValueError("ModelFieldList requires model to be set")
+	def __init__(self, *args, **kwargs):         
+		self.model = kwargs.pop("model", None)
+		super(ModelFieldList, self).__init__(*args, **kwargs)
+		if not self.model:
+			raise ValueError("ModelFieldList requires model to be set")
 
-    def populate_obj(self, obj, name):
-        while len(getattr(obj, name)) < len(self.entries):
-            newModel = self.model()
-            db.session.add(newModel)
-            getattr(obj, name).append(newModel)
-        while len(getattr(obj, name)) > len(self.entries):
-            db.session.delete(getattr(obj, name).pop())
-        super(ModelFieldList, self).populate_obj(obj, name)
+	def populate_obj(self, obj, name):
+		while len(getattr(obj, name)) < len(self.entries):
+			newModel = self.model()
+			db.session.add(newModel)
+			getattr(obj, name).append(newModel)
+		while len(getattr(obj, name)) > len(self.entries):
+			db.session.delete(getattr(obj, name).pop())
+		super(ModelFieldList, self).populate_obj(obj, name)
 
 class ActivityForm(Form):
 	activity_id = HiddenField("Activity ID")
 	name = StringField("Name")
-    weight = SelectField("Weight", choices=[(c, c) for c in [1', '2', '3', '4', '5']])
-    def __init__(self, csrf_enabled=False, *args, **kwargs):
-        super(ActivityForm, self).__init__(csrf_enabled=False, *args, **kwargs)
+	weight = SelectField("Weight", choices=[(c, c) for c in [1', '2', '3', '4', '5']])
+	def __init__(self, csrf_enabled=False, *args, **kwargs):
+		super(ActivityForm, self).__init__(csrf_enabled=False, *args, **kwargs)
 
 class UserActivityForm(FlaskForm):
 	#activities = []
