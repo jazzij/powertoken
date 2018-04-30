@@ -12,7 +12,7 @@ from werkzeug.datastructures import MultiDict
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login, get_wc_activities
 from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
-		UserWcLoginForm, UserActivityForm, ActivityForm)
+		UserWcLoginForm, UserActivityForm)
 from app.models import Admin, User, Log, Activity, Error
 from app.viewmodels import UserViewModel, LogViewModel
 
