@@ -90,7 +90,7 @@ class UserActivityForm(FlaskForm):
 			self.activities.append(act_field)
 """
 
-class UserActivityForm(Form):
+class UserActivityForm(FlaskForm):
 	activities = FieldList(SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']]))
 
 	def populate_assoc(self, user):
