@@ -71,15 +71,12 @@ class Activity(db.Model):
 	Represents a WEconnect activity.
 	"""
 	id = db.Column(db.Integer, primary_key=True)
-	activity_id = db.Column(db.Integer, index=True, unique=True)
-	activity_name = db.Column(db.String(256))
-	start_time = db.Column(db.DateTime, index=True)
-	end_time = db.Column(db.DateTime, index=True)
+	wc_id = db.Column(db.Integer, index=True, unique=True)
+	name = db.Column(db.String(256))
 	expiration = db.Column(db.DateTime, index=True)
-	weekdays = db.Column(db.String(9))
 	weight = db.Column(db.Integer, default=1)
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-	days_activities = db.relationship("DaysActivities", backref="activity", lazy="dynamic")
+	events = db.relationship("Event", backref="activity", lazy="dynamic")
 
 	def __repr__(self):
 		return "<Activity {}>".format(self.activity_id)
@@ -106,10 +103,13 @@ class Day(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	date = db.Column(db.DateTime, index=True)
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-	days_activities = db.relationship("DaysActivities", backref="day", lazy="dynamic")
+	events = db.relationship("Event", backref="day", lazy="dynamic")
 
-class DaysActivities(db.Model):
+class Event(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
+	eid = db.Column(db.String, index=True)
+	start_time = db.Column(db.DateTime)	# Date portion is ignored
+	end_time = db.Column(db.DateTime)	# Date portion is ignored
 	completed = db.Column(db.Boolean)
 	day_id = db.Column(db.Integer, db.ForeignKey("day.id"))
 	activity_id = db.Column(db.Integer, db.ForeignKey("activity.id"))

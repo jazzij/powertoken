@@ -10,13 +10,16 @@ from datetime import datetime, timedelta, MAXYEAR
 from app import db
 from app.models import Activity
 
+WC_URL = "https://palalinq.herokuapp.com/api/People"
+WC_DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
+
 def login_to_wc(email, password):
 	"""
 	Log user into WEconnect, produce an ID and access token that will last 90
 	days. Return False if the login was unsuccessful; otherwise, return the ID
 	and token.
 	"""
-	url = "https://palalinq.herokuapp.com/api/People/login"
+	url = "{}/login".format(WC_URL)
 	data = {"email": email, "password": password}
 	result = requests.post(url, data=data)
 	if result.status_code != 200:
@@ -27,8 +30,15 @@ def login_to_wc(email, password):
 	return (wc_id, wc_token)
 
 def get_wc_activities(user):
-	url = "https://palalinq.herokuapp.com/api/people/{}/activities?access_token={}".\
-			format(user.wc_id, user.wc_token)
+	"""
+	Pulls all of a user's activities from the WEconnect backend and stores
+	metadata about them in the database. Returns a list of app.model.Activity
+	objects.
+
+	:param app.model.User user: a user from the database
+	"""
+	url = "{}/{}/activities?access_token={}".format(WC_URL, user.wc_id, 
+			user.wc_token)
 	response = requests.get(url)
 	if response.status_code == 200:
 		parsed = response.json()
@@ -36,11 +46,13 @@ def get_wc_activities(user):
 		for item in parsed:
 			activity = wc_json_to_db(item, user)
 			if activity.expiration > datetime.now():
+				# Adds the activity to the database if it's unexpired.
 				db.session.add(activity)
 				db.session.commit()
 				acts.append(activity)
 		return acts
 	else:
+		# Returns an empty list if the request was unable to be completed.
 		return []
 
 def wc_json_to_db(wc_act, user):
@@ -51,7 +63,7 @@ def wc_json_to_db(wc_act, user):
 	:param dict wc_act: an activity from WEconnect in JSON format
 	"""
 	# Determines the start and end times
-	ts = datetime.strptime(wc_act["dateStart"], "%Y-%m-%dT%H:%M:%S.%fZ")
+	ts = datetime.strptime(wc_act["dateStart"], WC_DATE_FMT)
 	te = ts + timedelta(minutes=wc_act["duration"])
 
 	# Determines the expiration date (if any)
@@ -59,11 +71,10 @@ def wc_json_to_db(wc_act, user):
 	if wc_act["repeat"] == "never":
 		expiration = te
 	if wc_act["repeatEnd"] != None:
-		expiration = datetime.strptime(wc_act["repeatEnd"], "%Y-%m-%dT%H:%M:%S.%fZ")
+		expiration = datetime.strptime(wc_act["repeatEnd"], WC_DATE_FMT)
 
-	activity = Activity(activity_id=wc_act["activityId"], activity_name=wc_act["name"],
-			start_time=ts, end_time=te, expiration=expiration,
-			weekdays="SMTWThFSa", user=user)
+	activity = Activity(wc_id=wc_act["activityId"], activity_name=wc_act["name"],
+			expiration=expiration, user=user)
 	return activity
 
 def complete_fb_login(response_data):

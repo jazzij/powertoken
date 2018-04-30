@@ -68,15 +68,12 @@ class Activity(Base):
 	"""
 	__tablename__ = "activity"
 	id = Column(Integer, primary_key=True)
-	activity_id = Column(Integer, index=True, unique=True)
-	activity_name = Column(String(256))
-	start_time = Column(DateTime, index=True)
-	end_time = Column(DateTime, index=True)
+	wc_id = Column(Integer, index=True, unique=True)
+	name = Column(String(256))
 	expiration = Column(DateTime, index=True)
-	weekdays = Column(String(9))
 	weight = Column(Integer, default=1)
 	user_id = Column(Integer, ForeignKey("user.id"))
-	days_activities = relationship("DaysActivities", backref="activity", lazy="dynamic")
+	events = relationship("Event", backref="activity", lazy="dynamic")
 
 	def __repr__(self):
 		return "<Activity {}>".format(self.activity_id)
@@ -103,13 +100,16 @@ class Day(Base):
 	"""
 	__tablename__ = "day"
 	id = Column(Integer, primary_key=True)
-	date = Column(DateTime, index=True)
+	date = Column(DateTime, index=True)	# Time portion is ignored
 	user_id = Column(Integer, ForeignKey("user.id"))
-	days_activities = relationship("DaysActivities", backref="day", lazy="dynamic")
+	events = relationship("Event", backref="day", lazy="dynamic")
 
-class DaysActivities(Base):
-	__tablename__ = "daysactivities"
+class Event(Base):
+	__tablename__ = "event"
 	id = Column(Integer, primary_key=True)
+	eid = Column(String, index=True)
+	start_time = Column(DateTime)	# Date portion is ignored
+	end_time = Column(DateTime)	# Date portion is ignored
 	completed = Column(Boolean)
 	day_id = Column(Integer, ForeignKey("day.id"))
 	activity_id = Column(Integer, ForeignKey("activity.id"))
