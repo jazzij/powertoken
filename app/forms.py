@@ -88,7 +88,6 @@ class UserActivityForm(FlaskForm):
 			act_field = SelectField(label=act.name, choices=_choices, 
 					_prefix=act.activity_id)
 			self.activities.append(act_field)
-"""
 
 class UserActivityForm(FlaskForm):
 	activities = FieldList(SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']]))
@@ -98,3 +97,12 @@ class UserActivityForm(FlaskForm):
 		for activity in user.activities:
 			activity.weight = self.activities[i].data
 			i += 1
+"""
+
+class ActivityForm(FlaskForm):
+	wc_act_id = HiddenField("Activity ID")
+	name = StringField("Activity Name")
+	weight = SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']])
+
+class UserActivityForm(FlaskForm):
+	activities = FieldList(FormField(ActivityForm))

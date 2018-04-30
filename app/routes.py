@@ -152,6 +152,23 @@ def user_activities():
 	user = User.query.filter_by(username=username).first()
 
 	if request.method == "POST":
+		return redirect(url_for("user_home", username=username))
+
+	form = UserActivityForm()
+	for act in user.activities:
+		d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
+				("weight", act.weight)])
+		form.activities.append_entry(data=d)
+		return render_template("user_activities.html", form=form)
+
+@app.route("/user_activities_old", methods=["GET", "POST"])
+def user_activities_old():
+	username = request.args.get("username")
+	if username is None:
+		return redirect(url_for("user_login", error="Invalid username"))
+	user = User.query.filter_by(username=username).first()
+
+	if request.method == "POST":
 		form = UserActivityForm()
 
 		if form.validate_on_submit():

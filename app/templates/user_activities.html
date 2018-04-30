@@ -9,8 +9,8 @@
 		<form action="" method="post">
             {% for activity in form.activities %}
                 <div class="row pt-form-group">
-                    {{activity.activity_id}}
-                    <div class="col-sm-8">{{activity.activity_name}}</div>
+                    {{activity.wc_act_id}}
+                    <div class="col-sm-8">{{activity.name}}</div>
                     <div class="col-sm-4">{{activity.weight}}</div>
                 </div>
             {% endfor %}
