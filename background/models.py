@@ -68,7 +68,7 @@ class Activity(Base):
 	"""
 	__tablename__ = "activity"
 	id = Column(Integer, primary_key=True)
-	wc_id = Column(Integer, index=True, unique=True)
+	wc_act_id = Column(Integer, index=True, unique=True)
 	name = Column(String(256))
 	expiration = Column(DateTime, index=True)
 	weight = Column(Integer, default=1)
@@ -76,7 +76,7 @@ class Activity(Base):
 	events = relationship("Event", backref="activity", lazy="dynamic")
 
 	def __repr__(self):
-		return "<Activity {}>".format(self.activity_id)
+		return "<Activity '{}'>".format(self.name)
 
 class Error(Base):
 	"""
@@ -104,6 +104,9 @@ class Day(Base):
 	user_id = Column(Integer, ForeignKey("user.id"))
 	events = relationship("Event", backref="day", lazy="dynamic")
 
+	def __repr__(self):
+		return "<Day {}>".format(self.date.strftime("%Y-%m-%d"))
+
 class Event(Base):
 	__tablename__ = "event"
 	id = Column(Integer, primary_key=True)
@@ -113,3 +116,6 @@ class Event(Base):
 	completed = Column(Boolean)
 	day_id = Column(Integer, ForeignKey("day.id"))
 	activity_id = Column(Integer, ForeignKey("activity.id"))
+
+	def __repr__(self):
+		return "<Event {}>".format(self.start_time.strftime("%I:%M %p"))

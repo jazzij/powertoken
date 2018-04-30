@@ -71,7 +71,7 @@ class Activity(db.Model):
 	Represents a WEconnect activity.
 	"""
 	id = db.Column(db.Integer, primary_key=True)
-	wc_id = db.Column(db.Integer, index=True, unique=True)
+	wc_act_id = db.Column(db.Integer, index=True, unique=True)
 	name = db.Column(db.String(256))
 	expiration = db.Column(db.DateTime, index=True)
 	weight = db.Column(db.Integer, default=1)
@@ -79,7 +79,7 @@ class Activity(db.Model):
 	events = db.relationship("Event", backref="activity", lazy="dynamic")
 
 	def __repr__(self):
-		return "<Activity {}>".format(self.activity_id)
+		return "<Activity '{}'>".format(self.name)
 
 class Error(db.Model):
 	"""
@@ -105,6 +105,9 @@ class Day(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 	events = db.relationship("Event", backref="day", lazy="dynamic")
 
+	def __repr__(self):
+		return "<Day {}>".format(self.date.strftime("%Y-%m-%d"))
+
 class Event(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	eid = db.Column(db.String, index=True)
@@ -113,3 +116,6 @@ class Event(db.Model):
 	completed = db.Column(db.Boolean)
 	day_id = db.Column(db.Integer, db.ForeignKey("day.id"))
 	activity_id = db.Column(db.Integer, db.ForeignKey("activity.id"))
+
+	def __repr__(self):
+		return "<Event {}>".format(self.start_time.strftime("%I:%M %p"))
