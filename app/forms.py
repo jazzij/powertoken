@@ -106,3 +106,4 @@ class ActivityForm(FlaskForm):
 
 class UserActivityForm(FlaskForm):
 	activities = FieldList(FormField(ActivityForm))
+	submit = SubmitField("Next")

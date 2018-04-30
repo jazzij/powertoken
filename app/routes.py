@@ -159,7 +159,7 @@ def user_activities():
 		d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
 				("weight", act.weight)])
 		form.activities.append_entry(data=d)
-		return render_template("user_activities.html", form=form)
+	return render_template("user_activities.html", form=form)
 
 @app.route("/user_activities_old", methods=["GET", "POST"])
 def user_activities_old():
