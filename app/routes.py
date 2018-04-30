@@ -7,8 +7,8 @@ Last modified by Abigail Franz on 4/16/2018.
 from datetime import datetime
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
-from wtforms import MultiDict
 from werkzeug.urls import url_parse
+from werkzeug.datastructures import MultiDict
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login, get_wc_activities
 from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
