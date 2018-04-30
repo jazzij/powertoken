@@ -53,7 +53,7 @@ class ActivityForm(FlaskForm):
 		choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
 		self.weight = SelectField(choices=choices, _prefix=activity.act_id)
 """
-
+"""
 class ModelFieldList(FieldList):
 	def __init__(self, *args, **kwargs):         
 		self.model = kwargs.pop("model", None)
@@ -71,18 +71,16 @@ class ModelFieldList(FieldList):
 		super(ModelFieldList, self).populate_obj(obj, name)
 
 class ActivityForm(FlaskForm):
-	activity_id = HiddenField("Activity ID")
-	activity_name = StringField("Activity Name")
+	wc_act_id = HiddenField("Activity ID")
+	name = StringField("Activity Name")
 	weight = SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']])
 	def __init__(self, csrf_enabled=False, *args, **kwargs):
 		super(ActivityForm, self).__init__(csrf_enabled=False, *args, **kwargs)
 
 class UserActivityForm(FlaskForm):
-	#activities = []
 	submit = SubmitField("Next")
 	activities = ModelFieldList(FormField(ActivityForm), model=Activity)
 
-	"""
 	def __init__(self, activities=[]):
 		super(UserActivityForm, self).__init__()
 		_choices = [('1', '1'), ('2, 2'), ('3', '3'), ('4', '4'), ('5', '5')]
@@ -90,4 +88,13 @@ class UserActivityForm(FlaskForm):
 			act_field = SelectField(label=act.name, choices=_choices, 
 					_prefix=act.activity_id)
 			self.activities.append(act_field)
-	"""
+"""
+
+class UserActivityForm(Form):
+	activities = FieldList(SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']]))
+
+	def populate_assoc(self, user):
+		i = 0
+		for activity in user.activities:
+			activity.weight = self.activities[i].data
+			i += 1

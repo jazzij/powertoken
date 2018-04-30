@@ -7,6 +7,7 @@ Last modified by Abigail Franz on 4/16/2018.
 from datetime import datetime
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user, login_required
+from wtforms import MultiDict
 from werkzeug.urls import url_parse
 from app import app, db
 from app.apis import login_to_wc, complete_fb_login, get_wc_activities
@@ -148,23 +149,21 @@ def user_activities():
 	username = request.args.get("username")
 	if username is None:
 		return redirect(url_for("user_login", error="Invalid username"))
-
 	user = User.query.filter_by(username=username).first()
-	form = UserActivityForm(obj=user)
-	form.activities.min_entries = len(user.activities.all())
 
-	if form.validate_on_submit():
-		form.populate_obj(user)
-		db.session.commit()
-		"""
-		for key, value in form.activities.iteritems():
-			if key != "username":
-				print(key, value)
-				#act = Activity.query.filter_by(activity_id=key).first()
-				#act.weight = value
-				#db.session.commit()
-		"""
-		return redirect(url_for("user_home", username=username))
+	if request.method == "POST":
+		form = UserActivityForm()
+
+		if form.validate_on_submit():
+			form.populate_assoc(user)
+			db.session.add(user)
+			db.session.commit()
+			return redirect(url_for("user_home", username=username))
+
+	data = []
+	for act in user.activities:
+		data.append("activities", act.weight)
+	form = UserActivityForm(data=MultiDict(data))
 
 	return render_template("user_activities.html", form=form)
 
