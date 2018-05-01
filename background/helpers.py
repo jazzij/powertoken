@@ -132,13 +132,13 @@ def populate_todays_events(user):
 			# If the event doesn't already exist for today, add it
 			event = session.query(Event).filter(Event.eid == wc_ev["eid"]).first()
 			if event:
-				modified = datetime.strptime(wc_act["dateModified"], WC_FORMAT)
+				modified = datetime.strptime(wc_act["dateModified"], weconnect.DATE_FMT)
 				if modified >= datetime.now() - timedelta(days=1):
-					event.start_time = datetime.strptime(wc_ev["dateStart"], WC_FORMAT)
+					event.start_time = datetime.strptime(wc_ev["dateStart"], weconnect.DATE_FMT)
 					event.end_time = act.start_time + timedelta(minutes=wc_ev["duration"])
 					event.completed = wc_ev["didCheckin"]
 			else:
-				st = datetime.strptime(wc_ev["dateStart"], WC_FORMAT)
+				st = datetime.strptime(wc_ev["dateStart"], weconnect.DATE_FMT)
 				et = start + timedelta(minutes=wc_ev["duration"])
 				event = Event(eid=wc_ev["eid"], start_time=st, end_time=et,
 						completed=wc_ev["didCheckin"], day=day, activity=act)
