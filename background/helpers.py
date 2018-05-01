@@ -120,7 +120,7 @@ def populate_todays_events(user):
 	# Add a new Day to the user's days table if it doesn't already exist
 	day = user.days.filter(Day.date == today).first()
 	if day is None:
-		day = Day(date=datetime(today.date, user=user))
+		day = Day(date=datetime(today.year, today.month, today.day), user=user))
 		session.add(day)
 		session.commit()
 
