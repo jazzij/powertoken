@@ -9,10 +9,11 @@ from datetime import datetime, timedelta
 from logging import getLogger, FileHandler, Formatter, INFO
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fitbit import Fitbit
+from db import session
+import fitbit
 from helpers import get_users_with_current_activities
 from models import Base, User, Activity, Log, DB_PATH
-from weconnect import WeConnect
+import weconnect
 
 # Configures logging for the module
 logger = getLogger("background.polling")
@@ -24,13 +25,29 @@ formatter = Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
-# Sets up the SQLAlchemy engine and connects it to the Sqlite database. 
-engine = create_engine("sqlite:///" + DB_PATH)
-Base.metadata.bind = engine
-DbSession = sessionmaker(bind=engine)
-session = DbSession()
-
 def poll_and_update():
+	users = session.query(User).all()
+	for user in users:
+		# API call to WEconnect activities-with-events
+		activity_events = weconnect.get_todays_events(user)
+
+		# Keep track of which events have didCheckin set to True
+		for activity in activity_events:
+			for ev in activity["events"]:
+				if ev["didCheckin"]:
+					event = session.query(Event).filter(Event.eid == ev["eid"])
+					event.completed = True
+		session.commit()
+
+		# Compute progress with fade function
+		thisday = user.thisday()
+		progress = compute_days_progress(thisday)
+		if not thisday.computed_progress == progress:
+			thisday.computed_progress = progress
+			# Send progress to Fitbit
+			step_count = fitbit.update_progress(user, progress)
+
+def poll_and_update_old():
 	"""
 	If any activities start or end within the next 15 minutes, add the user who 
 	owns them to a list. Then poll all the users in the list for progress.

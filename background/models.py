@@ -44,6 +44,11 @@ class User(Base):
 	errors = relationship("Error", backref="user", lazy="dynamic")
 	days = relationship("Day", backref="user", lazy="dynamic")
 
+	def thisday(self):
+		d = datetime.now()
+		today = datetime(d.year, d.month, d.day)
+		return self.days.filter(date == today).all()
+
 	def __repr__(self):
 		return "<User {}>".format(self.username)
 
@@ -101,6 +106,7 @@ class Day(Base):
 	__tablename__ = "day"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime, index=True)	# Time portion is ignored
+	computed_progress = Column(Float)
 	user_id = Column(Integer, ForeignKey("user.id"))
 	events = relationship("Event", backref="day", lazy="dynamic")
 

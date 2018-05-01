@@ -5,8 +5,11 @@ Last modified by Abigail Franz on 3/26/2018.
 """
 
 from datetime import datetime, timedelta, MAXYEAR
-from models import User, Activity
-from weconnect import WC_FORMAT
+from models import Activity, Day, Event, User
+from weconnect import WeConnect
+
+d = datetime.now()
+today = datetime(d.year, d.month, d.day)
 
 def add_or_update_activity(session, activity, user):
 	"""
@@ -35,7 +38,7 @@ def add_or_update_activity(session, activity, user):
 		existing = session.query(Activity).filter(
 			Activity.activity_id == act_id).first()
 		if existing:
-			modified = datetime.strptime(activity["dateModified"], WC_FORMAT)
+			modified = datetime.strptime(activity["dateModified"], weconnect.DATE_FMT)
 			if modified >= datetime.now() - timedelta(days=1):
 				existing.start_time = st
 				existing.end_time = et
@@ -62,7 +65,7 @@ def extract_params(activity):
 	:param dict activity: an activity from WEconnect in JSON format
 	"""
 	# Determines the start and end times
-	ts = datetime.strptime(activity["dateStart"], WC_FORMAT)
+	ts = datetime.strptime(activity["dateStart"], weconnect.DATE_FMT)
 	te = ts + timedelta(minutes=activity["duration"])
 
 	# Determines the expiration date (if any)
@@ -70,7 +73,7 @@ def extract_params(activity):
 	if activity["repeat"] == "never":
 		expiration = te
 	if activity["repeatEnd"] != None:
-		expiration = datetime.strptime(activity["repeatEnd"], WC_FORMAT)
+		expiration = datetime.strptime(activity["repeatEnd"], weconnect.DATE_FMT)
 
 	return ts, te, expiration
 
@@ -81,18 +84,17 @@ def get_users_with_current_activities(session):
 
 	:param sqlalchemy.orm.session.Session session: the database session
 	"""
-	users = []
+	users_to_monitor = []
 	now = datetime.now().time()
 	margin = timedelta(minutes=15)
-	activities = session.query(Activity).all()
-	for activity in activities:
-		st = activity.start_time
-		et = activity.end_time
-		if (st - margin).time() <= now and now <= (et + margin).time():
-			print(activity.user)
-			if not activity.user in users:
-				users.append(activity.user)
-	return users
+	users = session.query(User).all()
+	for user in users:
+		day = user.days.filter(Day.date == today)
+		events = day.events.filter((Event.start_time - margin).time() <= now).\
+				filter(now <= (Event.end_time + margin).time()).count()
+		if events:
+			users_to_monitor.append(user)
+	return users_to_monitor
 
 def get_yesterdays_progress(session, user):
 	"""
@@ -106,5 +108,87 @@ def get_yesterdays_progress(session, user):
 	start = datetime(yesterday.year, yesterday.month, yesterday.day, 0, 0)
 	end = datetime(yesterday.year, yesterday.month, yesterday.day, 23, 59)
 	yest_log = user.logs.filter(Log.timestamp > start, Log.timestamp < end).\
-		order_by(Log.timestamp.desc()).first()
+			order_by(Log.timestamp.desc()).first()
 	return yest_log.daily_progress
+
+def populate_todays_events(session, user):
+	"""
+	Populate the database with a list of the user's activity-events today.
+
+	:param sqlalchemy.orm.session.Session session: the database session\n
+	:param background.models.User user: the user for which to get events
+	"""
+	# Add a new Day to the user's days table if it doesn't already exist
+	day = user.days.filter(Day.date == today).first()
+	if day is None:
+		day = Day(date=datetime(today.date, user=user)
+		session.add(day)
+		session.commit()
+
+	# Get today's events from WEconnect and add them to the day's events table
+	activity_events = weconnect.get_todays_events(user)
+	for wc_act in activity_events:
+		act = user.activities.filter(Activity.wc_act_id == wc_act["activityId"]).first()
+		for wc_ev in wc_act["events"]:
+			# If the event doesn't already exist for today, add it
+			event = session.query(Event).filter(Event.eid == wc_ev["eid"]).first()
+			if event:
+				modified = datetime.strptime(wc_act["dateModified"], WC_FORMAT)
+				if modified >= datetime.now() - timedelta(days=1):
+					event.start_time = datetime.strptime(wc_ev["dateStart"], WC_FORMAT)
+					event.end_time = act.start_time + timedelta(minutes=wc_ev["duration"])
+					event.completed = wc_ev["didCheckin"]
+			else:
+				st = datetime.strptime(wc_ev["dateStart"], WC_FORMAT)
+				et = start + timedelta(minutes=wc_ev["duration"])
+				event = Event(eid=wc_ev["eid"], start_time=st, end_time=et,
+						completed=wc_ev["didCheckin"], day=day, activity=act)
+				session.add(event)
+	session.commit()
+
+def compute_possible_score(day):
+    """
+	Compute the highest possible score for a particular user on a particular
+	day.
+
+	:param background.models.Day day
+	"""
+    events = day.events.all()
+    score = 0
+    for ev in events:
+        score += ev.activity.weight
+    return score
+
+def compute_days_progress(day):
+	"""
+	Compute the user's actual progress on a particular day.
+
+	:param background.models.Day day
+	"""
+	score = 0
+	day_0_acts = day.events.filter(Event.completed).all()
+	for act in day_0_acts:
+		score += event.activity.weight
+
+	day_1_ago = day.user.days.filter_by(date=(day.date - timedelta(1))).first()
+	day_1_acts = day_1_ago.events.filter(Event.completed).all()
+	for act in day_1_acts:
+		score += (act.activity.weight - 1)
+
+	day_2_ago = day.user.days.filter_by(date=(day.date - timedelta(2))).first()
+	day_2_acts = day_2_ago.events.filter(Event.completed).all()
+	for act in day_2_acts:
+		score += (act.activity.weight - 2) if act.activity.weight > 1 else 0
+
+	day_3_ago = day.user.days.filter_by(date=(day.date - timedelta(3))).first()
+	day_3_acts = day_3_ago.events.filter(Event.completed).all()
+	for act in day_3_acts:
+		score += (act.activity.weight - 3) if act.activity.weight > 2 else 0
+
+	day_4_ago = day.user.days.filter_by(date=(day.date - timedelta(4))).first()
+	day_4_acts = day_4_ago.events.filter(Event.completed).all()
+	for act in day_4_ago.days_activities:
+		score += (act.activity.weight - 4) if act.activity.weight > 3 else 0
+
+	possible_score = compute_possible_score(day)
+	return float(score) / float(possible_score)
