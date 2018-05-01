@@ -116,13 +116,12 @@ def populate_todays_events(user):
 	"""
 	Populate the database with a list of the user's activity-events today.
 
-	:param sqlalchemy.orm.session.Session session: the database session\n
 	:param background.models.User user: the user for which to get events
 	"""
 	# Add a new Day to the user's days table if it doesn't already exist
 	day = user.days.filter(Day.date == today).first()
 	if day is None:
-		day = Day(date=datetime(today.date, user=user)
+		day = Day(date=datetime(today.date, user=user))
 		session.add(day)
 		session.commit()
 

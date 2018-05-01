@@ -125,4 +125,5 @@ if __name__ == "__main__":
 	maintain_users()
 	maintain_activities()
 	maintain_logs()
+	maintain_events()
 	logger.info("...Done.")
