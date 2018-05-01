@@ -36,8 +36,7 @@ def add_or_update_activity(activity, user):
 	else:
 		# If the activity already exists in the database, sees if it's been
 		# modified recently. If yes, updates it. If not, ignores it.
-		existing = session.query(Activity).filter(
-			Activity.activity_id == act_id).first()
+		existing = session.query(Activity).filter(Activity.wc_act_id == act_id).first()
 		if existing:
 			modified = datetime.strptime(activity["dateModified"], weconnect.DATE_FMT)
 			if modified >= datetime.now() - timedelta(days=1):
