@@ -3,7 +3,7 @@ Database module common to the background scripts and their various helpers.\n
 Created by Abigail Franz on 4/30/2018.\n
 """
 
-from models import DB_PATH
+from models import Base, DB_PATH
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
