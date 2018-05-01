@@ -11,7 +11,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db import session
 import fitbit
-from helpers import get_users_with_current_activities
+from helpers import get_users_with_current_activities, compute_days_progress
 from models import Base, User, Activity, Log, DB_PATH
 import weconnect
 
