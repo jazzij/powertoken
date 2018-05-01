@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 3/26/2018.
 
 from datetime import datetime, timedelta, MAXYEAR
 from db import session
-from models import Activity, Day, Event, User
+from models import Activity, Day, Event, Log, User
 import weconnect
 
 d = datetime.now()
@@ -139,7 +139,7 @@ def populate_todays_events(user):
 					event.completed = wc_ev["didCheckin"]
 			else:
 				st = datetime.strptime(wc_ev["dateStart"], weconnect.DATE_FMT)
-				et = start + timedelta(minutes=wc_ev["duration"])
+				et = st + timedelta(minutes=wc_ev["duration"])
 				event = Event(eid=wc_ev["eid"], start_time=st, end_time=et,
 						completed=wc_ev["didCheckin"], day=day, activity=act)
 				session.add(event)
@@ -167,7 +167,7 @@ def compute_days_progress(day):
 	score = 0
 	day_0_acts = day.events.filter(Event.completed).all()
 	for act in day_0_acts:
-		score += event.activity.weight
+		score += act.activity.weight
 
 	day_1_ago = day.user.days.filter_by(date=(day.date - timedelta(1))).first()
 	day_1_acts = day_1_ago.events.filter(Event.completed).all()
@@ -186,8 +186,9 @@ def compute_days_progress(day):
 
 	day_4_ago = day.user.days.filter_by(date=(day.date - timedelta(4))).first()
 	day_4_acts = day_4_ago.events.filter(Event.completed).all()
-	for act in day_4_ago.days_activities:
+	for act in day_4_acts:
 		score += (act.activity.weight - 4) if act.activity.weight > 3 else 0
 
 	possible_score = compute_possible_score(day)
 	return float(score) / float(possible_score)
+	

@@ -4,7 +4,8 @@ Created by Abigail Franz.\n
 Last modified by Abigail Franz on 4/30/2018.
 """
 
-import datetime, json, logging, requests
+from datetime import datetime
+import json, logging, requests
 from db import session
 from models import Error
 
@@ -60,11 +61,11 @@ def update_progress(user, progress):
 	# Delete existing Fitbit step activities for the day
 	step_activities = get_daily_step_activities(user)
 	for activity in step_activities:
-		delete_activity(activity["logId"])
+		delete_activity(user, activity["logId"])
 
 	# Update Fitbit with the new percentage
 	new_steps = int(progress * get_step_goal(user))
-	return log_step_activity(new_steps)
+	return log_step_activity(user, new_steps)
 
 def get_daily_step_activities(user):
 	"""

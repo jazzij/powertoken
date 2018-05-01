@@ -47,7 +47,7 @@ class User(Base):
 	def thisday(self):
 		d = datetime.now()
 		today = datetime(d.year, d.month, d.day)
-		return self.days.filter(date == today).all()
+		return self.days.filter(Day.date == today).all()
 
 	def __repr__(self):
 		return "<User {}>".format(self.username)
