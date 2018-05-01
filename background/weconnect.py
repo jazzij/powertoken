@@ -4,7 +4,8 @@ Created by Abigail Franz.\n
 Last modified by Abigail Franz on 4/30/2018.
 """
 
-import datetime, json, logging, requests
+from datetime import datetime
+import json, logging, requests
 from db import session
 from models import Error
 
