@@ -6,12 +6,12 @@ Modified by Abigail Franz on 4/30/2018.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db import session
 import fitbit
-from models import Base, User, Log, Activity, Error, DB_PATH
+from models import Base, User, Log, Activity, Day, Error, DB_PATH
 from helpers import add_or_update_activity, populate_todays_events
 import weconnect
 
@@ -49,6 +49,18 @@ def maintain_users():
 
 	for user in users:
 		fitbit.change_step_goal(user, 1000000)
+
+	# TODO: Make sure that all users have at least 4 past Days
+	for user in users:
+		if user.days.count() < 5:
+			first_day = user.days.first()
+			past_days = [
+				Day(date=(first_day.date - timedelta(days=1)), user=user),
+				Day(date=(first_day.date - timedelta(days=2)), user=user),
+				Day(date=(first_day.date - timedelta(days=3)), user=user),
+				Day(date=(first_day.date - timedelta(days=4)), user=user)
+			]
+			session.add_all(past_days)
 
 	session.commit()
 

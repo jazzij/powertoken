@@ -102,7 +102,7 @@ class Day(db.Model):
 	"""
 	id = db.Column(db.Integer, primary_key=True)
 	date = db.Column(db.DateTime, index=True)
-	computed_progress = db.Column(db.Float)
+	computed_progress = db.Column(db.Float, default=0.0)
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 	events = db.relationship("Event", backref="day", lazy="dynamic")
 

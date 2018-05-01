@@ -106,7 +106,7 @@ class Day(Base):
 	__tablename__ = "day"
 	id = Column(Integer, primary_key=True)
 	date = Column(DateTime, index=True)	# Time portion is ignored
-	computed_progress = Column(Float)
+	computed_progress = Column(Float, default=0.0)
 	user_id = Column(Integer, ForeignKey("user.id"))
 	events = relationship("Event", backref="day", lazy="dynamic")
 
