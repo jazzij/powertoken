@@ -7,7 +7,7 @@ Last modified by Abigail Franz on 3/26/2018.
 from datetime import datetime, timedelta, MAXYEAR
 from db import session
 from models import Activity, Day, Event, User
-from weconnect import WeConnect
+import weconnect
 
 d = datetime.now()
 today = datetime(d.year, d.month, d.day)
