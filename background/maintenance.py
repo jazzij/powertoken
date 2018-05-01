@@ -101,7 +101,7 @@ def maintain_events():
 	"""
 	Populates (or updates) the list of today's events
 	"""
-	user = session.query(User).all()
+	users = session.query(User).all()
 	for user in users:
 		populate_todays_events(user)
 
