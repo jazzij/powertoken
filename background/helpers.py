@@ -5,13 +5,14 @@ Last modified by Abigail Franz on 3/26/2018.
 """
 
 from datetime import datetime, timedelta, MAXYEAR
+from db import session
 from models import Activity, Day, Event, User
 from weconnect import WeConnect
 
 d = datetime.now()
 today = datetime(d.year, d.month, d.day)
 
-def add_or_update_activity(session, activity, user):
+def add_or_update_activity(activity, user):
 	"""
 	Insert new activity row into the database if it doesn't already exist and
 	is not expired. If it exists but has been updated, update it in the
@@ -77,7 +78,7 @@ def extract_params(activity):
 
 	return ts, te, expiration
 
-def get_users_with_current_activities(session):
+def get_users_with_current_activities():
 	"""
 	Get a list of all the users who have activities starting or ending within
 	the next 15 minutes.
@@ -96,7 +97,7 @@ def get_users_with_current_activities(session):
 			users_to_monitor.append(user)
 	return users_to_monitor
 
-def get_yesterdays_progress(session, user):
+def get_yesterdays_progress(user):
 	"""
 	Get the daily_progress component from yesterday's last log.
 
@@ -111,7 +112,7 @@ def get_yesterdays_progress(session, user):
 			order_by(Log.timestamp.desc()).first()
 	return yest_log.daily_progress
 
-def populate_todays_events(session, user):
+def populate_todays_events(user):
 	"""
 	Populate the database with a list of the user's activity-events today.
 

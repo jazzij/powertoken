@@ -10,8 +10,8 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from db import session
-from models import Base, User, Log, Activity, Error, DB_PATH
 import fitbit
+from models import Base, User, Log, Activity, Error, DB_PATH
 from helpers import add_or_update_activity, populate_todays_events
 import weconnect
 
@@ -82,7 +82,7 @@ def maintain_activities():
 	for user in users:
 		wc_acts = weconnect.get_activities(user)
 		for act in wc_acts:
-			status = add_or_update_activity(user, act)
+			status = add_or_update_activity(act, user)
 			if status == "Inserted":
 				added_count += 1
 			elif status == "Updated":
