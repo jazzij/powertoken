@@ -1,5 +1,5 @@
 """
-Contains the API calls to Fitbit (except for the login).\n
+Contains the API calls to Fitbit.\n
 Created by Abigail Franz.\n
 Last modified by Abigail Franz on 4/30/2018.
 """
@@ -9,24 +9,15 @@ import json, logging, requests
 from db import session
 from models import Error
 
-# Configures logging for the module
-logger = logging.getLogger("background.fitbit")
-logger.setLevel(logging.WARNING)
-logpath = "data/background.fitbit.log"
-handler = logging.FileHandler(logpath)
-handler.setLevel(logging.WARNING)
-formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 BASE_URL = "https://api.fitbit.com/1/user/-"
 DATE_FMT = "%Y-%m-%d"
 
 def change_step_goal(user, new_step_goal):
 	"""
-	Change the step goal to new_step_goal. Return a Boolean indicating success.
+	Change the step goal to new_step_goal. Return the new step goal (or 0 if
+	the request was unsuccessful).
 
-	:param background.models.User user
+	:param background.models.User user\n
 	:param int new_step_goal
 	"""
 	url = "{}/activities/goals/daily.json".format(BASE_URL)
@@ -55,7 +46,7 @@ def update_progress(user, progress):
 	Reset Fitbit to receive new step activities and return the number of
 	steps added; if there's an error, return an Error.
 
-	:param background.models.User user
+	:param background.models.User user\n
 	:param float progress: WEconnect progress as a decimal
 	"""
 	# Delete existing Fitbit step activities for the day
@@ -96,7 +87,7 @@ def delete_activity(user, log_id):
 	Delete a step activity from the user's Fitbit endpoint. Return a Boolean
 	indicating success.
 
-	:param background.models.User user
+	:param background.models.User user\n
 	:param int log_id: identifier for Fitbit step activity
 	"""
 	url = "{}/activities/{}.json".format(BASE_URL, log_id)
@@ -119,6 +110,8 @@ def get_step_goal(user):
 	"""
 	Get the user's step goal. If the request is unsuccessful, return a
 	default value of 1 million.
+
+	:param background.models.User user
 	"""
 	url = "{}/activities/goals/daily.json".format(BASE_URL)
 	auth_headers = {"Authorization": "Bearer " + user.fb_token}
@@ -141,6 +134,9 @@ def log_step_activity(user, new_step_count):
 	Log a walking activity containing the number of steps specified in
 	new_step_count. Return the new step count (0 if the POST request is
 	unsuccessful).
+
+	:param background.models.User user\n
+	:param int new_step_count
 	"""
 	url = "{}/activities.json".format(BASE_URL)
 	now = datetime.now()

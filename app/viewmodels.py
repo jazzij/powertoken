@@ -4,6 +4,7 @@ Created by Abigail Franz on 3/19/2018.\n
 """
 
 from datetime import datetime
+from app.apis import TODAY
 from app.models import Log, User
 
 class UserViewModel:
@@ -13,34 +14,38 @@ class UserViewModel:
 		"""
 		self.id = user.id
 		self.username = user.username
-		self.registered_on = user.registered_on.strftime("%Y-%m-%d %I:%M %p")
-		self.goal_period = user.goal_period
+		self.registered_on = user.registered_on.strftime("%Y-%m-%d")
 		self.wc_id = user.wc_id
 		self.wc_status = "Current" if user.wc_id and user.wc_token else "Expired"
 		self.fb_status = "Current" if user.fb_token else "Expired"
 		self.last_check_in = self._last_check_in(user) 
-		self.daily_progress, self.weekly_progress = self._todays_last_progress(user)
+		self.daily_progress, self.weekly_progress = self._todays_progress(user)
 
 	def _last_check_in(self, user):
-		logs = user.logs.all()
-		last_log = logs[-1] if len(logs) > 0 else None
-		if last_log is None:
+		days = user.days.filter_by(computed_progress > 0).all()
+		last_day = day[-1] if len(days) > 0 else None
+		if last_day is None:
 			return "Never"
 		else:
-			return last_log.timestamp.strftime("%Y-%m-%d %I:%M %p")
+			return last_log.date.strftime("%Y-%m-%d")
 
-	def _todays_last_progress(self, user):
-		logs = user.logs.all()
+	def _todays_progress(self, user):
+		d = datetime.now()
+		today = datetime(d.year, d.month, d.day)
+		day = user.days.filter_by(date == today).first()
 
-		# If the user has no logs, or has made no progress today, return a Log
-		# object with 0 for all the progress values.
-		last_log = logs[-1] if len(logs) > 0 else \
-			Log(daily_progress=0, weekly_progress=0, step_count=0, user=user)
-		if last_log.timestamp is None or last_log.timestamp.day != datetime.now().day:
-			last_log = Log(daily_progress=0, weekly_progress=last_log.weekly_progress, 
-					step_count=0)
+		# If the user has no Day object for today, return 0
+		if day is None:
+			return 0.0, 0.0
+
+		total_progress = day.computed_progress
+		weekday = today.weekday()
+		for i in range(1, weekday):
+			d = user.days.filter_by(date == (day.date - timedelta(days=i))).first()
+			total_progress += d.computed_progress
+		weekly_avg = total_progress / weekday
 			
-		return last_log.daily_progress * 100, last_log.weekly_progress * 100
+		return day.computed_progress * 100, weekly_avg * 100
 
 	def __repr__(self):
 		return "<UserViewModel {}>".format(self.username)

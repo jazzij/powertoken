@@ -12,6 +12,39 @@ import weconnect
 d = datetime.now()
 today = datetime(d.year, d.month, d.day)
 
+def check_users_complete():
+	"""
+	Go through the users table of the database and check 2 things:
+	1. All user fields are complete, and incomplete profiles are removed.
+	2. All WEconnect and Fitbit access tokens are unexpired.
+	Remove all users who do not meet these criteria.
+	"""
+	users = session.query(User).all()
+	for user in users:
+		if not all([user.username, user.wc_id, user.wc_token, user.fb_token]):
+			# TODO: If a user has to be deleted, delete all foreign key refs (unless SQLAlchemy already does this)
+			session.delete(user)
+	session.commit()
+	# TODO: Make sure all access tokens are unexpired.
+
+def check_days(user):
+	"""
+	Make sure the user has at least 5 Days in the days table of the database.
+	If not, add empty (default) Day objects.
+
+	:param background.models.User user
+	"""
+	if user.days.count() < 5:
+		first_day = user.days.first()
+		past_days = [
+			Day(date=(first_day.date - timedelta(days=1)), user=user),
+			Day(date=(first_day.date - timedelta(days=2)), user=user),
+			Day(date=(first_day.date - timedelta(days=3)), user=user),
+			Day(date=(first_day.date - timedelta(days=4)), user=user)
+		]
+		session.add_all(past_days)
+		session.commit()
+
 def add_or_update_activity(activity, user):
 	"""
 	Insert new activity row into the database if it doesn't already exist and
@@ -19,7 +52,6 @@ def add_or_update_activity(activity, user):
 	database. Return "Inserted" if activity was inserted, "Updated" if updated,
 	and False if neither.
 
-	:param sqlalchemy.orm.session.Session session: the database session\n
 	:param dict activity: an activity from WEconnect in JSON format\n
 	:param background.models.User user: the user to which the activity belongs
 	"""
@@ -77,12 +109,10 @@ def extract_params(activity):
 
 	return ts, te, expiration
 
-def get_users_with_current_activities():
+def get_users_with_current_events():
 	"""
-	Get a list of all the users who have activities starting or ending within
-	the next 15 minutes.
-
-	:param sqlalchemy.orm.session.Session session: the database session
+	Get a list of all the users who have events starting or ending within
+	the next 15 minutes. Not currently in use.
 	"""
 	users_to_monitor = []
 	now = datetime.now().time()
@@ -98,9 +128,9 @@ def get_users_with_current_activities():
 
 def get_yesterdays_progress(user):
 	"""
-	Get the daily_progress component from yesterday's last log.
+	Get the daily_progress component from yesterday's last log. Not currently
+	in use.
 
-	:param sqlalchemy.orm.session.Session session: the database session\n
 	:param background.models.User user: the user for which to get progress
 	"""
 	yesterdays_logs = []
@@ -113,7 +143,7 @@ def get_yesterdays_progress(user):
 
 def populate_todays_events(user):
 	"""
-	Populate the database with a list of the user's activity-events today.
+	Populate the database with a list of the user's events that occur today.
 
 	:param background.models.User user: the user for which to get events
 	"""
@@ -160,7 +190,10 @@ def compute_possible_score(day):
 
 def compute_days_progress(day):
 	"""
-	Compute the user's actual progress on a particular day.
+	Compute the user's actual progress (decimal) on a particular day. The
+	algorithm essentially allows progress from activities with weights of 5 to
+	persist for 5 days, 4 for 4 days, etc. If the final percentage is more than
+	100%, the extra is truncated.
 
 	:param background.models.Day day
 	"""
@@ -190,5 +223,6 @@ def compute_days_progress(day):
 		score += (act.activity.weight - 4) if act.activity.weight > 3 else 0
 
 	possible_score = compute_possible_score(day)
+	computed_score = float(score) / float(possible_score) if score < possible_score else 1.0
 	return float(score) / float(possible_score)
 	

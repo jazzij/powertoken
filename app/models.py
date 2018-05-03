@@ -83,7 +83,7 @@ class Activity(db.Model):
 
 class Error(db.Model):
 	"""
-	Represents an error that occurred somewhere in the background scripts.
+	Represents an error that occurred somewhere in the application(s).
 	"""
 	id = db.Column(db.Integer, primary_key=True)
 	timestamp = db.Column(db.DateTime, default=datetime.now())
@@ -94,7 +94,7 @@ class Error(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 	def __repr__(self):
-		return "<Error '{}' for user {}>".format(self.message, self.user.username)
+		return "<Error '{}', '{}'>".format(self.summary, self.message)
 
 class Day(db.Model):
 	"""
@@ -110,6 +110,9 @@ class Day(db.Model):
 		return "<Day {}>".format(self.date.strftime("%Y-%m-%d"))
 
 class Event(db.Model):
+	"""
+	Represents a WEconnect event (an activity on a particular date).
+	"""
 	id = db.Column(db.Integer, primary_key=True)
 	eid = db.Column(db.String, index=True)
 	start_time = db.Column(db.DateTime)	# Date portion is ignored
@@ -119,4 +122,5 @@ class Event(db.Model):
 	activity_id = db.Column(db.Integer, db.ForeignKey("activity.id"))
 
 	def __repr__(self):
-		return "<Event {}>".format(self.start_time.strftime("%I:%M %p"))
+		output = "<Event '{}' at {}>".format(self.activity.name, 
+				self.start_time.strftime("%I:%M %p"))

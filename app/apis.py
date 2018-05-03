@@ -12,6 +12,7 @@ from app.models import Activity
 
 WC_URL = "https://palalinq.herokuapp.com/api/People"
 WC_DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
+TODAY = datetime(datetime.now().year, datetime.now().month, datetime.now().day)
 
 def login_to_wc(email, password):
 	"""

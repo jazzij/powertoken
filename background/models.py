@@ -85,7 +85,7 @@ class Activity(Base):
 
 class Error(Base):
 	"""
-	Represents an error that occurred somewhere in the background scripts.
+	Represents an error that occurred somewhere in the application(s).
 	"""
 	__tablename__ = "error"
 	id = Column(Integer, primary_key=True)
@@ -97,7 +97,7 @@ class Error(Base):
 	user_id = Column(Integer, ForeignKey("user.id"))
 
 	def __repr__(self):
-		return "<Error '{}' for user {}>".format(self.message, self.user.username)
+		return "<Error '{}', '{}'>".format(self.summary, self.message)
 
 class Day(Base):
 	"""
@@ -114,14 +114,19 @@ class Day(Base):
 		return "<Day {}>".format(self.date.strftime("%Y-%m-%d"))
 
 class Event(Base):
+	"""
+	Represents a WEconnect event (an activity on a particular date).
+	"""
 	__tablename__ = "event"
 	id = Column(Integer, primary_key=True)
 	eid = Column(String, index=True)
-	start_time = Column(DateTime)	# Date portion is ignored
+	start_time = Column(DateTime) # Date portion is ignored
 	end_time = Column(DateTime)	# Date portion is ignored
 	completed = Column(Boolean)
 	day_id = Column(Integer, ForeignKey("day.id"))
 	activity_id = Column(Integer, ForeignKey("activity.id"))
 
 	def __repr__(self):
-		return "<Event {}>".format(self.start_time.strftime("%I:%M %p"))
+		output = "<Event '{}' at {}>".format(self.activity.name, 
+				self.start_time.strftime("%I:%M %p"))
+		return output

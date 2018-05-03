@@ -2,91 +2,42 @@
 Script that makes sure the database is up-to-date.\n
 Meant to be run as a job in CronTab.\n
 Created by Abigail Franz on 2/28/2018.\n
-Modified by Abigail Franz on 4/30/2018.
+Last modified by Abigail Franz on 5/2/2018.
 """
 
-import logging
-from datetime import datetime, timedelta
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from datetime import datetime
 from db import session
 import fitbit
-from models import Base, User, Log, Activity, Day, Error, DB_PATH
-from helpers import add_or_update_activity, populate_todays_events
+from models import Activity, Day, Error, Event, User
+from helpers import (add_or_update_activity, populate_todays_events, 
+	check_users_complete, check_days)
 import weconnect
-
-# Configures logging for the module
-logger = logging.getLogger("background.maintenance")
-logger.setLevel(logging.INFO)
-logpath = "data/background.maintenance.log"
-handler = logging.FileHandler(logpath)
-handler.setLevel(logging.INFO)
-formatter = logging.Formatter("%(asctime)s: %(levelname)-4s - %(message)s")
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 def maintain_users():
 	"""
-	Go through the users table of the database and check 2 things:
-	1. All user fields are complete, and incomplete profiles are removed.
-	2. All WEconnect and Fitbit access tokens are unexpired.
+	Go through the users table of the database and check 3 things:
+	1. All user fields are complete and access tokens are unexpired.
+	2. Every user has a Fitbit step goal of 1,000,000.
+	3. Every user has at least 5 Days in the days table.
 	"""
-	# Removes incomplete user rows from the database
-	users = session.query(User).all()
-	del_count = 0
-	for user in users:
-		if not all([user.username, user.wc_id, user.wc_token, user.fb_token]):
-			session.delete(user)
-	if del_count > 0:
-		logger.info("%d incomplete users removed from the database", del_count)
-
-	# TODO: Make sure all access tokens are current
-	users = session.query(User).all()
-	for user in users:
-		#Determine if WC token is expired
-		#Determine if FB token is expired
-		pass
-
+	check_users_complete()
 	for user in users:
 		fitbit.change_step_goal(user, 1000000)
-
-	# TODO: Make sure that all users have at least 4 past Days
-	for user in users:
-		if user.days.count() < 5:
-			first_day = user.days.first()
-			past_days = [
-				Day(date=(first_day.date - timedelta(days=1)), user=user),
-				Day(date=(first_day.date - timedelta(days=2)), user=user),
-				Day(date=(first_day.date - timedelta(days=3)), user=user),
-				Day(date=(first_day.date - timedelta(days=4)), user=user)
-			]
-			session.add_all(past_days)
-
-	session.commit()
+		check_days(user)
 
 def maintain_activities():
 	"""
-	Go through the activities table of the database and check 3 things:
-	1. No activity is assigned to a user that no longer exists in the database.
-	2. All activities are unexpired, and expired activities are removed.
-	3. If users have added/updated activities, those are added to the database.
+	Go through the activities table of the database and check 2 things:
+	1. All activities are unexpired, and expired activities are removed.
+	2. If users have added/updated activities, those are added to the database.
 	"""
-	del_count = 0
-
-	# Makes sure activities aren't assigned to "ghost users"
-	activities = session.query(Activity).all()
-	users = session.query(User).all()
-	for act in activities:
-		if not act.user in users:
-			session.delete(act)
-			del_count += 1
-
 	# Makes sure no activities are expired
 	activities = session.query(Activity).all()
 	now = datetime.now()
 	for act in activities:
 		if act.expiration <= now:
 			session.delete(act)
+			session.commit()
 			del_count += 1
 
 	# Adds new activities
@@ -94,20 +45,7 @@ def maintain_activities():
 	for user in users:
 		wc_acts = weconnect.get_activities(user)
 		for act in wc_acts:
-			status = add_or_update_activity(act, user)
-			if status == "Inserted":
-				added_count += 1
-			elif status == "Updated":
-				updated_count += 1
-	
-	session.commit()
-
-	if del_count > 0:
-		logger.info("%d activities removed from the database.", del_count)
-	if added_count > 0:
-		logger.info("%d activities added to the database.", added_count)
-	if updated_count > 0:
-		logger.info("%d activities updated in the database.", updated_count)
+			add_or_update_activity(act, user)
 
 def maintain_events():
 	"""
@@ -117,25 +55,7 @@ def maintain_events():
 	for user in users:
 		populate_todays_events(user)
 
-def maintain_logs():
-	"""
-	Makes sure no logs are assigned to "ghost users"
-	"""
-	logs = session.query(Log).all()
-	users = session.query(User).all()
-	del_count = 0
-	for log in logs:
-		if not log.user in users:
-			session.delete(log)
-			session.commit()
-			del_count += 1
-	if del_count > 0:
-		logger.info("%d logs removed from the database.", del_count)
-
 if __name__ == "__main__":
-	logger.info("Running database maintenance...")
 	maintain_users()
 	maintain_activities()
-	maintain_logs()
 	maintain_events()
-	logger.info("...Done.")

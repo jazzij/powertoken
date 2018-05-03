@@ -16,8 +16,9 @@ def make_shell_context():
 		"db": db,
 		"User": User,
 		"Admin": Admin,
-		"Log": Log,
-		"Activity": Activity
+		"Activity": Activity,
+		"Day": Day,
+		"Event": Event
 	}
 
 if __name__ == "__main__":

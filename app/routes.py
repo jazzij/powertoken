@@ -1,7 +1,7 @@
 """
 Handles routing and form processing for the PowerToken Flask app.\n
-Created by Jasmine Jones.\n
-Last modified by Abigail Franz on 4/16/2018.
+Created by Jasmine Jones in 11/2017.\n
+Last modified by Abigail Franz on 5/2/2018.
 """
 
 from datetime import datetime
@@ -149,39 +149,22 @@ def user_activities():
 	username = request.args.get("username")
 	if username is None:
 		return redirect(url_for("user_login", error="Invalid username"))
+
 	user = User.query.filter_by(username=username).first()
+	form = UserActivityForm()
 
 	if request.method == "POST":
-		return redirect(url_for("user_home", username=username))
+		if form.validate_on_submit():
+			for act in form.activities.entries:
+				activity = user.activities.filter_by(wc_act_id == act.wc_act_id).first()
+			db.session.commit()
+			return redirect(url_for("user_home", username=username))
 
 	form = UserActivityForm()
 	for act in user.activities:
 		d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
 				("weight", act.weight)])
 		form.activities.append_entry(data=d)
-	return render_template("user_activities.html", form=form)
-
-@app.route("/user_activities_old", methods=["GET", "POST"])
-def user_activities_old():
-	username = request.args.get("username")
-	if username is None:
-		return redirect(url_for("user_login", error="Invalid username"))
-	user = User.query.filter_by(username=username).first()
-
-	if request.method == "POST":
-		form = UserActivityForm()
-
-		if form.validate_on_submit():
-			form.populate_assoc(user)
-			db.session.add(user)
-			db.session.commit()
-			return redirect(url_for("user_home", username=username))
-
-	data = []
-	for act in user.activities:
-		data.append("activities", act.weight)
-	form = UserActivityForm(data=MultiDict(data))
-
 	return render_template("user_activities.html", form=form)
 
 @app.route("/admin")
