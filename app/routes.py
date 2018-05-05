@@ -159,11 +159,9 @@ def user_activities():
 	# POST: Process the submitted activity weighting form.
 	if request.method == "POST":
 		for entry in form.activities.entries:
-			print(entry)
+			# Strip '[' and ']' characters added by MultiDict representation
 			entry_id = entry.wc_act_id.data[1:-1]
-			print(entry_id)
 			activity = user.activities.filter_by(wc_act_id=entry_id).first()
-			print(activity)
 			activity.weight = entry.weight.data
 		db.session.commit()
 		return redirect(url_for("user_home", username=username))
@@ -172,7 +170,7 @@ def user_activities():
 	elif request.method == "GET":
 		for act in user.activities.all():
 			# The append_entry method only takes a MultiDict data structure.
-			d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
+			d = MultiDict([("wc_act_id", act.wc_act_id), ("act_name", act.name),
 					("weight", act.weight)])
 			form.activities.append_entry(data=d)
 		return render_template("user_activities.html", form=form)

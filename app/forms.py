@@ -44,7 +44,7 @@ class UserWcLoginForm(FlaskForm):
 
 class ActivityForm(FlaskForm):
 	wc_act_id = HiddenField("Activity ID")
-	name = StringField("Activity Name")
+	act_name = StringField("Activity Name")
 	weight = SelectField("Weight", choices=[(c, c) for c in ['1', '2', '3', '4', '5']])
 
 class UserActivityForm(FlaskForm):
