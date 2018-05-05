@@ -124,3 +124,4 @@ class Event(db.Model):
 	def __repr__(self):
 		output = "<Event '{}' at {}>".format(self.activity.name, 
 				self.start_time.strftime("%I:%M %p"))
+		return output
