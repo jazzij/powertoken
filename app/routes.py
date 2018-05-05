@@ -158,20 +158,20 @@ def user_activities():
 
 	# POST: Process the submitted activity weighting form.
 	if request.method == "POST":
-		if form.validate_on_submit():
-			for act in form.activities.entries:
-				activity = user.activities.filter_by(wc_act_id == act.wc_act_id).first()
-				activity.weight = act.weight
-			db.session.commit()
-			return redirect(url_for("user_home", username=username))
+		for act in form.activities.entries:
+			activity = user.activities.filter_by(wc_act_id == act.wc_act_id).first()
+			activity.weight = act.weight
+		db.session.commit()
+		return redirect(url_for("user_home", username=username))
 
 	# GET: Set up the form for activity weighting and render the page.
-	for act in user.activities.all():
-		# The append_entry method only takes a MultiDict data structure.
-		d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
-				("weight", act.weight)])
-		form.activities.append_entry(data=d)
-	return render_template("user_activities.html", form=form)
+	elif request.method == "GET":
+		for act in user.activities.all():
+			# The append_entry method only takes a MultiDict data structure.
+			d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
+					("weight", act.weight)])
+			form.activities.append_entry(data=d)
+		return render_template("user_activities.html", form=form)
 
 @app.route("/admin")
 @app.route("/admin/")
