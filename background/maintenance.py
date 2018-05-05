@@ -21,6 +21,7 @@ def maintain_users():
 	3. Every user has at least 5 Days in the days table.
 	"""
 	check_users_complete()
+	users = session.query(User).all()
 	for user in users:
 		fitbit.change_step_goal(user, 1000000)
 		check_days(user)
@@ -34,7 +35,7 @@ def maintain_activities():
 	3. If users have added/updated activities, those are added to the database.
 	"""
 	# Remove "ghost" activities
-	activities_to_delete = session.query(Activity.user=None).all()
+	activities_to_delete = session.query(Activity.user is None).all()
 	for act in activities_to_delete:
 		session.delete(act)
 	session.commit()
@@ -59,7 +60,7 @@ def maintain_days():
 	Remove "ghost" days that aren't assigned to any user and the events
 	associated with them.
 	"""
-	days_to_delete = Day.query.filter(Day.user=None).all()
+	days_to_delete = Day.query.filter(Day.user is None).all()
 	for day in days_to_delete:
 		for event in day.events:
 			session.delete(event)
