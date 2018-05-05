@@ -160,7 +160,7 @@ def user_activities():
 	if request.method == "POST":
 		for entry in form.activities.entries:
 			print(entry)
-			entry_id = entry.wc_act_id.data[0]
+			entry_id = entry.wc_act_id.data[1:-1]
 			print(entry_id)
 			activity = user.activities.filter_by(wc_act_id=entry_id).first()
 			print(activity)
