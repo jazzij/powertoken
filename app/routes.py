@@ -166,7 +166,7 @@ def user_activities():
 			return redirect(url_for("user_home", username=username))
 
 	# GET: Set up the form for activity weighting and render the page.
-	for act in user.activities:
+	for act in user.activities.all():
 		# The append_entry method only takes a MultiDict data structure.
 		d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
 				("weight", act.weight)])

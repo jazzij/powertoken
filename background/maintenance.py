@@ -28,24 +28,43 @@ def maintain_users():
 def maintain_activities():
 	"""
 	Go through the activities table of the database and check 2 things:
-	1. All activities are unexpired, and expired activities are removed.
-	2. If users have added/updated activities, those are added to the database.
+	1. If any activities belong to users that have been removed, those
+	   activities are removed.
+	2. All activities are unexpired, and expired activities are removed.
+	3. If users have added/updated activities, those are added to the database.
 	"""
-	# Makes sure no activities are expired
+	# Remove "ghost" activities
+	activities_to_delete = session.query(Activity.user=None).all()
+	for act in activities_to_delete:
+		session.delete(act)
+	session.commit()
+
+	# Make sure no activities are expired
 	activities = session.query(Activity).all()
 	now = datetime.now()
 	for act in activities:
 		if act.expiration <= now:
 			session.delete(act)
-			session.commit()
-			del_count += 1
+	session.commit()
 
-	# Adds new activities
+	# Add new activities
 	added_count, updated_count = 0, 0
 	for user in users:
 		wc_acts = weconnect.get_activities(user)
 		for act in wc_acts:
 			add_or_update_activity(act, user)
+
+def maintain_days():
+	"""
+	Remove "ghost" days that aren't assigned to any user and the events
+	associated with them.
+	"""
+	days_to_delete = Day.query.filter(Day.user=None).all()
+	for day in days_to_delete:
+		for event in day.events:
+			session.delete(event)
+		session.delete(day)
+	session.commit()
 
 def maintain_events():
 	"""
@@ -58,4 +77,5 @@ def maintain_events():
 if __name__ == "__main__":
 	maintain_users()
 	maintain_activities()
+	maintain_days()
 	maintain_events()
