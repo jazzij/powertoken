@@ -159,7 +159,7 @@ def user_activities():
 	# POST: Process the submitted activity weighting form.
 	if request.method == "POST":
 		for act in form.activities.entries:
-			activity = user.activities.filter_by(wc_act_id == act.wc_act_id).first()
+			activity = user.activities.filter_by(wc_act_id=act.wc_act_id).first()
 			activity.weight = act.weight
 		db.session.commit()
 		return redirect(url_for("user_home", username=username))
