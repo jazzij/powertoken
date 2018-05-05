@@ -160,7 +160,9 @@ def user_activities():
 	if request.method == "POST":
 		for entry in form.activities.entries:
 			print(entry)
-			activity = user.activities.filter_by(wc_act_id=entry.wc_act_id.data).first()
+			entry_id = entry.wc_act_id.data[0]
+			print(entry_id)
+			activity = user.activities.filter_by(wc_act_id=entry_id).first()
 			print(activity)
 			activity.weight = entry.weight.data
 		db.session.commit()
