@@ -28,21 +28,10 @@ You might notice that we are not running [maintenance.py](maintenance.py) and [p
 
 Every hour, the [maintenance.py](maintenance.py) script performs the following activities:
 
-In the `users` table of the database:
-* Makes sure all user fields are complete, and removes incomplete profiles.
-* Makes sure all WEconnect and Fitbit access tokens are unexpired.
-* Makes sure all users have at least 5 Day records in the database, and adds empty Day records if needed.
-
-In the `activities` table:
-* If any users have been removed from the database, deletes their activity records.
-* Removes any expired activities.
-* If users have added or updated activities, adds those to the database.
-
-In the `days` table:
-* Populates each user's Day record for today.
-
-In the `logs` table:
-* If any users have been removed from the database, deletes their logs.
+* Deletes all incomplete profiles from the `user` table.
+* If any users have been removed from the database, deletes their `activity` and `day` (and corresponding `event`) records.
+* If users have added or updated activities, updates the database.
+* Populates each user's `day` and corresponding `event` records for today.
 
 
 ## Poll WEconnect and update Fitbit

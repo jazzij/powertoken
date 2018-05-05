@@ -9,23 +9,44 @@ from db import session
 from models import Activity, Day, Event, Log, User
 import weconnect
 
-d = datetime.now()
-today = datetime(d.year, d.month, d.day)
+TODAY = datetime(datetime.now().year, datetime.now().month, datetime.now().day)
 
-def check_users_complete():
+def remove_incomplete_users():
 	"""
 	Go through the users table of the database and check 2 things:
 	1. All user fields are complete, and incomplete profiles are removed.
 	2. All WEconnect and Fitbit access tokens are unexpired.
-	Remove all users who do not meet these criteria.
+	Remove all users who do not meet these criteria, and any other records that
+	belong to the deleted users.
 	"""
+	# TODO: Make sure all access tokens are unexpired.
 	users = session.query(User).all()
 	for user in users:
 		if not all([user.username, user.wc_id, user.wc_token, user.fb_token]):
-			# TODO: If a user has to be deleted, delete all foreign key refs (unless SQLAlchemy already does this)
+			activities = user.activities.all()
+			for activity in activities:
+				session.delete(activity)
+			days = user.days.all()
+			for day in days:
+				events = day.events.all()
+				for event in events:
+					session.delete(event)
+				session.delete(day)
 			session.delete(user)
 	session.commit()
-	# TODO: Make sure all access tokens are unexpired.
+
+# Make sure no activities are expired
+def remove_expired_activities()
+	"""
+	Remove all activities whose expiration date is in the past from the
+	database.
+	"""
+	activities = session.query(Activity).all()
+	now = datetime.now()
+	for act in activities:
+		if act.expiration <= now:
+			session.delete(act)
+	session.commit()
 
 def check_days(user):
 	"""
@@ -119,7 +140,7 @@ def get_users_with_current_events():
 	margin = timedelta(minutes=15)
 	users = session.query(User).all()
 	for user in users:
-		day = user.days.filter(Day.date == today)
+		day = user.days.filter(Day.date == TODAY)
 		events = day.events.filter((Event.start_time - margin).time() <= now).\
 				filter(now <= (Event.end_time + margin).time()).count()
 		if events:
@@ -141,16 +162,28 @@ def get_yesterdays_progress(user):
 			order_by(Log.timestamp.desc()).first()
 	return yest_log.daily_progress
 
-def populate_todays_events(user):
+def update_activities(user):
 	"""
-	Populate the database with a list of the user's events that occur today.
+	If the user has added or updated any WEconnect activities, update the
+	database.
+
+	:param background.models.User user
+	"""
+	wc_acts = weconnect.get_activities(user)
+	for act in wc_acts:
+		add_or_update_activity(act, user)
+
+def populate_today(user):
+	"""
+	Populate the database (`day` and `event` tables) with a list of the user's 
+	events that occur today.
 
 	:param background.models.User user: the user for which to get events
 	"""
 	# Add a new Day to the user's days table if it doesn't already exist
-	day = user.days.filter(Day.date == today).first()
+	day = user.days.filter(Day.date == TODAY).first()
 	if day is None:
-		day = Day(date=datetime(today.year, today.month, today.day), user=user)
+		day = Day(date=datetime(TODAY.year, TODAY.month, TODAY.day), user=user)
 		session.add(day)
 		session.commit()
 
@@ -203,24 +236,28 @@ def compute_days_progress(day):
 		score += act.activity.weight
 
 	day_1_ago = day.user.days.filter_by(date=(day.date - timedelta(1))).first()
-	day_1_acts = day_1_ago.events.filter(Event.completed).all()
-	for act in day_1_acts:
-		score += (act.activity.weight - 1)
+	if not day_1_ago is None:
+		day_1_acts = day_1_ago.events.filter(Event.completed).all()
+		for act in day_1_acts:
+			score += (act.activity.weight - 1)
 
 	day_2_ago = day.user.days.filter_by(date=(day.date - timedelta(2))).first()
-	day_2_acts = day_2_ago.events.filter(Event.completed).all()
-	for act in day_2_acts:
-		score += (act.activity.weight - 2) if act.activity.weight > 1 else 0
+	if not day_2_ago is None:
+		day_2_acts = day_2_ago.events.filter(Event.completed).all()
+		for act in day_2_acts:
+			score += (act.activity.weight - 2) if act.activity.weight > 1 else 0
 
 	day_3_ago = day.user.days.filter_by(date=(day.date - timedelta(3))).first()
-	day_3_acts = day_3_ago.events.filter(Event.completed).all()
-	for act in day_3_acts:
-		score += (act.activity.weight - 3) if act.activity.weight > 2 else 0
+	if not day_3_ago is None:
+		day_3_acts = day_3_ago.events.filter(Event.completed).all()
+		for act in day_3_acts:
+			score += (act.activity.weight - 3) if act.activity.weight > 2 else 0
 
 	day_4_ago = day.user.days.filter_by(date=(day.date - timedelta(4))).first()
-	day_4_acts = day_4_ago.events.filter(Event.completed).all()
-	for act in day_4_acts:
-		score += (act.activity.weight - 4) if act.activity.weight > 3 else 0
+	if not day_4_ago is None:
+		day_4_acts = day_4_ago.events.filter(Event.completed).all()
+		for act in day_4_acts:
+			score += (act.activity.weight - 4) if act.activity.weight > 3 else 0
 
 	possible_score = compute_possible_score(day)
 	computed_score = float(score) / float(possible_score) if score < possible_score else 1.0
