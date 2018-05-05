@@ -36,7 +36,7 @@ def remove_incomplete_users():
 	session.commit()
 
 # Make sure no activities are expired
-def remove_expired_activities()
+def remove_expired_activities():
 	"""
 	Remove all activities whose expiration date is in the past from the
 	database.
