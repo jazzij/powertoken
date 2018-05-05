@@ -19,8 +19,7 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = "admin_login"
 
-# TODO: Set up mail server so that administrators get an email in the event of
-# a system failure. (This code currently does nothing).
+# Set up email logging for system failures.
 if not app.debug:
 	# Configure email logging
 	if app.config["MAIL_SERVER"]:

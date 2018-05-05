@@ -5,16 +5,16 @@ Last modified by Abigail Franz on 5/2/2018.
 """
 
 from datetime import datetime
-from flask import flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import redirect, render_template, request, url_for
+from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
 from werkzeug.datastructures import MultiDict
 from app import app, db
-from app.apis import login_to_wc, complete_fb_login, get_wc_activities
+from app.helpers import login_to_wc, complete_fb_login, get_wc_activities
 from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
 		UserWcLoginForm, UserActivityForm)
-from app.models import Admin, User, Log, Activity, Error
-from app.viewmodels import UserViewModel, LogViewModel
+from app.models import Activity, Admin, Error, Log, User
+from app.viewmodels import LogViewModel, UserViewModel
 
 @app.route("/")
 @app.route("/index")
@@ -34,7 +34,7 @@ def user_home():
 def user_login():
 	form = UserLoginForm()
 
-	# POST: processes the PowerToken login form
+	# POST: Process the PowerToken login form.
 	if form.validate_on_submit():
 		username = form.username.data
 		user = User.query.filter_by(username=username).first()
@@ -71,8 +71,8 @@ def user_wc_login():
 	if form.validate_on_submit():
 		username = request.args.get("username")
 
-		# If the username wasn't saved, return to the original PowerToken login
-		# page.
+		# If for whatever reason the username wasn't saved, return to the 
+		# original PowerToken login page.
 		if username is None:
 			return redirect(url_for("user_login", error="Invalid username"))
 
@@ -147,21 +147,27 @@ def user_fb_login():
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
 	username = request.args.get("username")
+
+	# If for whatever reason the username wasn't saved, go back to the 
+	# original login screen.
 	if username is None:
 		return redirect(url_for("user_login", error="Invalid username"))
 
 	user = User.query.filter_by(username=username).first()
 	form = UserActivityForm()
 
+	# POST: Process the submitted activity weighting form.
 	if request.method == "POST":
 		if form.validate_on_submit():
 			for act in form.activities.entries:
 				activity = user.activities.filter_by(wc_act_id == act.wc_act_id).first()
+				activity.weight = act.weight
 			db.session.commit()
 			return redirect(url_for("user_home", username=username))
 
-	form = UserActivityForm()
+	# GET: Set up the form for activity weighting and render the page.
 	for act in user.activities:
+		# The append_entry method only takes a MultiDict data structure.
 		d = MultiDict([("wc_act_id", act.wc_act_id), ("name", act.name),
 				("weight", act.weight)])
 		form.activities.append_entry(data=d)
@@ -188,7 +194,7 @@ def admin_login():
 		admin = Admin.query.filter_by(username=form.username.data).first()
 		if admin is None or not admin.check_password(form.password.data):
 			return redirect(url_for("admin_login"))
-		login_user(admin, remember=form.remember_me.data)
+		login_user(admin, remember=False)
 		next_page = request.args.get("next")
 		if not next_page or url_parse(next_page).netloc != '':
 			next_page = url_for("admin_home")
@@ -204,14 +210,14 @@ def admin_logout():
 
 @app.route("/admin/register", methods=["GET", "POST"])
 def admin_register():
-	# If a user who's already logged in tries to register, sends him/her to the
+	# If a user who's already logged in tries to register, send him/her to the
 	# homepage.
 	if current_user.is_authenticated:
 		return redirect(url_for("admin_home"))
 
 	form = AdminRegistrationForm()
 
-	# POST: Processes the admin registration form.
+	# POST: Process the admin registration form.
 	if form.validate_on_submit():
 		admin = Admin(username=form.username.data, email=form.email.data)
 		admin.set_password(form.password.data)
@@ -220,7 +226,7 @@ def admin_register():
 		login_user(admin, remember=False)
 		return redirect(url_for("admin_home"))
 
-	# GET: Renders the admin login template.
+	# GET: Render the admin login page.
 	return render_template("admin_register.html", form=form)
 
 @app.route("/admin/progress_logs")

@@ -4,13 +4,13 @@ Created by Abigail Franz on 3/19/2018.\n
 """
 
 from datetime import datetime
-from app.apis import TODAY
+from app.helpers import TODAY
 from app.models import Log, User
 
 class UserViewModel:
 	def __init__(self, user):
 		"""
-		Param user is of type app.models.User
+		:param app.models.User user
 		"""
 		self.id = user.id
 		self.username = user.username
@@ -30,9 +30,7 @@ class UserViewModel:
 			return last_log.date.strftime("%Y-%m-%d")
 
 	def _todays_progress(self, user):
-		d = datetime.now()
-		today = datetime(d.year, d.month, d.day)
-		day = user.days.filter_by(date == today).first()
+		day = user.days.filter_by(date == TODAY).first()
 
 		# If the user has no Day object for today, return 0
 		if day is None:
@@ -53,7 +51,7 @@ class UserViewModel:
 class LogViewModel:
 	def __init__(self, log):
 		"""
-		Param log is of type app.models.Log
+		:param app.models.Log log
 		"""
 		self.id = log.id
 		self.username = log.user.username

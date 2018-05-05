@@ -1,5 +1,5 @@
 # PowerToken Flask App 
-### (Last Update, 4/9/2018)
+### (Last Update, 5/5/2018)
 
 
 ## Dependencies
@@ -21,7 +21,7 @@
 
 The user navigates to the URL on which the application is hosted (currently https://powertoken.grouplens.org/). If he is not logged in, he will be redirected to the login page. He enters the username we gave him into the form field and clicks "NEXT". If he has already signed up with PowerToken, he is redirected to the homepage and is good to go.
 
-If the user has never logged into PowerToken before, she is redirected to the WEconnect login page and must enter her WEconnect credentials. These credentials are not seen or saved by the researchers. Upon clicking next, she is redirected to the external Fitbit login page, where she must grant the application permission to access her data. Then she is sent back to the homepage.
+If the user has never logged into PowerToken before, she is redirected to the WEconnect login page and must enter her WEconnect credentials. These credentials are not seen or saved by the researchers. Upon clicking next, she is redirected to the external Fitbit login page, where she must grant the application permission to access her data. Finally, the user is shown a list of the activities she has entered in the WEconnect app. She is prompted to give each a weight from 1 to 5, with 1 (lasting 1 day) being the default. After submitting the activity weighting form, she is sent back to the homepage.
 
 Back on the homepage, the user will see a welcome message. He is good to go!
 
@@ -40,10 +40,6 @@ In [routes.py](routes.py) you will see a collection of methods that are mapped t
 In the [templates](templates) folder, you will see a collection of HTML files. These are served and modified by the Python code. The templates with the "user_" prefix are part of the user-facing application, and the templates with the "admin_" prefix are part of the admin-facing application. The [user_fb_login.html](templates/user_fb_login.html) file contains JavaScript that logs the user into Fitbit, goes through the OAuth process, and sends an access code back to the server via the POST method of the `/fb_login` route.
 
 Similar to the routes, manually entering an HTML template might not yield the behavior you expect, because some of the templates are not hard-coded HTML, but populated by the Python code as they are served.
-
-<!--
-In the /static folder, you will find the golden egg. The JavaScript file [fb_login.js](static/js/fb_login.js) (which is run from [fb_login.html](templates/fb_login.html)) logs the user into Fitbit, goes through the OATH process, and sends an access code back to the server via the POST method of the /fb_login route. There is probably a more finessed way of doing this, but hey, it works.
--->
 
 Other than the Fitbit login, the user setup code is written in Python, found in [routes.py](routes.py).
 

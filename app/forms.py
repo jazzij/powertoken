@@ -1,16 +1,14 @@
 """
-Contains the form classes for the admin registration and login, the user login,
-and the user WEconnect login.\n
+Contains the form classes for the Flask application.\n
 Created by Abigail Franz on 3/12/2018.\n
-Last modified by Abigail Franz on 3/13/2018.
+Last modified by Abigail Franz on 4/30/2018.
 """
 
 from flask_wtf import FlaskForm
-from wtforms import (StringField, PasswordField, BooleanField, SubmitField, 
-	RadioField, HiddenField, FieldList, FormField, IntegerField, SelectField)
+from wtforms import (StringField, PasswordField, SubmitField, HiddenField, 
+		FieldList, FormField, SelectField)
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
-from app import db
-from app.models import Admin, Activity, User
+from app.models import Admin
 
 class AdminLoginForm(FlaskForm):
 	username = StringField("Username", validators=[DataRequired()])

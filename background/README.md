@@ -1,5 +1,5 @@
 # PowerToken Background Scripts
-### (Last Update, 3/25/2018)
+### (Last Update, 5/5/2018)
 
 
 ## Dependencies
@@ -21,7 +21,7 @@ The scripts [maintenance.py](maintenance.py) and [polling.py](polling.py) are me
 
 We have the maintenance script set to run at the beginning of every hour and the polling script to run at the 0, 15, 30, and 45 minute marks (effectively every 15 minutes).
 
-You might notice that we are not running [maintenance.py](maintenance.py) and [polling.py](polling.py) directly from Cron. This is because both utilize a virtualenv, which Cron has no knowledge of. Instead, the bash scripts run_maintenance.sh and run_polling.sh activate the virtualenv, run the respective Python script, and then deactivate the virtualenv.
+You might notice that we are not running [maintenance.py](maintenance.py) and [polling.py](polling.py) directly from Cron. This is because both utilize a virtualenv, which Cron has no knowledge of. Instead, the bash scripts run_maintenance.sh and run_polling.sh activate the virtualenv, run the respective Python script, and then deactivate the virtualenv. Example bash scripts, [run_maintenance_ex.sh](../run_maintenance_ex.sh) and [run_polling_ex.sh](../run_polling.sh), have been included in the root directory of the repository.
 
 
 ## Database Maintenance
@@ -31,11 +31,15 @@ Every hour, the [maintenance.py](maintenance.py) script performs the following a
 In the `users` table of the database:
 * Makes sure all user fields are complete, and removes incomplete profiles.
 * Makes sure all WEconnect and Fitbit access tokens are unexpired.
+* Makes sure all users have at least 5 Day records in the database, and adds empty Day records if needed.
 
 In the `activities` table:
 * If any users have been removed from the database, deletes their activity records.
 * Removes any expired activities.
 * If users have added or updated activities, adds those to the database.
+
+In the `days` table:
+* Populates each user's Day record for today.
 
 In the `logs` table:
 * If any users have been removed from the database, deletes their logs.
@@ -51,11 +55,11 @@ The [polling.py](polling.py) script performs the main function of the PowerToken
     2. Update Fitbit with the new step count `progress * 1000000`.
     3. Add an entry to the `logs` table of the database.
 
-The two classes used by the application are `WeConnect` and `Fitbit`, which are located in the [weconnect.py](weconnect.py) and [fitbit.py](fitbit.py) files, respectively. As might be expected, the `WeConnect` class handles API calls to WEconnect and the `Fitbit` class handles API calls to Fitbit.
+The two modules used by the application are `weconnect` and `fitbit`, which are located in the [weconnect.py](weconnect.py) and [fitbit.py](fitbit.py) files, respectively. As might be expected, the `weconnect` class handles API calls to WEconnect and the `fitbit` module handles API calls to Fitbit.
 
 
 ## Notes
 
-Both scripts make use of the models `background.helpers` and `background.models`. The `WeConnect` and `Fitbit` classes utilize the functions in [common.py]. 
+Both scripts make use of the modules `background.helpers` and `background.models`. In turn, all the modules rely on `background.db`, which handles the database session. 
 
 If something isn't working, it's probably a path issue. Check that your directory structure matches the structure the scripts are expecting.

@@ -15,6 +15,7 @@ skey = ""
 with open("csrf") as fp:
 	skey = fp.read().strip()
 
+# The environment variables are currently set in the run_powertoken.sh script.
 # TODO: Add administrator email addresses to the ADMINS field.
 class Config(object):
 	"""
