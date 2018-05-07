@@ -27,7 +27,7 @@ class UserViewModel:
 		if last_day is None:
 			return "Never"
 		else:
-			return last_log.date.strftime("%Y-%m-%d")
+			return last_day.date.strftime("%Y-%m-%d")
 
 	def _todays_progress(self, user):
 		day = user.days.filter(Day.date == TODAY).first()
