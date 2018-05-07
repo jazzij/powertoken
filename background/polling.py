@@ -39,6 +39,7 @@ def poll_and_update():
 		progress = compute_days_progress(thisday)
 		if not thisday.computed_progress == progress:
 			thisday.computed_progress = progress
+			session.commit()
 			# Send progress to Fitbit
 			step_count = fitbit.update_progress(user, progress)
 
