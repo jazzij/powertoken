@@ -30,7 +30,7 @@ def poll_and_update():
 		for activity in activity_events:
 			for ev in activity["events"]:
 				if ev["didCheckin"]:
-					event = session.query(Event).filter(Event.eid == ev["eid"])
+					event = session.query(Event).filter(Event.eid == ev["eid"]).first()
 					event.completed = True
 					print("{} completed".format(event))
 		session.commit()
