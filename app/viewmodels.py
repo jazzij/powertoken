@@ -37,7 +37,7 @@ class UserViewModel:
 			return 0.0, 0.0
 
 		total_progress = day.computed_progress
-		weekday = today.weekday()
+		weekday = TODAY.weekday()
 		for i in range(1, weekday):
 			d = user.days.filter(Day.date == (day.date - timedelta(days=i))).first()
 			total_progress += d.computed_progress
