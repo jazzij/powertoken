@@ -234,14 +234,12 @@ def compute_days_progress(day):
 	day_0_acts = day.events.filter(Event.completed).all()
 	for act in day_0_acts:
 		score += act.activity.weight
-	print("score before added faded progress: {}".format(score))
 
 	day_1_ago = day.user.days.filter_by(date=(day.date - timedelta(1))).first()
 	if not day_1_ago is None:
 		day_1_acts = day_1_ago.events.filter(Event.completed).all()
 		for act in day_1_acts:
 			score += (act.activity.weight - 1)
-		print("score after adding faded progress: {}".format(score))
 
 	day_2_ago = day.user.days.filter_by(date=(day.date - timedelta(2))).first()
 	if not day_2_ago is None:
@@ -263,7 +261,5 @@ def compute_days_progress(day):
 
 	possible_score = compute_possible_score(day)
 	computed_score = float(score) / float(possible_score) if score < possible_score else 1.0
-	print("possible score: {}".format(possible_score))
-	print("computed score: {}".format(computed_score))
 	return float(score) / float(possible_score)
 	

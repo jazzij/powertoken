@@ -2,13 +2,13 @@
 Script that runs the main PowerToken function: poll WEconnect and update Fitbit.
 Meant to be run in Crontab, probably every 5-15 minutes.\n
 Created by Abigail Franz on 2/28/2018.\n
-Last modified by Abigail Franz on 5/2/2018.
+Last modified by Abigail Franz on 5/7/2018.
 """
 
 from db import session
 import fitbit
 from helpers import compute_days_progress
-from models import Activity, Event, User
+from models import Activity, Event, Log, User
 import weconnect
 
 def poll_and_update():
@@ -34,15 +34,20 @@ def poll_and_update():
 					event.completed = True
 		session.commit()
 
-		# Compute progress with fade function
+		# Compute progress with fade algorithm
 		thisday = user.thisday()
 		progress = compute_days_progress(thisday)
 		print("Progress is {}".format(progress))
 		if not thisday.computed_progress == progress:
+			# Update today's Day object in the database
 			thisday.computed_progress = progress
 			session.commit()
+
 			# Send progress to Fitbit
 			step_count = fitbit.update_progress(user, progress)
+
+			# Add a Log object to the database
+			log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
 
 if __name__ == "__main__":
 	poll_and_update()

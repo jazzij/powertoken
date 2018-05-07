@@ -4,25 +4,20 @@
 		<tr>
 			<th>Username</th>
 			<th>Timestamp</th>
-			<th>Daily Progress</th>
-			<th>Weekly Progress</th>
+			<th>WEconnect Progress</th>
+			<th>Fitbit Step Count</th>
 		</tr>
 		{% for log in log_vms %}
 			<tr>
 				<td>{{log.username}}</td>
 				<td>{{log.timestamp}}</td>
 				<td>
-					<svg id="daily{{log.id}}" width="50" height="50"></svg>
+					<svg id="{{log.id}}" width="25" height="25"></svg>
 					<script>
-						var gauge = loadLiquidFillGauge("daily{{log.id}}", "{{log.daily_progress}}");
+						var gauge = loadLiquidFillGauge("{{log.id}}", "{{log.wc_progress}}");
 					</script>
 				</td>
-				<td>
-					<svg id="weekly{{log.id}}" width="50" height="50"></svg>
-					<script>
-						var gauge = loadLiquidFillGauge("weekly{{log.id}}", "{{log.weekly_progress}}");
-					</script>
-				</td>
+				<td>{{log.fb_step_count}}</td>
 			</tr>
 		{% endfor %}
 	</table>

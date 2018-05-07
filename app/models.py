@@ -57,9 +57,8 @@ class Log(db.Model):
 	"""
 	id = db.Column(db.Integer, primary_key=True)
 	timestamp = db.Column(db.DateTime, index=True, default=datetime.now())
-	daily_progress = db.Column(db.Float)
-	weekly_progress = db.Column(db.Float)
-	step_count = db.Column(db.Integer)
+	wc_progress = db.Column(db.Float)
+	fb_step_count = db.Column(db.Integer)
 	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 	def __repr__(self):

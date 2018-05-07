@@ -56,9 +56,8 @@ class LogViewModel:
 		self.id = log.id
 		self.username = log.user.username
 		self.timestamp = log.timestamp.strftime("%Y-%m-%d %I:%M %p")
-		self.daily_progress = log.daily_progress * 100
-		self.weekly_progress = log.weekly_progress * 100
-		self.step_count = log.step_count
+		self.wc_progress = log.wc_progress * 100
+		self.fb_step_count = log.fb_step_count
 
 	def __repr__(self):
 		return "<LogViewModel {} at {}>".format(self.username, self.timestamp)

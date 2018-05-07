@@ -54,14 +54,14 @@ class User(Base):
 
 class Log(Base):
 	"""
-	Represents a WEconnect-Fitbit progress log.
+	Represents a PowerToken progress log, added whenever WEconnect progress is
+	detected and Fitbit step count is updated.
 	"""
 	__tablename__ = "log"
 	id = Column(Integer, primary_key=True)
 	timestamp = Column(DateTime, index=True, default=datetime.now())
-	daily_progress = Column(Float)
-	weekly_progress = Column(Float)
-	step_count = Column(Integer)
+	wc_progress = Column(Float)
+	fb_step_count = Column(Integer)
 	user_id = Column(Integer, ForeignKey("user.id"))
 
 	def __repr__(self):
