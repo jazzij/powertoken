@@ -37,6 +37,7 @@ def poll_and_update():
 		# Compute progress with fade function
 		thisday = user.thisday()
 		progress = compute_days_progress(thisday)
+		print("Progress is {}".format(progress))
 		if not thisday.computed_progress == progress:
 			thisday.computed_progress = progress
 			session.commit()
