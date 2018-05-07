@@ -5,14 +5,14 @@
 			<th>Username</th>
 			<th>Registered On</th>
 			<th>WEconnect ID</th>
-			<th>Goal Period</th>
+			<th>More Stats</th>
 		</tr>
 		{% for user in user_vms %}
 			<tr>
 				<td>{{user.username}}</td>
 				<td>{{user.registered_on}}</td>
 				<td>{{user.wc_id}}</td>
-				<td>{{user.goal_period}}</td>
+				<td></td>
 			</tr>
 		{% endfor %}
 	</table>

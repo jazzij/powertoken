@@ -8,7 +8,7 @@ Last modified by Abigail Franz on 5/2/2018.
 from db import session
 import fitbit
 from helpers import compute_days_progress
-from models import Base, User, Activity, Log, DB_PATH
+from models import Activity, Event, User
 import weconnect
 
 def poll_and_update():

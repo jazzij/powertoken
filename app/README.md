@@ -62,7 +62,7 @@ You might want to automate the process of starting Gunicorn by placing the comma
 
 ```bash
 #!/bin/bash
-cd /export/scratch/powertoken
+cd <absolute-path>
 . venv/bin/activate
 export MAIL_SERVER=smtp.googlemail.com
 export MAIL_PORT=587

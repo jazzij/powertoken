@@ -155,7 +155,7 @@ def log_step_activity(user, new_step_count):
 	else:
 		error = Error(
 			summary = "Couldn't log step activity.",
-			origin = "background/fitbit.py, in _log_step_activity",
+			origin = "background/fitbit.py, in log_step_activity",
 			message = response.json()["errors"][0]["message"],
 			user = user
 		)
