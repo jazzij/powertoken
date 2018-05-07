@@ -195,7 +195,7 @@ def admin_login():
 	if form.validate_on_submit():
 		admin = Admin.query.filter_by(username=form.username.data).first()
 		if admin is None or not admin.check_password(form.password.data):
-			return redirect(url_for("admin_login"))
+			return redirect(url_for("admin_login"), next=request.args.get("next"))
 		login_user(admin, remember=False)
 		next_page = request.args.get("next")
 		if not next_page or url_parse(next_page).netloc != '':
@@ -226,7 +226,10 @@ def admin_register():
 		db.session.add(admin)
 		db.session.commit()
 		login_user(admin, remember=False)
-		return redirect(url_for("admin_home"))
+		next_page = request.args.get("next")
+		if not next_page or url_parse(next_page).netloc != '':
+			next_page = url_for("admin_home")
+		return redirect(next_page)
 
 	# GET: Render the admin login page.
 	return render_template("admin_register.html", form=form)
