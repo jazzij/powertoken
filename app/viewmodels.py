@@ -41,8 +41,8 @@ class UserViewModel:
 		for i in range(1, weekday):
 			d = user.days.filter(Day.date == (day.date - timedelta(days=i))).first()
 			total_progress += d.computed_progress
-		weekly_avg = total_progress / weekday
-			
+		weekly_avg = total_progress / weekday if total_progress > 0 else 0
+
 		return day.computed_progress * 100, weekly_avg * 100
 
 	def __repr__(self):
