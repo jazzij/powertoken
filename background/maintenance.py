@@ -19,11 +19,10 @@ def maintain():
 	  `activity` and `day` (and corresponding `event`) records.
 	* If users have added or updated activities, updates the database.
 	* Populates each user's `day` and corresponding `event` records for today.
-	* Makes sure all users have Fitbit step goal of 1,000,00
+	* Makes sure all users have Fitbit step goals of 1,000,00
 
 	"""
 	remove_incomplete_users()
-	remove_expired_activities()
 	users = session.query(User).all()
 	for user in users:
 		update_activities(user)

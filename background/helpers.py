@@ -40,6 +40,10 @@ def remove_expired_activities():
 	"""
 	Remove all activities whose expiration date is in the past from the
 	database.
+
+	As of 5/7/2018, we're no longer doing this. It causes a lot of problems
+	with the Events table. Having expired activities sitting in the database
+	should be all right.
 	"""
 	activities = session.query(Activity).all()
 	now = datetime.now()
