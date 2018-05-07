@@ -32,6 +32,7 @@ def poll_and_update():
 				if ev["didCheckin"]:
 					event = session.query(Event).filter(Event.eid == ev["eid"])
 					event.completed = True
+					print("{} completed".format(event))
 		session.commit()
 
 		# Compute progress with fade algorithm
