@@ -150,7 +150,7 @@ def log_step_activity(user, new_step_count):
 	}
 	auth_headers = {"Authorization": "Bearer " + user.fb_token}
 	response = requests.post(url, headers=auth_headers, params=params)
-	if response == 200:
+	if response != 201:
 		return new_step_count
 	else:
 		error = Error(
