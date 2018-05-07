@@ -23,7 +23,7 @@ class UserViewModel:
 
 	def _last_check_in(self, user):
 		days = user.days.filter(Day.computed_progress > 0).all()
-		last_day = day[-1] if len(days) > 0 else None
+		last_day = days[-1] if len(days) > 0 else None
 		if last_day is None:
 			return "Never"
 		else:
