@@ -5,7 +5,7 @@ Created by Abigail Franz on 3/19/2018.\n
 
 from datetime import datetime
 from app.helpers import TODAY
-from app.models import Log, User
+from app.models import Day, Log, User
 
 class UserViewModel:
 	def __init__(self, user):
