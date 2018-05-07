@@ -22,7 +22,7 @@ class UserViewModel:
 		self.daily_progress, self.weekly_progress = self._todays_progress(user)
 
 	def _last_check_in(self, user):
-		days = user.days.filter_by(computed_progress > 0).all()
+		days = user.days.filter(Day.computed_progress > 0).all()
 		last_day = day[-1] if len(days) > 0 else None
 		if last_day is None:
 			return "Never"
@@ -30,7 +30,7 @@ class UserViewModel:
 			return last_log.date.strftime("%Y-%m-%d")
 
 	def _todays_progress(self, user):
-		day = user.days.filter_by(date == TODAY).first()
+		day = user.days.filter(Day.date == TODAY).first()
 
 		# If the user has no Day object for today, return 0
 		if day is None:
@@ -39,7 +39,7 @@ class UserViewModel:
 		total_progress = day.computed_progress
 		weekday = today.weekday()
 		for i in range(1, weekday):
-			d = user.days.filter_by(date == (day.date - timedelta(days=i))).first()
+			d = user.days.filter(Day.date == (day.date - timedelta(days=i))).first()
 			total_progress += d.computed_progress
 		weekly_avg = total_progress / weekday
 			
