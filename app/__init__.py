@@ -7,8 +7,6 @@ Last modified by Abigail Franz on 3/13/2018.
 import logging
 from logging.handlers import RotatingFileHandler, SMTPHandler
 
-# Leave at the bottom of the file!
-from app import errors, models, routes
 from config import Config
 from flask import Flask
 from flask_login import LoginManager
@@ -50,3 +48,6 @@ if not app.debug:
 		"%(asctime)s %(levelname)4s: %(message)s [in %(pathname)s:%(lineno)d]"))
 	file_handler.setLevel(logging.WARNING)
 	app.logger.addHandler(file_handler)
+
+# Leave at the bottom of the file!
+from app import errors, models, routes
