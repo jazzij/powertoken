@@ -4,7 +4,7 @@ Created by Abigail Franz on 3/16/2018.\n
 Last modified by Abigail Franz on 5/7/2018.
 """
 
-from datetime import datetime, timedelta, MAXYEAR
+from datetime import datetime, time, timedelta, MAXYEAR
 from db import session
 from models import Activity, Day, Event, Log, User
 import weconnect
