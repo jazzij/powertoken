@@ -1,7 +1,7 @@
 """
 Contains some helper functions for the background scripts.\n
 Created by Abigail Franz on 3/16/2018.\n
-Last modified by Abigail Franz on 3/26/2018.
+Last modified by Abigail Franz on 5/7/2018.
 """
 
 from datetime import datetime, timedelta, MAXYEAR
@@ -9,7 +9,7 @@ from db import session
 from models import Activity, Day, Event, Log, User
 import weconnect
 
-TODAY = datetime(datetime.now().year, datetime.now().month, datetime.now().day)
+TODAY = datetime.combine(datetime.now().date(), time(0, 0, 0))
 
 def remove_incomplete_users():
 	"""
@@ -51,24 +51,6 @@ def remove_expired_activities():
 		if act.expiration <= now:
 			session.delete(act)
 	session.commit()
-
-def check_days(user):
-	"""
-	Make sure the user has at least 5 Days in the days table of the database.
-	If not, add empty (default) Day objects.
-
-	:param background.models.User user
-	"""
-	if user.days.count() < 5:
-		first_day = user.days.first()
-		past_days = [
-			Day(date=(first_day.date - timedelta(days=1)), user=user),
-			Day(date=(first_day.date - timedelta(days=2)), user=user),
-			Day(date=(first_day.date - timedelta(days=3)), user=user),
-			Day(date=(first_day.date - timedelta(days=4)), user=user)
-		]
-		session.add_all(past_days)
-		session.commit()
 
 def add_or_update_activity(activity, user):
 	"""

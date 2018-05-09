@@ -1,6 +1,7 @@
 """
 Contains the view models to be used with the admin dashboard.\n
 Created by Abigail Franz on 3/19/2018.\n
+Last modified by Abigail Franz on 5/9/2018.
 """
 
 from datetime import datetime, timedelta
@@ -8,6 +9,10 @@ from app.helpers import TODAY
 from app.models import Day, Log, User
 
 class UserViewModel:
+	"""
+	The `UserViewModel` class brings together information from the `User` and
+	`Day` models for easy display on the dashboard.
+	"""
 	def __init__(self, user):
 		"""
 		:param app.models.User user
@@ -36,12 +41,16 @@ class UserViewModel:
 		if day is None:
 			return 0.0, 0.0
 
+		# Compute average progress this week
 		total_progress = day.computed_progress
 		weekday = TODAY.weekday()
-		for i in range(1, weekday):
+		sunday = weekday - (weekday % 7)
+		days_so_far = (weekday - sunday) + 1
+		for i in range(1, days_so_far):
 			d = user.days.filter(Day.date == (day.date - timedelta(days=i))).first()
-			total_progress += d.computed_progress
-		weekly_avg = total_progress / (weekday + 1) if total_progress > 0 else 0
+			if not d is None:
+				total_progress += d.computed_progress
+		weekly_avg = total_progress / (weekday + 1)
 
 		return day.computed_progress * 100, weekly_avg * 100
 
