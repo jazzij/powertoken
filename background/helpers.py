@@ -93,8 +93,7 @@ def add_or_update_activity(activity, user):
 	if existing:
 		modified = datetime.strptime(activity["dateModified"], weconnect.DATE_FMT)
 		if modified >= datetime.now() - timedelta(days=1):
-			existing.start_time = st
-			existing.end_time = et
+			existing.name = activity["name"]
 			existing.expiration = expiration
 			session.commit()
 			status = "Updated"
@@ -102,8 +101,8 @@ def add_or_update_activity(activity, user):
 			status = False
 	else:
 		# If the activity doesn't exist in the database, adds it.
-		new = Activity(activity_id=act_id, start_time=st, end_time=et,
-				expiration=expiration, user=user)
+		new = Activity(activity_id=act_id, name=activity["name"], 
+			expiration=expiration, user=user)
 		session.add(new)
 		session.commit()
 		status = "Inserted"
