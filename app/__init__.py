@@ -4,13 +4,16 @@ Created by Abigail Franz on 3/12/2018.\n
 Last modified by Abigail Franz on 3/13/2018.
 """
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager
-from config import Config
 import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
+from logging.handlers import RotatingFileHandler, SMTPHandler
+
+# Leave at the bottom of the file!
+from app import errors, models, routes
+from config import Config
+from flask import Flask
+from flask_login import LoginManager
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -47,6 +50,3 @@ if not app.debug:
 		"%(asctime)s %(levelname)4s: %(message)s [in %(pathname)s:%(lineno)d]"))
 	file_handler.setLevel(logging.WARNING)
 	app.logger.addHandler(file_handler)
-
-# Leave at the bottom of the file!
-from app import routes, errors, models
