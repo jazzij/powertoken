@@ -200,7 +200,7 @@ def admin_login():
 	if form.validate_on_submit():
 		admin = Admin.query.filter_by(username=form.username.data).first()
 		if admin is None or not admin.check_password(form.password.data):
-			return redirect(url_for("admin_login"), next=request.args.get("next"))
+			return redirect(url_for("admin_login", next=request.args.get("next")))
 		login_user(admin, remember=False)
 		next_page = request.args.get("next")
 		if not next_page or url_parse(next_page).netloc != '':

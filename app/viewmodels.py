@@ -3,7 +3,7 @@ Contains the view models to be used with the admin dashboard.\n
 Created by Abigail Franz on 3/19/2018.\n
 """
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.helpers import TODAY
 from app.models import Day, Log, User
 
