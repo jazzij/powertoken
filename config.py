@@ -21,4 +21,4 @@ class Config(object):
 	MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 	MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 	ADMINS = ["franz322@umn.edu"]
-	LOG_FILE = os.path.join(basedir, "data/app.log")
+	LOG_FILE = os.environ.get("LOG_PATH")
