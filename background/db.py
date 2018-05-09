@@ -9,9 +9,7 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.environ.get("DATABASE_URL") or \
-	"sqlite:///" + os.path.join(basedir, "data/pt-fade.db")
+DB_PATH = os.environ.get("DATABASE_URL")
 
 # Set up the SQLAlchemy engine and connect it to the Sqlite database.
 engine = create_engine(DB_PATH)
