@@ -101,7 +101,7 @@ def add_or_update_activity(activity, user):
 			status = False
 	else:
 		# If the activity doesn't exist in the database, adds it.
-		new = Activity(activity_id=act_id, name=activity["name"], 
+		new = Activity(wc_act_id=act_id, name=activity["name"], 
 			expiration=expiration, user=user)
 		session.add(new)
 		session.commit()
