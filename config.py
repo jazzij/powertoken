@@ -25,4 +25,4 @@ class Config(object):
 	MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 	ADMINS = ["franz322@umn.edu"]
 	LOG_FILE = os.environ.get("LOG_PATH") or \
-		os.path.join(basedir, "data/pt-fade.db")
+		os.path.join(basedir, "data/app.log")
