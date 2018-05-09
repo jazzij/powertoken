@@ -87,30 +87,26 @@ def add_or_update_activity(activity, user):
 	# Flag indicating whether or not the activity was inserted/updated
 	status = False
 
-	# Ignores the activity if it's already expired
-	if expiration <= datetime.now():
-		status = False
-	else:
-		# If the activity already exists in the database, sees if it's been
-		# modified recently. If yes, updates it. If not, ignores it.
-		existing = session.query(Activity).filter(Activity.wc_act_id == act_id).first()
-		if existing:
-			modified = datetime.strptime(activity["dateModified"], weconnect.DATE_FMT)
-			if modified >= datetime.now() - timedelta(days=1):
-				existing.start_time = st
-				existing.end_time = et
-				existing.expiration = expiration
-				session.commit()
-				status = "Updated"
-			else:
-				status = False
-		else:
-			# If the activity doesn't exist in the database, adds it.
-			new = Activity(activity_id=act_id, start_time=st, end_time=et,
-				expiration=expiration, user=user)
-			session.add(new)
+	# If the activity already exists in the database, sees if it's been
+	# modified recently. If yes, updates it. If not, ignores it.
+	existing = session.query(Activity).filter(Activity.wc_act_id == act_id).first()
+	if existing:
+		modified = datetime.strptime(activity["dateModified"], weconnect.DATE_FMT)
+		if modified >= datetime.now() - timedelta(days=1):
+			existing.start_time = st
+			existing.end_time = et
+			existing.expiration = expiration
 			session.commit()
-			status = "Inserted"
+			status = "Updated"
+		else:
+			status = False
+	else:
+		# If the activity doesn't exist in the database, adds it.
+		new = Activity(activity_id=act_id, start_time=st, end_time=et,
+				expiration=expiration, user=user)
+		session.add(new)
+		session.commit()
+		status = "Inserted"
 
 	return status
 

@@ -169,6 +169,11 @@ def user_activities():
 	# GET: Set up the form for activity weighting and render the page.
 	elif request.method == "GET":
 		for act in user.activities.all():
+			# Don't show the user expired activities (but they still need to be
+			# in the database).
+			if act.expiration < datetime.now():
+				continue
+
 			# The append_entry method only takes a MultiDict data structure.
 			d = MultiDict([("wc_act_id", act.wc_act_id), ("act_name", act.name),
 					("weight", act.weight)])
