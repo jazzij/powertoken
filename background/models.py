@@ -10,7 +10,6 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Float, Boo
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-DB_PATH = "data/pt.db"
 Base = declarative_base()
 
 class Admin(Base):
