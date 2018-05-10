@@ -23,6 +23,7 @@ class Config(object):
 	MAIL_USE_TLS = int(os.environ.get("MAIL_USE_TLS") or 0)
 	MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
 	MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-	ADMINS = ["franz322@umn.edu"]
+	#ADMINS = ["franz322@umn.edu"]
+	ADMINS = os.environ.get("PT_ADMINS").split(",")
 	LOG_FILE = os.environ.get("LOG_PATH") or \
 		os.path.join(basedir, "data/app.log")

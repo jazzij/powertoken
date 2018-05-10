@@ -1,11 +1,8 @@
 __pycache__/*
 .vscode/*
 data/*
-logs/*
 migrations/*
 venv/*
-csrf
-*.bat
 *.ini
 *.pyc
 *.sh
