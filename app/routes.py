@@ -3,6 +3,7 @@ Handles routing and form processing for the PowerToken Flask app.\n
 Created by Jasmine Jones in 11/2017.\n
 Last modified by Abigail Franz on 5/2/2018.
 """
+import logging, sys
 
 from datetime import datetime
 from flask import redirect, render_template, request, url_for
@@ -10,11 +11,13 @@ from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
 from werkzeug.datastructures import MultiDict
 from app import app, db
-from app.helpers import login_to_wc, complete_fb_login, get_wc_activities
+from app.helpers import login_to_wc, complete_fb_login, get_wc_activities, check_wc_token_status
 from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
 		UserWcLoginForm, UserActivityForm)
 from app.models import Activity, Admin, Error, Log, User
 from app.viewmodels import LogViewModel, UserViewModel
+
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 @app.route("/")
 @app.route("/index")
@@ -46,11 +49,18 @@ def user_login():
 			db.session.add(user)
 			db.session.commit()
 			return redirect(url_for("user_wc_login", username=username))
+		
 			
 		# If the user exists in the database, but the WEconnect (or Fitbit)
 		# info isn't filled out, redirect to the WEconnect login.
 		if any([not user.wc_id, not user.wc_token, not user.fb_token]):
 			return redirect(url_for("user_wc_login", username=username))
+		
+		#TODO Add token expiry check here
+		# If user exists in the db, but token returns an error, then login again to refresh 
+		if not check_wc_token_status(username):
+			return redirect(url_for("user_wc_login", username=username))
+			
 			
 		# If the user exists in the database, and the WEconnect and Fitbit info
 		# is already filled out, bypass the login process.
@@ -65,6 +75,7 @@ def user_login():
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
+
 	form = UserWcLoginForm()
 
 	# POST: Process the WEconnect login form.
@@ -88,19 +99,21 @@ def user_wc_login():
 		# login to external WEconnect server.
 		email = form.email.data
 		password = form.password.data
-		successful_result = login_to_wc(email, password)
+		success, result = login_to_wc(email, password)
 
 		# If the username or password is incorrect, prompt the user to re-enter
 		# credentials.
-		if not successful_result:
+		if not success:
 			error = "Incorrect username or password"
 			return render_template("user_wc_login.html", form=form, error=error)
 
 		# If the login was successful, store the WEconnect ID and access token
 		# in the database, pull the user's WEconnect activities into the
 		# database, and redirect to the Fitbit login.
-		user.wc_id = successful_result[0]
-		user.wc_token = successful_result[1]
+		user.wc_id = result[0]
+		user.wc_token = result[1]
+		logging.info("Adding User {}".format(user.wc_id))
+		
 		try:
 			db.session.commit()
 		except:
@@ -144,6 +157,14 @@ def user_fb_login():
 		username = request.args.get("username")
 		return render_template("user_fb_login.html", username=username)
 
+@app.route("/user_refresh", methods=["GET", "POST"])
+def refresh_tokens():
+	# GET PT USERNAME
+	username = request.args.get("username")
+	return redirect(url_for("user_wc_login", username=username))
+	
+	
+
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
 	username = request.args.get("username")
@@ -179,7 +200,9 @@ def user_activities():
 					("weight", act.weight)])
 			form.activities.append_entry(data=d)
 		return render_template("user_activities.html", form=form)
-
+"""
+ADMIN
+"""
 @app.route("/admin")
 @app.route("/admin/")
 @app.route("/admin/index")
@@ -254,7 +277,7 @@ def admin_user_stats():
 	return render_template("admin_user_stats.html", user_vms=user_vms)
 
 @app.route("/admin/system_logs")
-@login_required
+#@login_required
 def admin_system_logs():
 	syslogs = Error.query.all()
 	return render_template("admin_system_logs.html", syslogs=syslogs)
@@ -275,3 +298,36 @@ def admin_instructions():
 @login_required
 def admin_help():
 	return "Not implemented."
+
+@app.route("/admin/test")
+def admin_test():
+	users = User.query.order_by(User.registered_on).all()
+	user_vms = [UserViewModel(user) for user in users]
+	return render_template("admin_user_stats.html", user_vms=user_vms)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

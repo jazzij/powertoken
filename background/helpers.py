@@ -11,6 +11,19 @@ import weconnect
 
 TODAY = datetime.combine(datetime.now().date(), time(0, 0, 0))
 
+def delete_all_content():
+	try:
+		session.query(Log).delete()
+		session.query(Event).delete()
+		session.query(Activity).delete()
+		session.query(Day).delete()
+		session.query(User).delete()
+
+		db.session.commit()
+	except:
+		db.session.rollback()
+	
+
 def remove_incomplete_users():
 	"""
 	Go through the users table of the database and check 2 things:
@@ -19,9 +32,10 @@ def remove_incomplete_users():
 	Remove all users who do not meet these criteria, and any other records that
 	belong to the deleted users.
 	"""
-	# TODO: Make sure all access tokens are unexpired.
+	""" #1 """
 	users = session.query(User).all()
 	for user in users:
+		
 		if not all([user.username, user.wc_id, user.wc_token, user.fb_token]):
 			activities = user.activities.all()
 			for activity in activities:
@@ -34,6 +48,7 @@ def remove_incomplete_users():
 				session.delete(day)
 			session.delete(user)
 	session.commit()
+
 
 # Make sure no activities are expired
 def remove_expired_activities():
@@ -203,7 +218,7 @@ def compute_possible_score(day):
     return score
 
 def compute_days_progress(day):
-	"""
+	""" FADE VERSION
 	Compute the user's actual progress (decimal) on a particular day. The
 	algorithm essentially allows progress from activities with weights of 5 to
 	persist for 5 days, 4 for 4 days, etc. If the final percentage is more than
@@ -243,4 +258,19 @@ def compute_days_progress(day):
 	possible_score = compute_possible_score(day)
 	computed_score = float(score) / float(possible_score) if score < possible_score else 1.0
 	return float(score) / float(possible_score)
+	
+def compute_days_progress_tally(day):
+	''' TALLY
+	Get current progress, compare with possible progress for that day.
+	Return a percentage of progress completed for display on fitbit
+	'''
+	
+	total_activities = day.events.all() #BUG HERE: list object has no attribte events
+	complete_activities = day.events.filter(Event.complete).all() #BUG HERE: Event has no attribute complete
+	current_score = float(len(complete_activities) / len(total_activities))
+	return float(current_score)
+		
+
+
+
 	

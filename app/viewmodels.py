@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 5/9/2018.
 
 from datetime import datetime, timedelta
 from app.helpers import TODAY
-from app.models import Day, Log, User
+from app.models import Day, Log, User, Admin
 
 class UserViewModel:
 	"""
@@ -55,7 +55,8 @@ class UserViewModel:
 		return day.computed_progress * 100, weekly_avg * 100
 
 	def __repr__(self):
-		return "<UserViewModel {}>".format(self.username)
+		return "<UserViewModel {},{}>".format(self.username, self.last_check_in)
+
 
 class LogViewModel:
 	def __init__(self, log):
@@ -70,3 +71,14 @@ class LogViewModel:
 
 	def __repr__(self):
 		return "<LogViewModel {} at {}>".format(self.username, self.timestamp)
+		
+		
+		
+class AdminViewModel:
+	def __init__(self, admin):
+		self.id = admin.id
+		self.username = admin.username
+		self.email = admin.email
+	
+	def __repr__(self):
+		return "<AdminViewModel {}, {}>".format(self.username, self.email)

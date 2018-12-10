@@ -3,11 +3,14 @@ Contains various helpers for use by the Flask application.\n
 Created by Abigail Franz on 3/13/2018\.n
 Last modified by Abigail Franz on 5/5/2018.
 """
-
+import logging, sys
 import json, requests
 from datetime import datetime, timedelta, MAXYEAR
 from app import db
 from app.models import Activity
+
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+
 
 WC_URL = "https://palalinq.herokuapp.com/api/People"
 WC_DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -26,11 +29,31 @@ def login_to_wc(email, password):
 	data = {"email": email, "password": password}
 	result = requests.post(url, data=data)
 	if result.status_code != 200:
-		return False
+		return False, ()
+		
 	jres = result.json()
 	wc_id = str(jres["accessToken"]["userId"])
 	wc_token = str(jres["accessToken"]["id"])
-	return (wc_id, wc_token)
+	logging.debug("WC Login attempt returns: {}".format(wc_id))
+	if wc_id is None:
+		return False, ()
+	else:
+		return True, (wc_id, wc_token)
+
+def check_wc_token_status(wc_user_id):
+	logging.info("CHECKING STATUS")
+	"""
+		CHECK TOKEN STATUS (401 AUTH ERROR)
+	"""
+	url = "{}/{}".format(WC_URL, wc_user_id) 
+	result = requests.post(url)
+	if result.status_code != 200:
+		logging.info("Response: {}").format( "Token invalid" if result.status_code == 404 else result.status_code)
+		return False
+	else:
+		logging.info("Token for User {} is good").format(wc_user_id)
+		return True
+
 
 def get_wc_activities(user):
 	"""
@@ -53,8 +76,9 @@ def get_wc_activities(user):
 		if activity.expiration > datetime.now():
 			# Add the activity to the database if it's unexpired.
 			db.session.add(activity)
-			db.session.commit()
 			acts.append(activity)
+	db.session.commit()
+	
 	return acts
 	
 def wc_json_to_db(wc_act, user):

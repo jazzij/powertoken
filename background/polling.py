@@ -7,7 +7,7 @@ Last modified by Abigail Franz on 5/7/2018.
 
 from db import session
 import fitbit
-from helpers import compute_days_progress
+from helpers import compute_days_progress, compute_days_progress_tally
 from models import Activity, Event, Log, User
 import weconnect
 
@@ -23,21 +23,28 @@ def poll_and_update():
 	"""
 	users = session.query(User).all()
 	for user in users:
+		print("polling for {}".format(user))
 		# API call to WEconnect activities-with-events
 		activity_events = weconnect.get_todays_events(user)
+		print( activity_events)
+		
+		# Keep track in DB of which events have didCheckin set to True
+		#for activity in activity_events:
+		#	for ev in activity["events"]:
+		#		if ev["didCheckin"]:
+		#			event = session.query(Event).filter(Event.eid == ev["eid"]).first()
+		#			event.completed = True
+		#			print("{} completed".format(event))
+		#session.commit()
 
-		# Keep track of which events have didCheckin set to True
-		for activity in activity_events:
-			for ev in activity["events"]:
-				if ev["didCheckin"]:
-					event = session.query(Event).filter(Event.eid == ev["eid"]).first()
-					event.completed = True
-					print("{} completed".format(event))
-		session.commit()
-
-		# Compute progress with fade algorithm
+		# Compute progress with fade or tally algorithm
 		thisday = user.thisday()
-		progress = compute_days_progress(thisday)
+		print("User: {}, Day: {}".format(user, user.id))
+		#progress = compute_days_progress(thisday) #FADE
+		progress = compute_days_progress_tally(thisday) #TALLY 
+		#progress = compute_days_progress_tally(activity_events) **BUG IS HERE
+		
+		
 		print("Progress is {}".format(progress))
 		if not thisday.computed_progress == progress:
 			# Update today's Day object in the database
@@ -49,6 +56,8 @@ def poll_and_update():
 
 			# Add a Log object to the database
 			log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
+
+
 
 if __name__ == "__main__":
 	poll_and_update()
