@@ -1,0 +1,25 @@
+{% extends "user_layout.html" %}
+{% block content %}
+	<div class="card">
+		<p>
+			Choose a username. It can be a nickname or whatever you like. Other PowerToken
+			users will not see your username; it is your anonymous identity, seen only by 
+			the researchers. If you've already signed up, enter the username you chose. 
+			Make sure to remember your username.
+		</p>
+		<form action="" method="post">
+			{{form.hidden_tag()}}
+			<div class="row pt-form-group">
+				<div class="col-sm-4">{{form.username.label}}</div>
+				<div class="col-sm-8">{{form.username(size=32)}}</div>
+			</div>
+			<div class="row pt-form-group">
+				<div class="col-sm-4">&nbsp;</div>
+				<div class="col-sm-8">{{form.submit()}}</div>
+			</div>
+		</form>
+		{% if error %}
+			<p class="warning">{{error}}</p>
+		{% endif %}
+	</div>
+{% endblock %}
