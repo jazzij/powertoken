@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 5/5/2018.
 import logging, sys
 import json, requests
 from datetime import datetime, timedelta, MAXYEAR
-from app import db
+from background import db
 from app.models import Activity
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -21,6 +21,9 @@ def login_to_wc(email, password):
 	Log user into WEconnect, produce an ID and access token that will last 90
 	days. Return False if the login was unsuccessful; otherwise, return the ID
 	and token in a tuple.
+	
+	Assumptions: People already have a WeConnect account (email)
+	Outcome: all successful login requests return a id, and NEW access token
 
 	:param String email: the user's WEconnect username (email address)
 	:param String password: the user's WEconnect password
@@ -40,18 +43,19 @@ def login_to_wc(email, password):
 	else:
 		return True, (wc_id, wc_token)
 
-def check_wc_token_status(wc_user_id):
+def check_wc_token_status(wc_user_id, wc_token):
 	logging.info("CHECKING STATUS")
 	"""
 		CHECK TOKEN STATUS (401 AUTH ERROR)
 	"""
-	url = "{}/{}".format(WC_URL, wc_user_id) 
-	result = requests.post(url)
+	url = "{}/{}?access_token={}".format(WC_URL, wc_user_id, wc_token) 
+	result = requests.get(url)
+	logging.debug("Result: {}".format(result.status_code))
 	if result.status_code != 200:
-		logging.info("Response: {}").format( "Token invalid" if result.status_code == 404 else result.status_code)
+		print("Response: {}").format("Token invalid" if result.status_code == 401 else result.status_code)
 		return False
 	else:
-		logging.info("Token for User {} is good").format(wc_user_id)
+		print("Token for User {} is good").format(wc_user_id)
 		return True
 
 
@@ -70,6 +74,9 @@ def get_wc_activities(user):
 		# Return an empty list if the request was unsuccessful
 		return []
 	parsed = response.json()
+
+	#TODO: EVERYTHING PAST HERE MODIFIED TO use WECONNECT.PY
+	# Data to use: user, activity
 	acts = []
 	for item in parsed:
 		activity = wc_json_to_db(item, user)

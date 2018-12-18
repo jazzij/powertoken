@@ -6,7 +6,7 @@ Last modified by Abigail Franz on 5/9/2018.
 
 from datetime import datetime, timedelta
 from app.helpers import TODAY
-from app.models import Day, Log, User, Admin
+from app.models import Day, Log, User, Admin, Event, Activity
 
 class UserViewModel:
 	"""
@@ -52,11 +52,42 @@ class UserViewModel:
 				total_progress += d.computed_progress
 		weekly_avg = total_progress / (weekday + 1)
 
+		#returns both daily progress and weekly progress
 		return day.computed_progress * 100, weekly_avg * 100
 
 	def __repr__(self):
 		return "<UserViewModel {},{}>".format(self.username, self.last_check_in)
 
+
+class ActivityViewModel:
+	def __init__(self, activity):
+		self.id = activity.wc_act_id
+		self.name = activity.name
+		self.expiration = activity.expiration
+		self.isExpired = _isExpired()
+		self.weight = activity.weight
+		self.user = activity.user
+		self.completion_rate = 0 #TODO
+	
+	def _isExpired():
+		return self.expiration < datetime.now()
+
+	def _completedActivityEvents():
+		pass	
+
+class EventLogViewModel:
+	def __init__(self, event):
+		self.id = event.id
+		self.activity_id = event.activity_id
+		self.act_name = event.activity.name
+		self.completed = event.completed
+		self.user_id = event.activity.user_id
+		self.start_time = event.start_time
+		self.end_time = event.end_time
+
+
+	def __repr__(self):
+		return "<EventLogViewModel {}, instance of {} is {}>".format(self.id, self.activity_id, ("completed" if self.completed else "not completed"))
 
 class LogViewModel:
 	def __init__(self, log):

@@ -11,17 +11,21 @@ import weconnect
 
 TODAY = datetime.combine(datetime.now().date(), time(0, 0, 0))
 
-def delete_all_content():
-	try:
-		session.query(Log).delete()
-		session.query(Event).delete()
-		session.query(Activity).delete()
-		session.query(Day).delete()
-		session.query(User).delete()
+def formatDate(dateStr):
+	"""convert WC JSON date to date object for databse"""
+	return datetime.strptime(dateStr, weconnect.DATE_FMT)
 
-		db.session.commit()
+def delete_all_content():
+	session.query(Log).delete()
+	session.query(Event).delete()
+	session.query(Activity).delete()
+	session.query(Day).delete()
+	session.query(User).delete()
+	
+	try:
+		session.commit()
 	except:
-		db.session.rollback()
+		session.rollback()
 	
 
 def remove_incomplete_users():
