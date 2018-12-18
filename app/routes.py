@@ -11,11 +11,12 @@ from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
 from werkzeug.datastructures import MultiDict
 from app import app, db
-from app.helpers import login_to_wc, complete_fb_login, get_wc_activities, check_wc_token_status
+from app.weconnect import check_wc_token_status, login_to_wc, set_wc_activities
+from app.helpers import complete_fb_login
 from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
 		UserWcLoginForm, UserActivityForm)
 from app.models import Activity, Admin, Error, Log, User
-from app.viewmodels import LogViewModel, UserViewModel
+from app.viewmodels import LogViewModel, UserViewModel, ActivityViewModel, EventLogViewModel
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
@@ -58,7 +59,7 @@ def user_login():
 		
 		#TODO Add token expiry check here
 		# If user exists in the db, but token returns an error, then login again to refresh 
-		if not check_wc_token_status(username):
+		if not check_wc_token_status(user.wc_id, user.wc_token):
 			return redirect(url_for("user_wc_login", username=username))
 			
 			
@@ -89,7 +90,8 @@ def user_wc_login():
 
 		# Get the user with that username from the database.
 		user = User.query.filter_by(username=username).first()
-
+		priorUser = user is not None
+		
 		# If the user with that username isn't in the database for whatever
 		# reason, go back to the PowerToken login page.
 		if user is None:
@@ -119,7 +121,10 @@ def user_wc_login():
 		except:
 			error = "A user with the same WEconnect credentials already exists"
 			return render_template("user_wc_login.html", form=form, error=error)
-		get_wc_activities(user)
+		
+		#TODO: CHECK TO MAKE SURE THIS WORKS. only execute when there is an new user
+		if not priorUser:
+			set_wc_activities(user)
 		return redirect(url_for("user_fb_login", username=username))
 
 	# GET: Render the WEconnect login page.
@@ -147,7 +152,11 @@ def user_fb_login():
 		
 		# If everything is okay so far, add the Fitbit token to the database.
 		user.fb_token = fb_token
-		db.session.commit()
+		
+		try:
+			db.session.commit()
+		except:
+			db.rollback()
 
 		# This code will never be called but must be present.
 		return render_template("user_home.html", username=username)
@@ -209,6 +218,9 @@ ADMIN
 @app.route("/admin/home")
 @login_required
 def admin_home():
+	'''
+	Home: Display list of users with user data
+	'''
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
 	return render_template("admin_home.html", user_vms=user_vms)
@@ -274,7 +286,17 @@ def admin_progress_logs():
 def admin_user_stats():
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
+	
 	return render_template("admin_user_stats.html", user_vms=user_vms)
+
+@app.route("/admin/event_stats")
+@login_required
+def admin_event_stats():
+	events = Event.query.all()
+	event_vms = [EventLogViewModel(event) for event in events]
+	
+	return render_template("admin_event_stats.html", event_vms=event_vms)
+
 
 @app.route("/admin/system_logs")
 #@login_required
