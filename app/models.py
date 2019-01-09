@@ -7,11 +7,11 @@ Last modified by Abigail Franz on 4/16/2018.
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from app import db, login
+#from flask_sqlalchemy import SQLAlchemy
 
-@login.user_loader
-def load_admin(id):
-	return Admin.query.get(int(id))
+from app import db
+#db = SQLAlchemy()
+
 
 class User(db.Model):
 	"""

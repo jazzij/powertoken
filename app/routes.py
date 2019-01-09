@@ -4,68 +4,43 @@ Created by Jasmine Jones in 11/2017.\n
 Last modified by Abigail Franz on 5/2/2018.
 """
 import logging, sys
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 from datetime import datetime
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
 from werkzeug.datastructures import MultiDict
-from app import app, db
-from app.weconnect import check_wc_token_status, login_to_wc, set_wc_activities
-from app.helpers import complete_fb_login
-from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
-		UserWcLoginForm, UserActivityForm)
-from app.models import Activity, Admin, Error, Log, User
-from app.viewmodels import LogViewModel, UserViewModel, ActivityViewModel, EventLogViewModel
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+from powertoken import app
+#from app.weconnect import check_wc_token_status, login_to_wc, set_wc_activities
+#from app.helpers import complete_fb_login
+#from powertoken.forms import AdminLoginForm, AdminRegistrationForm, UserLoginForm, UserWcLoginForm, UserActivityForm
+#from app.models import Activity, Admin, Error, Log, User
+#from app.viewmodels import LogViewModel, UserViewModel, ActivityViewModel, EventLogViewModel
+
 
 @app.route("/")
 @app.route("/index")
 @app.route("/home")
 def user_home():
-	username = request.args.get("username")
-
+	return  "Hello world"
+	username = request.args.get("username") or "TEST"
+	
 	# If the user isn't logged in, redirect to the PowerToken login.
 	if username is None:
 		return redirect(url_for("user_login"))
 
 	# If the user is logged in, show the welcome page.
-	else:
-		return render_template("user_home.html", username=username)
+	return render_template("user_home.html", username=username)
+
+
 
 @app.route("/user_login", methods=["GET", "POST"])
 def user_login():
 	form = UserLoginForm()
-
-	# POST: Process the PowerToken login form.
-	if form.validate_on_submit():
-		username = form.username.data
-		user = User.query.filter_by(username=username).first()
-
-		# If the user has not been added to the database, add the user to the
-		# database and redirect to the WEconnect login.
-		if user is None:
-			user = User(username=username)
-			db.session.add(user)
-			db.session.commit()
-			return redirect(url_for("user_wc_login", username=username))
-		
-			
-		# If the user exists in the database, but the WEconnect (or Fitbit)
-		# info isn't filled out, redirect to the WEconnect login.
-		if any([not user.wc_id, not user.wc_token, not user.fb_token]):
-			return redirect(url_for("user_wc_login", username=username))
-		
-		#TODO Add token expiry check here
-		# If user exists in the db, but token returns an error, then login again to refresh 
-		if not check_wc_token_status(user.wc_id, user.wc_token):
-			return redirect(url_for("user_wc_login", username=username))
-			
-			
-		# If the user exists in the database, and the WEconnect and Fitbit info
-		# is already filled out, bypass the login process.
-		return redirect(url_for("user_home", username=username))
+	
+	#POST ...
 
 	# GET: Render the PowerToken login page.
 	error = request.args.get("error")
@@ -76,13 +51,12 @@ def user_login():
 
 @app.route("/user_wc_login", methods=["GET", "POST"])
 def user_wc_login():
-
 	form = UserWcLoginForm()
 
 	# POST: Process the WEconnect login form.
 	if form.validate_on_submit():
 		username = request.args.get("username")
-
+	'''
 		# If for whatever reason the username wasn't saved, return to the 
 		# original PowerToken login page.
 		if username is None:
@@ -126,17 +100,19 @@ def user_wc_login():
 		if not priorUser:
 			set_wc_activities(user)
 		return redirect(url_for("user_fb_login", username=username))
-
+		'''
 	# GET: Render the WEconnect login page.
 	return render_template("user_wc_login.html", form=form)
 
 @app.route("/user_fb_login", methods=["GET", "POST"])
 def user_fb_login():
 	# POST: Process response from external Fitbit server.
+	pass
+	'''
 	if request.method == "POST":
 		# Extract the Fitbit token and username from the response data.
 		fb_token, username = complete_fb_login(request.data)
-
+		
 		# If the username wasn't saved, return to the original PowerToken login
 		# page.
 		if username is None:
@@ -157,7 +133,7 @@ def user_fb_login():
 			db.session.commit()
 		except:
 			db.rollback()
-
+		
 		# This code will never be called but must be present.
 		return render_template("user_home.html", username=username)
 
@@ -165,24 +141,18 @@ def user_fb_login():
 	elif request.method == "GET":
 		username = request.args.get("username")
 		return render_template("user_fb_login.html", username=username)
-
-@app.route("/user_refresh", methods=["GET", "POST"])
-def refresh_tokens():
-	# GET PT USERNAME
-	username = request.args.get("username")
-	return redirect(url_for("user_wc_login", username=username))
-	
-	
+	'''
 
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
+	pass
 	username = request.args.get("username")
 
 	# If for whatever reason the username wasn't saved, go back to the 
 	# original login screen.
 	if username is None:
 		return redirect(url_for("user_login", error="Invalid username"))
-
+	'''
 	user = User.query.filter_by(username=username).first()
 	form = UserActivityForm()
 
@@ -195,9 +165,10 @@ def user_activities():
 			activity.weight = entry.weight.data
 		db.session.commit()
 		return redirect(url_for("user_home", username=username))
-
+	'''
+	
 	# GET: Set up the form for activity weighting and render the page.
-	elif request.method == "GET":
+'''	elif request.method == "GET":
 		for act in user.activities.all():
 			# Don't show the user expired activities (but they still need to be
 			# in the database).
@@ -208,29 +179,40 @@ def user_activities():
 			d = MultiDict([("wc_act_id", act.wc_act_id), ("act_name", act.name),
 					("weight", act.weight)])
 			form.activities.append_entry(data=d)
-		return render_template("user_activities.html", form=form)
+		return render_template("user_activities.html", form=form)'''
 """
 ADMIN
 """
+'''
+@login.user_loader
+def load_admin(id):
+	return Admin.query.get(int(id))
+'''
+
 @app.route("/admin")
 @app.route("/admin/")
 @app.route("/admin/index")
 @app.route("/admin/home")
 @login_required
 def admin_home():
+	pass
 	'''
 	Home: Display list of users with user data
 	'''
+	'''
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
+	
 	return render_template("admin_home.html", user_vms=user_vms)
+	'''
 
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
+	pass
 	if current_user.is_authenticated:
 		return redirect(url_for("admin_home"))
 	form = AdminLoginForm()
-
+'''
 	# POST: If a valid form was submitted
 	if form.validate_on_submit():
 		admin = Admin.query.filter_by(username=form.username.data).first()
@@ -244,6 +226,7 @@ def admin_login():
 
 	# GET: Renders the admin login template.
 	return render_template("admin_login.html", form=form)
+	'''
 
 @app.route("/admin/logout")
 def admin_logout():
@@ -252,13 +235,14 @@ def admin_logout():
 
 @app.route("/admin/register", methods=["GET", "POST"])
 def admin_register():
+	pass
 	# If a user who's already logged in tries to register, send him/her to the
 	# homepage.
 	if current_user.is_authenticated:
 		return redirect(url_for("admin_home"))
 
 	form = AdminRegistrationForm()
-
+	'''
 	# POST: Process the admin registration form.
 	if form.validate_on_submit():
 		admin = Admin(username=form.username.data, email=form.email.data)
@@ -270,39 +254,49 @@ def admin_register():
 		if not next_page or url_parse(next_page).netloc != '':
 			next_page = url_for("admin_home")
 		return redirect(next_page)
-
+	
 	# GET: Render the admin login page.
-	return render_template("admin_register.html", form=form)
+	return render_template("admin_register.html", form=form)'''
 
 @app.route("/admin/progress_logs")
 @login_required
 def admin_progress_logs():
+	'''	
 	logs = Log.query.order_by(Log.timestamp.desc()).all()
 	log_vms = [LogViewModel(log) for log in logs]
 	return render_template("admin_progress_logs.html", log_vms=log_vms)
-
+	'''
+	pass
 @app.route("/admin/user_stats")
 @login_required
 def admin_user_stats():
+	'''	
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
 	
 	return render_template("admin_user_stats.html", user_vms=user_vms)
-
+	'''
+	pass
+	
 @app.route("/admin/event_stats")
 @login_required
 def admin_event_stats():
+	'''	
 	events = Event.query.all()
 	event_vms = [EventLogViewModel(event) for event in events]
 	
 	return render_template("admin_event_stats.html", event_vms=event_vms)
-
+	'''
+	pass
 
 @app.route("/admin/system_logs")
 #@login_required
 def admin_system_logs():
+	'''
 	syslogs = Error.query.all()
 	return render_template("admin_system_logs.html", syslogs=syslogs)
+	'''
+	pass
 
 # TODO: Put PowerToken setup instructions here (or just link to the document,
 # which can be found in the GroupLens Google Drive under Meetings >
@@ -323,13 +317,22 @@ def admin_help():
 
 @app.route("/admin/test")
 def admin_test():
+	'''	
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
 	return render_template("admin_user_stats.html", user_vms=user_vms)
+	'''
+	pass
 
 
+@app.errorhandler(404)
+def not_found_error(error):
+	return render_template("404.html"), 404
 
-
+@app.errorhandler(500)
+def internal_error(error):
+	db.session.rollback()
+	return render_template("500.html"), 500
 
 
 
