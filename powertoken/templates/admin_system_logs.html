@@ -1,0 +1,21 @@
+{% extends "admin_layout.html" %}
+{% block content %}
+    <table class="table table-responsive-sm pt-table-striped pt-err-table">
+        <tr>
+            <th>User</th>
+            <th>Timestamp</th>
+            <th>Summary</th>
+            <th>Origin</th>
+            <th>Message</th>
+        </tr>
+        {% for err in syslogs %}
+            <tr>
+                <td>{{err.user.username}}</td>
+                <td>{{err.timestamp}}</td>
+                <td>{{err.summary}}</td>
+                <td>{{err.origin}}</td>
+                <td>{{err.message}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
