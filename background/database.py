@@ -24,8 +24,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 #from sqlalchemy.ext.declarative import declarative_base
 from data.models import metadata
 
-basedir = os.path.abspath(os.path.curdir)
-DB_PATH = "sqlite:///" + os.path.join(basedir, "data/pt_data.db")
+#basedir = os.path.abspath(os.path.curdir)
+#DB_PATH = "sqlite:///" + os.path.join(basedir, "data/pt_data.db")
+DB_PATH = "sqlite:///" + os.environ.get("DB_PATH")
 
 # Set up the SQLAlchemy engine and connect it to the Sqlite database
 #using poolclass=NullPool makes it so that the entire connection to the database is cut when the session is closed
@@ -48,7 +49,7 @@ def printTables():
 	tables = metadata.tables
 	print(tables['activity'])
 	print(tables['user'])
-	print(tables['event']
+	print(tables['event'])
 		
 def closeConnection():
 	'''Use this function to kill all threads and make sure the sessions are closed

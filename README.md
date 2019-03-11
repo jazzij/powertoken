@@ -24,7 +24,7 @@ The code for this project is licensed under the MIT License.
 
 FOLDER STRUCTURE
 /powertoken
-	data/ --> pt.db
+	data/ --> pt_data.db
 	background/
 	setup.py 
 	requirements.txt
@@ -56,14 +56,14 @@ MAIL_USERNAME
 MAIL_PASSWORD
 PT_ADMINS (admin email addresses you'd like to get)
 LOG_PATH
-
+DB_PATH (from the directory that contains powertoken, $PWD/powertoken/data/pt_data.db)
 
 HOW TO CREATE DB
 from python interpreter (same level as powertoken/):
->> from powertoken.database import init_db
+>> from background.database import init_db
 >> init_db()
 OR via FLASK
-go to localhost:xxx/createDB
+go to localhost:xxxx/createDB
 
 
 
