@@ -62,5 +62,10 @@ HOW TO CREATE DB
 from python interpreter (same level as powertoken/):
 >> from powertoken.database import init_db
 >> init_db()
+OR via FLASK
+go to localhost:xxx/createDB
+
+
+
 
 

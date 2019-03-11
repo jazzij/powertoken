@@ -19,7 +19,7 @@ import powertoken.api_util as api_util #import check_wc_token_status, login_to_w
 #from app.helpers import complete_fb_login
 from powertoken.forms import UserLoginForm, UserWcLoginForm, UserActivityForm
 #from powertoken.forms import AdminLoginForm, AdminRegistrationForm
-from powertoken.models import Activity, Admin, Error, Log, User, Event
+#from powertoken.models import Activity, Admin, Error, Log, User, Event
 #from app.viewmodels import LogViewModel, UserViewModel, ActivityViewModel, EventLogViewModel
 
 @app.route("/createDB")
@@ -109,13 +109,13 @@ def user_wc_login():
 		errormsg = db_util.wc_addInfo(username, wc_id, wc_token, activities)
 		
 		if errormsg is None:
-			logging.info("Adding User {}".format(wc_id))
+			logging.info("Added User Info for {}:{}".format(username, wc_id))
 		else:
 			return render_template("user_wc_login.html", form=form, error=errormsg)
 		
-		##TODO :	where are weights added?
+		#TODO: change order of execution to get weights added here, before FB login.
 		
-		#Fill in user activities 	
+		#Get Fitbit Token 	
 		return redirect(url_for("user_fb_login", username=username))
 			
 	# GET: Render the WEconnect login page.
@@ -163,20 +163,33 @@ def user_wc_login():
 
 @app.route("/user_fb_login", methods=["GET", "POST"])
 def user_fb_login():
+	'''
+	fyi production callback url: https://powertoken.grouplens.org/fb_login
+	test callback url: http://localhost:5000/user_fb_login
+	'''
 	# POST: Process response from external Fitbit server.
 	username = request.args.get("username")
-	return render_template("user_home.html", username=username)
-	pass
-	'''
+	#return render_template("user_home.html", username=username)
+	
 	if request.method == "POST":
 		# Extract the Fitbit token and username from the response data.
-		fb_token, username = complete_fb_login(request.data)
+		fb_token, fb_username = api_util.complete_fb_login(request.data)
 		
 		# If the username wasn't saved, return to the original PowerToken login
 		# page.
 		if username is None:
 			return redirect(url_for("user_login", error="Invalid username"))
-
+		
+		# Get the user with that username from the database. go back to login page if
+		# invalid user. This shouldn't happen but just in case.
+		if not db_util.pt_userExists(username):
+			return redirect(url_for("user_login", error="Please create user profile"))
+			
+		db_util.fb_addInfo(username, fb_token)
+		
+		return render_template("user_home.html", username=username)
+		
+		'''
 		# Get the user with that username from the database.
 		user = User.query.filter_by(username=username).first()
 
@@ -195,23 +208,49 @@ def user_fb_login():
 		
 		# This code will never be called but must be present.
 		return render_template("user_home.html", username=username)
-	
+		'''
 	# GET: Render Fitbit page, which redirects to external login.
 	elif request.method == "GET":
 		username = request.args.get("username")
 		return render_template("user_fb_login.html", username=username)
-	'''
+	
 
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
-	pass
+	''' NOTE: This function is called via js redirect from user_fb_login.html'''
 	username = request.args.get("username")
 
 	# If for whatever reason the username wasn't saved, go back to the 
 	# original login screen.
 	if username is None:
 		return redirect(url_for("user_login", error="Invalid username"))
-	'''
+	
+	if not db_util.pt_userExists(username):
+		return redirect(url_for("user_login", error="Invalid username"))
+	
+	form = UserActivityForm()
+
+	# GET: Set up the form for activity weighting and render the page.	
+	if request.method == "GET":
+		activities = db_util.wc_getUserActivities(username)	#returns list of MultiDict
+		for a in activities:
+			form.activities.append_entry(data=a)
+		return render_template("user_activities.html", form=form)
+	
+	# POST: Process the submitted activity weighting form.
+	elif request.method == "POST":
+		logging.debug(form.activities.entries)
+		act_weights = []
+		for entry in form.activities.entries:
+			# Strip '[' and ']' characters added by MultiDict representation
+			entry_id = entry.wc_act_id.data[1:-1]
+			#create and send a tuple of wc_act_id, weight
+			act_weights.append((entry_id, entry.weight.data))
+			
+		db_util.wc_addActivityWeight(username, act_weights)
+		return redirect(url_for("user_home", username=username))
+		
+	''' 
 	user = User.query.filter_by(username=username).first()
 	form = UserActivityForm()
 

@@ -1,6 +1,4 @@
 """
-DEPRECATED MARCH 2019. See Data.models for updated file
-
 Contains the models to be used with the SQLAlchemy database interface.\n
 Meant to be used by the background scripts, not the Flask app.\n
 Created by Abigail Franz on 3/12/2018.\n
@@ -8,6 +6,10 @@ Last modified by Abigail Franz on 4/30/2018.
 
 Update March 2019 -  This is a really helpful guide:
 https://stackoverflow.com/questions/41004540/using-sqlalchemy-models-in-and-out-of-flask
+
+TODO: 
+Create separate ADMIN Model for FLASK with UserMixin, Password hashing
+See models_flask.py for details on how
 """
 
 from datetime import datetime
@@ -88,7 +90,7 @@ class Activity(Base):
 	name = Column(String(256))
 	expiration = Column(DateTime, index=True)
 	weight = Column(Integer, default=1)
-	user_id = Column(Integer, ForeignKey("user.id"))
+	user_id = Column(Integer, ForeignKey("user.wc_id"))
 	events = relationship("Event", backref="activity", lazy="dynamic")
 
 	def __repr__(self):
@@ -136,7 +138,7 @@ class Event(Base):
 	end_time = Column(DateTime)	# Date portion is ignored
 	completed = Column(Boolean)
 	day_id = Column(Integer, ForeignKey("day.id"))
-	activity_id = Column(Integer, ForeignKey("activity.id"))
+	activity_id = Column(Integer, ForeignKey("activity.wc_act_id"))
 
 	def __repr__(self):
 		output = "<Event '{}' at {}>".format(self.activity.name, 

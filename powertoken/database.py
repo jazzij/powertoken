@@ -1,4 +1,5 @@
 """
+>> DEPRECATED MARCH 2019. FIND UPDATED file in ~/background/database.py
 Database.py
 Initialization and such, as described by 
 http://flask.pocoo.org/docs/1.0/patterns/sqlalchemy/

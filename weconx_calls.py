@@ -92,7 +92,7 @@ try:
 	pw = args['password']
 	token, userInfo = login( user, pw)
 	print( "Token: ", token)
-	#print( "User ID: ", userInfo["userId"])
+	print( "User ID: ", userInfo["userId"])
 	
 	#print ( getUserActivities( str(userInfo["userId"]), str(token)))
 	#print (getUserActivitiesProgress(str(userInfo["userId"]), str(token), ))

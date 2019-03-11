@@ -1,130 +1,149 @@
 """
+DEPRECATED MARCH 2019 - See data.models for updated file
+
 Contains the models to be used with the SQLAlchemy database interface.\n
+Meant to be used by the background scripts, not the Flask app.\n
 Created by Abigail Franz on 3/12/2018.\n
-Last modified by Abigail Franz on 4/16/2018.
+Last modified by Abigail Franz on 4/30/2018.
+
+Update March 2019 -  This is a really helpful guide:
+https://stackoverflow.com/questions/41004540/using-sqlalchemy-models-in-and-out-of-flask
 """
 
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from sqlalchemy import MetaData, Column, ForeignKey, Integer, String, DateTime, Float, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
-from powertoken import db
+metadata = MetaData()
+Base = declarative_base(metadata=metadata)
 
-class User(db.Model):
-	"""
-	Represents a PowerToken user who is in recovery.
-	Combines WeConnect User and Fitbit User Information
-	"""
-	id = db.Column(db.Integer, primary_key=True)
-	username = db.Column(db.String(64), index=True, unique=True)
-	registered_on = db.Column(db.DateTime, index=True, default=datetime.now())
-	goal_period = db.Column(db.String(16), default="daily")
-	wc_id = db.Column(db.Integer, unique=True)
-	wc_token = db.Column(db.String(128))
-	fb_token = db.Column(db.String(256))
-	logs = db.relationship("Log", backref="user", lazy="dynamic")
-	activities = db.relationship("Activity", backref="user", lazy="dynamic")
-	errors = db.relationship("Error", backref="user", lazy="dynamic")
-	days = db.relationship("Day", backref="user", lazy="dynamic")
-
-	def __repr__(self):
-		return "<User {}>".format(self.username)
-
-
-class Activity(db.Model):
-	"""
-	Represents a WEconnect activity.
-	Links to WC_user and WC_events 
-	"""
-	id = db.Column(db.Integer, primary_key=True)
-	wc_act_id = db.Column(db.Integer, index=True, unique=True)
-	name = db.Column(db.String(256))
-	expiration = db.Column(db.DateTime, index=True)
-	weight = db.Column(db.Integer, default=1)
-	user_id = db.Column(db.Integer, db.ForeignKey("user.wc_id"))
-	events = db.relationship("Event", backref="activity", lazy="dynamic")
-
-	def __repr__(self):
-		return "<Activity '{}'>".format(self.name)
-
-
-class Event(db.Model):
-	"""
-	Represents a WEconnect event (an activity on a particular date).
-	Links to WC_activities
-	"""
-	id = db.Column(db.Integer, primary_key=True)
-	eid = db.Column(db.String, index=True)
-	start_time = db.Column(db.DateTime)	# Date portion is ignored
-	completed = db.Column(db.Boolean) #Setup in polling.py for "didCheckin" == True
-	day_id = db.Column(db.Integer, db.ForeignKey("day.id"))
-	activity_id = db.Column(db.Integer, db.ForeignKey("activity.wc_act_id"))
-
-	def __repr__(self):
-		output = "<Event '{}' at {}>".format(self.eid, 
-				self.start_time.strftime("%I:%M %p"))
-		return output
-
-
-class Day(db.Model):
-	"""
-	Represents a day of progress (which activities are completed, etc).
-	Links to Powertoken User
-	Links to WC_events
-	"""
-	id = db.Column(db.Integer, primary_key=True)
-	date = db.Column(db.DateTime, index=True)
-	computed_progress = db.Column(db.Float, default=0.0)
-	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-	events = db.relationship("Event", backref="day", lazy="dynamic")
-
-	def __repr__(self):
-		return "<Day {}>".format(self.date.strftime("%Y-%m-%d"))
-
-class Admin(UserMixin, db.Model):
+class Admin(Base):
 	"""
 	Represents a PowerToken administrator, capable of viewing the admin
 	dashboard and supervising user progress.
 	"""
-	id = db.Column(db.Integer, primary_key=True)
-	username = db.Column(db.String(64), index=True, unique=True)
-	email = db.Column(db.String(120), index=True, unique=True)
-	password_hash = db.Column(db.String(128))
-
-	def set_password(self, password):
-		self.password_hash = generate_password_hash(password)
-
-	def check_password(self, password):
-		return check_password_hash(self.password_hash, password)		
+	__tablename__ = "admin"
+	id = Column(Integer, primary_key=True)
+	username = Column(String(32), nullable=False, index=True, unique=True)
+	email = Column(String(64), nullable=False, index=True, unique=True)
+	password_hash = Column(String(128))
 
 	def __repr__(self):
 		return "<Admin {}>".format(self.username)
+		
+	def __init__(self, username):
+		self.username = username
 
-class Log(db.Model):
+class User(Base):
 	"""
-	Represents a WEconnect-Fitbit progress log.
+	Represents a PowerToken user who is in recovery.
 	"""
-	id = db.Column(db.Integer, primary_key=True)
-	timestamp = db.Column(db.DateTime, index=True, default=datetime.now())
-	wc_progress = db.Column(db.Float)
-	fb_step_count = db.Column(db.Integer)
-	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+	__tablename__ = "user"
+	id = Column(Integer, primary_key=True)
+	username = Column(String(32), nullable=False, index=True, unique=True)
+	registered_on = Column(DateTime, index=True, default=datetime.now())
+	goal_period = Column(String(16), default="daily")
+	wc_id = Column(Integer, unique=True)
+	wc_token = Column(String(128))
+	fb_token = Column(String(256))
+	logs = relationship("Log", backref="user", lazy="dynamic")
+	activities = relationship("Activity", backref="user", lazy="dynamic")
+	errors = relationship("Error", backref="user", lazy="dynamic")
+	days = relationship("Day", backref="user", lazy="dynamic")
+
+	def thisday(self):
+		d = datetime.now()
+		today = datetime(d.year, d.month, d.day)
+		return self.days.filter(Day.date == today).first()
 
 	def __repr__(self):
-		timestr = self.timestamp.strftime("%Y-%m-%d %I:%M %p")
-		return "<Log {} at {}>".format(self.user.username, timestr)
+		return "<User {}>".format(self.username)
+	
+	def __init__(self, username):
+		self.username = username
 
-class Error(db.Model):
+class Log(Base):
+	"""
+	Represents a PowerToken progress log, added whenever WEconnect progress is
+	detected and Fitbit step count is updated.
+	"""
+	__tablename__ = "log"
+	id = Column(Integer, primary_key=True)
+	timestamp = Column(DateTime, index=True, default=datetime.now())
+	wc_progress = Column(Float)
+	fb_step_count = Column(Integer)
+	user_id = Column(Integer, ForeignKey("user.id"))
+
+	def __repr__(self):
+		return "<Log {}>".format(self.id)
+
+class Activity(Base):
+	"""
+	Represents a WEconnect activity.
+	"""
+	__tablename__ = "activity"
+	id = Column(Integer, primary_key=True)
+	wc_act_id = Column(Integer, index=True, unique=True)
+	name = Column(String(256))
+	expiration = Column(DateTime, index=True)
+	weight = Column(Integer, default=1)
+	user_id = Column(Integer, ForeignKey("user.id"))
+	events = relationship("Event", backref="activity", lazy="dynamic")
+
+	def __repr__(self):
+		return "<Activity '{}'>".format(self.name)
+	
+
+class Error(Base):
 	"""
 	Represents an error that occurred somewhere in the application(s).
 	"""
-	id = db.Column(db.Integer, primary_key=True)
-	timestamp = db.Column(db.DateTime, default=datetime.now())
-	summary = db.Column(db.String(64))
-	origin = db.Column(db.String(256))
-	message = db.Column(db.String(256))
-	traceback = db.Column(db.String(1048))
-	user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+	__tablename__ = "error"
+	id = Column(Integer, primary_key=True)
+	timestamp = Column(DateTime, default=datetime.now())
+	summary = Column(String(64))
+	origin = Column(String(256))
+	message = Column(String(256))
+	traceback = Column(String(1048))
+	user_id = Column(Integer, ForeignKey("user.id"))
 
 	def __repr__(self):
 		return "<Error '{}', '{}'>".format(self.summary, self.message)
+
+class Day(Base):
+	"""
+	Represents a day of progress (which activities are completed, etc).
+	"""
+	__tablename__ = "day"
+	id = Column(Integer, primary_key=True)
+	date = Column(DateTime, index=True)	# Time portion is ignored
+	computed_progress = Column(Float, default=0.0)
+	user_id = Column(Integer, ForeignKey("user.id"))
+	events = relationship("Event", backref="day", lazy="dynamic")
+
+	def __repr__(self):
+		return "<Day {}>".format(self.date.strftime("%Y-%m-%d"))
+
+class Event(Base):
+	"""
+	Represents a WEconnect event (an activity on a particular date).
+	"""
+	__tablename__ = "event"
+	id = Column(Integer, primary_key=True)
+	eid = Column(String, index=True)
+	start_time = Column(DateTime) # Date portion is ignored
+	end_time = Column(DateTime)	# Date portion is ignored
+	completed = Column(Boolean)
+	day_id = Column(Integer, ForeignKey("day.id"))
+	activity_id = Column(Integer, ForeignKey("activity.id"))
+
+	def __repr__(self):
+		output = "<Event '{}' at {}>".format(self.activity.name, 
+				self.start_time.strftime("%I:%M %p"))
+		return output
+		
+		
+if __name__ == "__main__":
+	print("Running models.py as main")
+	

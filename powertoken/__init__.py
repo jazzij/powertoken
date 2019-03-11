@@ -10,18 +10,21 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import Config	#powertoken defined configuration class
+from data.models import metadata
 
-db = SQLAlchemy()
+db = SQLAlchemy(metadata=metadata)
 migrate = Migrate()
+login = LoginManager()
 
 def create_app(config_class=Config):
 	app = Flask(__name__)
 	app.config.from_object(config_class)
 	db.init_app(app)
 	migrate.init_app(app, db)
+	login.init_app(app)
 	return app
 
 app = create_app()
 
-from powertoken.models import User, Activity, Event, Log, Day, Admin, Error
+#from powertoken.models import User, Activity, Event, Log, Day, Admin, Error
 import powertoken.routes
