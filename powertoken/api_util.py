@@ -95,7 +95,7 @@ def get_wc_activities(wc_id, wc_token):
 #def wc_json_to_db(wc_act, user):
 def wc_json_to_db(wc_act):
 	"""
-	Given a JSON activity object from WEconnect, convert it to an Activity
+	Given a JSON activity object from WEconnect, convert it to an activity dict
 	object compatible with the database.
 
 	:param dict wc_act: an activity from WEconnect in JSON format
