@@ -21,7 +21,7 @@ import traceback
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 def close_session():
-	db.session.remove()
+	db.session.close()
 
 def pt_userExists(username):
 	''' RETURNS TRUE | FALSE '''
@@ -133,7 +133,7 @@ def wc_addActivityWeight(username, activity_list):
 
 	db.session.commit()
 	
-def fb_addInfo(pt_username, fb_token):
+def fb_addInfo(username, fb_token):
 	'''
 	Save fitbit token to user profile in the database
 	@params powertoken username and fitbit token	

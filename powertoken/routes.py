@@ -173,18 +173,20 @@ def user_fb_login():
 	
 	if request.method == "POST":
 		# Extract the Fitbit token and username from the response data.
-		fb_token, fb_username = api_util.complete_fb_login(request.data)
+		fb_token, username = api_util.complete_fb_login(request.data)
 		
 		# If the username wasn't saved, return to the original PowerToken login
 		# page.
+		logging.debug("POST for Username {}".format(username))
 		if username is None:
-			return redirect(url_for("user_login", error="Invalid username"))
+			return redirect(url_for("user_login", error="No username given"))
 		
 		# Get the user with that username from the database. go back to login page if
 		# invalid user. This shouldn't happen but just in case.
 		if not db_util.pt_userExists(username):
-			return redirect(url_for("user_login", error="Please create user profile"))
+			return redirect(url_for("user_login", error="Invalid username. Please create user profile"))
 			
+		#TODO: WHY NO SAVE INFO???	
 		db_util.fb_addInfo(username, fb_token)
 		
 		return render_template("user_home.html", username=username)
