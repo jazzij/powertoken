@@ -6,8 +6,8 @@ Last modified by Abigail Franz on 4/30/2018.
 
 from datetime import datetime
 import json, logging, requests
-from db import session
-from models import Error
+from database import db_session
+from data.models import User, Error
 
 BASE_URL = "https://api.fitbit.com/1/user/-"
 DATE_FMT = "%Y-%m-%d"
@@ -143,7 +143,7 @@ def log_step_activity(user, new_step_count):
 	params = {
 		"activityId": '90013',
 		"startTime": now.strftime("%H:%M:%S"),
-		"durationMillis": 3600000,
+		"durationMillis": 3600000, 
 		"date": now.strftime("%Y-%m-%d"),
 		"distance": new_step_count,
 		"distanceUnit": "steps"
