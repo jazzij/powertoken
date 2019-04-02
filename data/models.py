@@ -141,8 +141,7 @@ class Event(Base):
 	activity_id = Column(Integer, ForeignKey("activity.wc_act_id"))
 
 	def __repr__(self):
-		output = "<Event '{}' at {}>".format(self.activity_id, 
-				self.start_time.strftime("%I:%M %p"))
+		output = "<Event '{}'>".format(self.eid)
 		return output
 		
 		
