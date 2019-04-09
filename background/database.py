@@ -25,11 +25,12 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from data.models import metadata
 
 #basedir = os.path.abspath(os.path.curdir)
-#DB_PATH = "sqlite:///" + os.path.join(basedir, "data/pt_data.db")
+DB_REL_PATH = "sqlite:///" + "data/pt_data.db"
 DB_PATH = "sqlite:///" + os.environ.get("DB_PATH")
 
 # Set up the SQLAlchemy engine and connect it to the Sqlite database
 #using poolclass=NullPool makes it so that the entire connection to the database is cut when the session is closed
+#engine = create_engine(DB_REL_PATH, poolclass=NullPool)
 engine = create_engine(DB_PATH, poolclass=NullPool)
 DBSession = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 
