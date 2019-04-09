@@ -6,10 +6,9 @@ Last modified by Jasmine Jones, 4/2019.
 
 from datetime import datetime, timedelta
 import json, logging, requests
-from database import db_session
 from data.models import User, Error
 
-BASE_URL = "https://api.fitbit.com/1/user/-/"
+BASE_URL = "https://api.fitbit.com/1/user/-"
 DATE_FMT = "%Y-%m-%d"
 DEFAULT_GOAL = 100000
 
@@ -57,7 +56,6 @@ def get_step_goal(user):
 		return response.json()["goals"]["steps"]
 	else:
 		error_msg = response.json()
-		print(error_msg)
 		error_msg = error_msg["errors"][0]
 		error = Error(
 			summary = "Couldn't get step goal.",
@@ -152,7 +150,7 @@ def delete_activity(user, log_id):
 		db_session.commit()
 		return False
 
-def log_step_activity(user, new_step_count):
+def log_step_activity(user, new_step_count, time=None):
 	""" POST
 	Log a walking activity containing the number of steps specified in
 	new_step_count. Return the new step count (0 if the POST request is
@@ -162,12 +160,13 @@ def log_step_activity(user, new_step_count):
 	:param int new_step_count
 	"""
 	url = "{}/activities.json".format(BASE_URL)
-	now = datetime.now()
+	
+	start_time = time or datetime.now()
 	params = {
 		"activityId": '90013',
-		"startTime": now.strftime("%H:%M:%S"),
+		"startTime": start_time.strftime("%H:%M:%S"),
 		"durationMillis": 60000, 
-		"date": now.strftime("%Y-%m-%d"),
+		"date": start_time.strftime("%Y-%m-%d"),
 		"distance": new_step_count,
 		"distanceUnit": "steps"
 	}
@@ -206,7 +205,6 @@ def get_logged_activities(user, afterDate=None):
 	
 	auth_headers = {"Authorization": "Bearer " + user.fb_token}
 	response = requests.get(url, headers=auth_headers, params=params)
-	print("Code {}".format(response.status_code))
 
 	if response.status_code == 200:
 		return response.json()["activities"]	
@@ -240,12 +238,18 @@ def get_dashboard_state(user, date=None):
 		return -1	
 
 if __name__ == "__main__":
+	from database import db_session
 	user = db_session.query(User).filter_by(username="jazzij").first()
-	#print( get_step_goal(user))
-	print( change_step_goal(user, 5000))
+	print( get_step_goal(user))
+	
+	before = datetime.now() - timedelta(hours = 1)
+	print( log_step_activity(user, 500, time=before))
+	print( log_step_activity(user, 200))
+	#print( change_step_goal(user, 5000))
 	#update_progress_decimal()
 	#update_progress_count()
-	#print( get_logged_activities(user))
+	print( get_logged_activities(user))
+	print(get_dashboard_state(user))
 	#print( get_daily_step_activities(user))
 	#print("A:{}, entered:{}, from:{} on {} steps:{}".format(l["activityName"], l["logType"], l["source"]["id"], l["originalStartTime"], l["steps"]))
 
