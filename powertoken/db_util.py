@@ -23,7 +23,7 @@ logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 def close_session():
 	db.session.close()
 
-def pt_userExists(username):
+def pt_userExists(username, db=db):
 	''' RETURNS TRUE | FALSE '''
 	user = db.session.query(User).filter_by(username=username).first()
 	#user= User.query.filter_by(username=username).first()
@@ -32,9 +32,9 @@ def pt_userExists(username):
 	else:
 		return True
 
-def pt_userProfileComplete(username):
+def pt_userProfileComplete(username, db=db):
 	''' RETURNS TRUE | FALSE '''
-	if pt_userExists(username):
+	if pt_userExists(username, db):
 		user= db.session.query(User).filter_by(username=username).first()
 		if any ([not user.wc_id, not user.wc_token, not user.fb_token]):
 			return False
@@ -43,11 +43,11 @@ def pt_userProfileComplete(username):
 	else:
 		return False
 
-def pt_addUser(username):
+def pt_addUser(username, db=db):
 	'''
 	Given string @param username, adds a blank powertoken user with that name to the db 
 	'''
-	if pt_userExists(username):
+	if pt_userExists(username, db):
 		return
 		
 	user= User(username=username)
@@ -62,7 +62,7 @@ def pt_addUser(username):
 		logging.debug("User {} could not be added".format(username))	
 
 	
-def wc_addInfo(username, wc_id, wc_token, activities):
+def wc_addInfo(username, wc_id, wc_token, activities, db=db):
 	'''
 	Add wc_user id, token and related activity info from WC API call to the database
 	@params username String, wc_id integer, wc_token string, activities Dict with keys=id,name,expiration
@@ -101,7 +101,7 @@ def wc_addInfo(username, wc_id, wc_token, activities):
 		return errorMsg
 
 
-def wc_getUserActivities(username):
+def wc_getUserActivities(username, db=db):
 	'''
 	Get a list of a user's activities from the database
 	Returns a MultiDict
@@ -122,7 +122,7 @@ def wc_getUserActivities(username):
 	
 	return activities
 	
-def wc_addActivityWeight(username, activity_list):
+def wc_addActivityWeight(username, activity_list, db=db):
 	'''
 	@params username string, activity_list is list of tuples [(id, weight), ...]
 	'''
@@ -133,7 +133,7 @@ def wc_addActivityWeight(username, activity_list):
 
 	db.session.commit()
 	
-def fb_addInfo(username, fb_token):
+def fb_addInfo(username, fb_token, db=db):
 	'''
 	Save fitbit token to user profile in the database
 	@params powertoken username and fitbit token	

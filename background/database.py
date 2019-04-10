@@ -21,7 +21,6 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import scoped_session, sessionmaker
-#from sqlalchemy.ext.declarative import declarative_base
 from data.models import metadata
 
 #basedir = os.path.abspath(os.path.curdir)

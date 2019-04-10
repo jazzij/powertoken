@@ -131,4 +131,5 @@ def complete_fb_login(fb_response):
 	"""
 	data_utf = fb_response.decode("utf-8")
 	data_json = json.loads(data_utf)
+	logging.debug(data_json)
 	return data_json["tok"], data_json["username"]
