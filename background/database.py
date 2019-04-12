@@ -56,7 +56,13 @@ def close_connection():
 	'''
 	db_session.close()
 
-
+def clear_db():
+	from data.models import User, Activity, Event, Log, Day, Admin, Error
+	all_events = db_session.query(Event).all()
+	all_days = db_session.query(Day).all()
+	all_activities = db_session.query(Activity).all()
+	#all_users = db_session.query(User).filter(User.fb_token is None).all()
+	all_errors = db_session.query(Error).all()
 
 
 if __name__ == "__main__":
