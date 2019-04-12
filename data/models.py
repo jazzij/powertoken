@@ -89,7 +89,7 @@ class Activity(Base):
 	wc_act_id = Column(Integer, index=True, unique=True)
 	name = Column(String(256))
 	expiration = Column(DateTime, index=True)
-	weight = Column(Integer, default=1)
+	weight = Column(Integer, default=3)
 	user_id = Column(Integer, ForeignKey("user.wc_id"))
 	events = relationship("Event", backref="activity", lazy="dynamic")
 

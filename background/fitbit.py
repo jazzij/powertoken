@@ -3,14 +3,20 @@ Contains the API calls to Fitbit.\n
 Created by Abigail Franz, Sunny Parawala, Jasmine Jones \n
 Last modified by Jasmine Jones, 4/2019.
 """
-
+from math import ceil
 from datetime import datetime, timedelta
 import json, logging, requests
+from database import db_session
 from data.models import User, Error
+
+import logging, sys
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 BASE_URL = "https://api.fitbit.com/1/user/-"
 DATE_FMT = "%Y-%m-%d"
+
 DEFAULT_GOAL = 100000
+STEPS_PER_POINT = .10 * DEFAULT_GOAL
 
 def change_step_goal(user, new_step_goal):
 	"""
@@ -65,7 +71,7 @@ def get_step_goal(user):
 		)
 		db_session.add(error)
 		db_session.commit()
-		return -1
+		return 0
 	
 
 def update_progress_decimal(user, progress):
@@ -76,14 +82,18 @@ def update_progress_decimal(user, progress):
 	:param background.models.User user\n
 	:param float progress: WEconnect progress as a decimal
 	"""
-	# Delete existing Fitbit step activities for the day
-	step_activities = get_daily_step_activities(user)
-	for activity in step_activities:
-		delete_activity(user, activity["logId"])
-
+	#GET CURRENT STEPS
+	#step_activities = get_daily_step_activities(user)
+	#cur_steps = step_activities[0]["steps"]
+	#logging.debug("found {} previous activities".format(num_activities))
+	
 	# Update Fitbit with the new count, based on percentage
-	new_steps = int(progress * get_step_goal(user))
-	return log_step_activity(user, new_steps)
+	goal = get_step_goal(user) or DEFAULT_GOAL
+	new_steps = ceil(progress * goal)
+	logging.debug("Logging new goal {} * {} = {} new steps".format(goal, progress, new_steps))
+	
+	log = log_step_activity(user, new_steps)
+	return log
 
 def update_progress_count(user, steps_to_add):
  	#Delete existing Fitbit step activities for the day
@@ -109,8 +119,9 @@ def get_daily_step_activities(user):
 	url = "{}/activities/date/{}.json".format(BASE_URL, today)
 	auth_headers = {"Authorization": "Bearer " + user.fb_token}
 	response = requests.get(url, headers=auth_headers)
+
 	if response.status_code == 200:
-		return response.json()["activities"]
+		return response.json()["activities"] #response.json()["steps"]
 	else:
 		error_msg = response.text
 		error = Error(
@@ -135,6 +146,7 @@ def delete_activity(user, log_id):
 	auth_headers = {"Authorization": "Bearer " + user.fb_token}
 	response = requests.delete(url, headers=auth_headers)
 	if response.status_code == 204:
+		logging.debug("Deleted activity {}".format(log_id))
 		return True
 	else:
 		error_msg = response.json()	
@@ -150,6 +162,18 @@ def delete_activity(user, log_id):
 		db_session.commit()
 		return False
 
+def log_addl_steps(user, add_steps):
+	# Count existing steps
+	# Add new steps
+	# Log old + new steps as updated count
+	step_activities = get_daily_step_activities(user)
+	cur_steps = step_activities[0]["steps"]
+	
+	updated_count = cur_steps + add_steps
+	log = log_step_activity(user, updated_count)
+	logging.debug("Logging additional {} to get total {}".format(add_steps, log))
+	return log
+
 def log_step_activity(user, new_step_count, time=None):
 	""" POST
 	Log a walking activity containing the number of steps specified in
@@ -159,6 +183,13 @@ def log_step_activity(user, new_step_count, time=None):
 	:param background.models.User user\n
 	:param int new_step_count
 	"""
+	
+	# Delete existing Fitbit step activities for the day
+	step_activities = get_daily_step_activities(user)
+	for activity in step_activities:
+		delete_activity(user, activity["logId"])
+	
+	#POST new steps
 	url = "{}/activities.json".format(BASE_URL)
 	
 	start_time = time or datetime.now()
@@ -172,7 +203,7 @@ def log_step_activity(user, new_step_count, time=None):
 	}
 	auth_headers = {"Authorization": "Bearer " + user.fb_token}
 	response = requests.post(url, headers=auth_headers, params=params)
-	if response == 200:
+	if response.status_code == 201: #POST success is 201
 		return new_step_count
 	else:
 		error_msg = response.text
@@ -238,7 +269,7 @@ def get_dashboard_state(user, date=None):
 		return -1	
 
 if __name__ == "__main__":
-	from database import db_session
+	from database import db_session, close_connection
 	user = db_session.query(User).filter_by(username="jazzij").first()
 	print( get_step_goal(user))
 	
@@ -253,4 +284,4 @@ if __name__ == "__main__":
 	#print( get_daily_step_activities(user))
 	#print("A:{}, entered:{}, from:{} on {} steps:{}".format(l["activityName"], l["logType"], l["source"]["id"], l["originalStartTime"], l["steps"]))
 
-	
+	close_connection()

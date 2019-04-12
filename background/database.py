@@ -51,7 +51,7 @@ def printTables():
 	print(tables['user'])
 	print(tables['event'])
 		
-def closeConnection():
+def close_connection():
 	'''Use this function to kill all threads and make sure the sessions are closed
 	'''
 	db_session.close()
@@ -63,4 +63,4 @@ if __name__ == "__main__":
 	print("Running background/database.py as main")	
 	init_db(engine)
 	printTables()
-	closeConnection()
+	close_connection()
