@@ -195,7 +195,7 @@ def log_step_activity(user, new_step_count, time=None):
 	start_time = time or datetime.now()
 	params = {
 		"activityId": '90013',
-		"startTime": start_time.strftime("%H:%M:%S"),
+		"startTime": start_time.strftime("%H:%M"),
 		"durationMillis": 60000, 
 		"date": start_time.strftime("%Y-%m-%d"),
 		"distance": new_step_count,

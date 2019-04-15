@@ -97,6 +97,7 @@ def update_db_events(activity_events, session):
 				event.completed = activity["events"][0]["didCheckin"]
 				if event.completed: checkins+=1
 				logging.debug("{} completed? {}".format(event.eid, event.completed))
+	logging.debug("{} checkins logged.".format(checkins))
 	session.commit()
 	return checkins
 	
@@ -161,7 +162,7 @@ def create_new_activity(activity, session):
 	act_dict = wc_json_to_db(activity)
 	newAct = Activity(wc_act_id=act_dict["wc_act_id"], name=act_dict["name"], expiration=act_dict["expiration"], user_id=act_dict["user_id"])
 	session.add(newAct)
-	logging.debug("Created activity {}".format(act_dict))
+	#logging.debug("Created activity {}".format(act_dict))
 
 	try:
 		session.commit()
