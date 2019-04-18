@@ -123,7 +123,6 @@ def add_events_to_db(activity_events, session):
 	session.commit()
 	return parsedEvents
 	
-	
 
 def create_new_event(json_event):
 	'''
@@ -202,6 +201,27 @@ def wc_json_to_db(wc_act):
 	return activity
 
 
+def get_events_for_user( user, session, onDate=None):
+	if onDate is None:
+		onDate = datetime.now()
+	
+	#Query user's activities that have not expired, and retrieve events from those activities
+	acts = user.activities.filter(Activity.expiration > datetime.now()).all()
+	logging.debug("Today's events for {}:".format(user.username))
+	today_events = []
+	for a in acts:
+		ev = a.events.filter(Event.start_time >= onDate.date()).first()
+		if ev is not None: 
+			today_events.append(ev)
+	print(today_events)	
+	
+	for ev in today_events:
+		print("Ev {} checked in? {}".format(ev.activity.name, ev.completed))
+	
+	return today_events
+		
+			
+
 def calculate_percentageComplete(user, session):
 	'''
 	1. From DB - Events for TODAY from USER
@@ -210,6 +230,14 @@ def calculate_percentageComplete(user, session):
 	4. Return COMPLETE as DECIMAL
 	'''
 	pass
+	events = get_events_for_user(user, session)
+	count = 0
+	for ev in events:
+		if ev.completed:
+			count += 1
+	
+	return count / len(events)
+	return percentage
 	
 
 def calculate_tallyComplete(user, session, fromDate=datetime.now().date()):
@@ -218,13 +246,7 @@ def calculate_tallyComplete(user, session, fromDate=datetime.now().date()):
 	2. Add up the number of events
 	@param fromDate default TODAY
 	'''
-	#GET USER'S	ACTIVITIES ID'S TO USE TO SEARCH EVENT DB
-	activities = session.query(Activity).filter_by(user_id=user.wc_id).all()
-	act_ids = []
-	for act in activities:
-		act_ids.append(act.wc_act_id)
-	
-	#TODO COMPLETE...
+	pass
 	
 def calculate_weightComplete(fromDate=datetime.now().date()):
 	pass

@@ -17,8 +17,9 @@ from data.models import Activity, Event, Log, User, Day
 import fitbit
 import weconnect
 import logging, sys
-
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+
+LAST_POLL_TIME = datetime.strptime('14:30', '%H:%M').time()
 
 import atexit
 def onExit():
@@ -77,19 +78,38 @@ def poll_and_update():
 		
 		weightedProgress = None
 		
-		#on Last Poll, create a new DAY for each use
-		#thisDay = Day(computed_progress=percentageProgress, user_id=user.id, date=datetime.now().date())
-		#db_session.add(thisDay)
-		#db_session.commit()
 		
 		# Send progress to Fitbit
 		step_count = fitbit.update_progress_decimal(user, percentageProgress)
 		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+		
 		# Add a Log object to the database
 		#log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
 	
+		# on the last poll of the day, create Day total
+		cur_time = datetime.now().time()
+		if cur_time > LAST_POLL_TIME:
+			save_today(user, num_completed, percentageProgress, db_session)
+		
 	db_session.commit()	
 	close_connection()
+
+
+def save_today(user, checkin_count, today_progress, session):
+	'''
+	on Last Poll, create a new DAY for the user, save the calculated checkin count and progress 
+	'''
+	thisDay = Day(user_id=user.id, date=datetime.now().date(), computed_progress=today_progress, checkin_count=checkin_count)
+	db_session.add(thisDay)
+	db_session.commit()
+
+	today_events = weconnect.get_events_for_user(user, db_session)
+	logging.debug(today_events)
+	for ev in today_events:
+		ev.day_id = thisDay.id
+		logging.debug(ev.day_id)	
+	db_session.commit()
+
 
 
 if __name__ == "__main__":
