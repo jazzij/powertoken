@@ -18,7 +18,7 @@ import fitbit
 import weconnect
 import logging, sys
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 import atexit
 def onExit():
@@ -31,14 +31,14 @@ def poll_and_save():
 	"""
 	users = db_session.query(User).all()
 	for user in users:
-		logging.debug("polling for {}".format(user))
+		logging.debug("Polling for {}".format(user))
 		
 		#Gather events from WC and save to database, including updating new activities added
 		activity_events = weconnect.get_todays_events(user, db_session)
 		weconnect.add_events_to_db(activity_events, db_session)
-		logging.info("Found {} events for user {}".format(len(activity_events), user.wc_id))
+		logging.info("Found {} new events for user {}".format(len(activity_events), user.wc_id))
 	
-	logging.info("Completed POLL for {} users at {}.".format(len(users), datetime.now()))
+	logging.info("Completed first POLL for {} users at {}.".format(len(users), datetime.now()))
 	
 	db_session.commit()
 	close_connection()
@@ -64,7 +64,7 @@ def poll_and_update():
 		if len(activity_events) < 1: 
 			continue
 		
-		logging.debug(activity_events)
+		#logging.debug(activity_events)
 		num_completed = weconnect.update_db_events(activity_events, db_session)
 		#logging.debug("{} {}".format(num_completed, len(activity_events)))
 
@@ -77,9 +77,10 @@ def poll_and_update():
 		
 		weightedProgress = None
 		
-		thisDay = Day(computed_progress=percentageProgress, user_id=user.id, date=datetime.now())
-		db_session.add(thisDay)
-		db_session.commit()
+		#on Last Poll, create a new DAY for each use
+		#thisDay = Day(computed_progress=percentageProgress, user_id=user.id, date=datetime.now().date())
+		#db_session.add(thisDay)
+		#db_session.commit()
 		
 		# Send progress to Fitbit
 		step_count = fitbit.update_progress_decimal(user, percentageProgress)

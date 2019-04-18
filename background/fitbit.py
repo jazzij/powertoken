@@ -81,20 +81,23 @@ def update_progress_decimal(user, progress):
 
 	:param background.models.User user\n
 	:param float progress: WEconnect progress as a decimal
-	"""
-	#GET CURRENT STEPS
-	#step_activities = get_daily_step_activities(user)
-	#cur_steps = step_activities[0]["steps"]
-	#logging.debug("found {} previous activities".format(num_activities))
-	clear_user_log(user)
-	
+	"""	
 	# Update Fitbit with the new count, based on percentage
 	goal = get_step_goal(user) or DEFAULT_GOAL
 	new_steps = int(ceil(progress * goal))
 	logging.debug("Logging new goal {} * {} = {} new steps".format(goal, progress, new_steps))
 	
-	log = log_step_activity(user, new_steps)
-	return log
+	#GET CURRENT STEPS
+	step_activities = get_daily_step_activities(user)
+	if len(step_activities) < 1: return 0
+	cur_steps = step_activities[0]["steps"]
+	if cur_steps == new_steps:
+		logging.info("No progress made. {} steps already logged".format(new_steps))
+		return 0
+	else:	
+		clear_user_log(user)	
+		log = log_step_activity(user, new_steps)
+		return log
 
 def update_progress_count(user, steps_to_add):
 
@@ -112,8 +115,9 @@ def clear_user_log(user):
 		Deletes existing manual activity logs in user profile
 		Returns number of steps represented in log
 	'''
-	step_activities = get_daily_step_activities(user)
+	step_activities = get_logged_activities(user)
 	old_steps = 0
+	#logging.debug(step_activities)
 	for activity in step_activities:
 		old_steps += activity["steps"]
 		delete_activity(user, activity["logId"])
@@ -238,7 +242,7 @@ def get_logged_activities(user, afterDate=None):
 		afterDate = yesterday	
 
 	params = {
-		"afterDate": afterDate.strftime(DATE_FMT),
+		"afterDate": datetime.now().strftime(DATE_FMT),
 		"sort": 'asc',
 		"limit": 20,
 		"offset": 0,

@@ -72,7 +72,7 @@ def get_todays_events(user, session):
 		try:
 			session.commit()
 		except:
-			logging.debug("Error in commiting error")
+			logging.debug("Error in commiting Error to DB")
 		finally:
 			return []
 
@@ -140,10 +140,10 @@ def create_new_event(json_event):
 def pt_eventExists(eid, session):
 	ev = session.query(Event).filter_by(eid=eid).first()
 	if ev is None:
-		logging.info("Event with id:{} does not exist".format(eid))
+		logging.debug("Event with id:{} does not exist".format(eid))
 		return False
 	else:
-		logging.info("Found event with id:{}".format(eid))
+		logging.debug("Found event with id:{}".format(eid))
 		return True
 
 def pt_activityExists(act_id, session):
