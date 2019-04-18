@@ -89,8 +89,11 @@ def update_progress_decimal(user, progress):
 	
 	#GET CURRENT STEPS
 	step_activities = get_daily_step_activities(user)
-	if len(step_activities) < 1: return 0
-	cur_steps = step_activities[0]["steps"]
+	if len(step_activities) < 1:
+		cur_steps = 0
+	else:
+		cur_steps = step_activities[0]["steps"]
+	
 	if cur_steps == new_steps:
 		logging.info("No progress made. {} steps already logged".format(new_steps))
 		return 0
@@ -115,8 +118,8 @@ def clear_user_log(user):
 		Deletes existing manual activity logs in user profile
 		Returns number of steps represented in log
 	'''
-	step_activities = get_logged_activities(user)
 	old_steps = 0
+	step_activities = get_logged_activities(user)
 	#logging.debug(step_activities)
 	for activity in step_activities:
 		old_steps += activity["steps"]
