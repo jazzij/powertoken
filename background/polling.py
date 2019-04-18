@@ -10,6 +10,7 @@ Created by Abigail Franz on 2/28/2018.\n
 Last modified by Jasmine J on 4/2019.
 
 """
+import sys
 from datetime import datetime
 from database import db_session, close_connection
 from data.models import Activity, Event, Log, User, Day
@@ -65,10 +66,11 @@ def poll_and_update():
 		
 		logging.debug(activity_events)
 		num_completed = weconnect.update_db_events(activity_events, db_session)
-
+		#logging.debug("{} {}".format(num_completed, len(activity_events)))
 
 		#PROGRESS TALLY --- THIS WILL BE HANDLED BY A LISTENER EVENTUALLY
-		percentageProgress = num_completed / len(activity_events)
+		num_activities = float(len(activity_events))
+		percentageProgress = num_completed / num_activities
 		logging.info("Today's Percentage Progress for {} is {}".format(user, percentageProgress))
 		
 		tallyProgress = None
@@ -90,4 +92,13 @@ def poll_and_update():
 
 
 if __name__ == "__main__":
-	poll_and_update()
+	if len(sys.argv) == 1:
+		poll_and_save()
+	
+	elif int(sys.argv[1]) == 0:
+		logging.info("Initiating first poll of the day...")
+		poll_and_save()
+	elif int(sys.argv[1]) == 1:
+		logging.info("Initiating update poll at {}".format(datetime.now()))
+		poll_and_update()
+		

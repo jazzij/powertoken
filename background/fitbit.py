@@ -86,26 +86,53 @@ def update_progress_decimal(user, progress):
 	#step_activities = get_daily_step_activities(user)
 	#cur_steps = step_activities[0]["steps"]
 	#logging.debug("found {} previous activities".format(num_activities))
+	clear_user_log(user)
 	
 	# Update Fitbit with the new count, based on percentage
 	goal = get_step_goal(user) or DEFAULT_GOAL
-	new_steps = ceil(progress * goal)
+	new_steps = int(ceil(progress * goal))
 	logging.debug("Logging new goal {} * {} = {} new steps".format(goal, progress, new_steps))
 	
 	log = log_step_activity(user, new_steps)
 	return log
 
 def update_progress_count(user, steps_to_add):
- 	#Delete existing Fitbit step activities for the day
+
+	old_steps = clear_user_log(user)
+	
+	#Update fitbit with new count
+	stepCount = old_steps + steps_to_add
+	log = log_step_activity(user, stepCount)
+	logging.debug("Logging additional {} to get total {}".format(steps_to_add, log))
+
+	return log
+
+def clear_user_log(user):
+	'''
+		Deletes existing manual activity logs in user profile
+		Returns number of steps represented in log
+	'''
 	step_activities = get_daily_step_activities(user)
 	old_steps = 0
 	for activity in step_activities:
 		old_steps += activity["steps"]
 		delete_activity(user, activity["logId"])
+	return old_steps
+
+def log_addl_steps(user, add_steps):
+	#DEPRECATED
+	# Count existing steps
+	# Add new steps
+	# Log old + new steps as updated count
+	step_activities = get_daily_step_activities(user)
+	cur_steps = step_activities[0]["steps"]
 	
-	#Update fitbit with new count
-	stepCount = old_steps + steps_to_add
-	return log_step_activity(user, stepCount)
+	updated_count = cur_steps + add_steps
+	log = log_step_activity(user, updated_count)
+	logging.debug("Logging additional {} to get total {}".format(add_steps, log))
+	return log
+
+
 	
 
 def get_daily_step_activities(user):
@@ -121,12 +148,12 @@ def get_daily_step_activities(user):
 	response = requests.get(url, headers=auth_headers)
 
 	if response.status_code == 200:
-		return response.json()["activities"] #response.json()["steps"]
+		return response.json()["activities"] 
 	else:
 		error_msg = response.text
 		error = Error(
 			summary = "Couldn't get today's step activities.",
-			origin = "background/fitbit.py, in _get_daily_step_activities",
+			origin = "background/fitbit.py, in get_daily_step_activities",
 			message = error_msg,
 			user = user
 		)
@@ -162,17 +189,6 @@ def delete_activity(user, log_id):
 		db_session.commit()
 		return False
 
-def log_addl_steps(user, add_steps):
-	# Count existing steps
-	# Add new steps
-	# Log old + new steps as updated count
-	step_activities = get_daily_step_activities(user)
-	cur_steps = step_activities[0]["steps"]
-	
-	updated_count = cur_steps + add_steps
-	log = log_step_activity(user, updated_count)
-	logging.debug("Logging additional {} to get total {}".format(add_steps, log))
-	return log
 
 def log_step_activity(user, new_step_count, time=None):
 	""" POST
@@ -182,21 +198,15 @@ def log_step_activity(user, new_step_count, time=None):
 
 	:param background.models.User user\n
 	:param int new_step_count
-	"""
-	
-	# Delete existing Fitbit step activities for the day
-	step_activities = get_daily_step_activities(user)
-	for activity in step_activities:
-		delete_activity(user, activity["logId"])
-	
+	"""	
 	#POST new steps
 	url = "{}/activities.json".format(BASE_URL)
 	
-	start_time = time or datetime.now()
+	start_time = datetime.now()
 	params = {
 		"activityId": '90013',
-		"startTime": start_time.strftime("%H:%M:%S"),
-		"durationMillis": 60000, 
+		"startTime": start_time.strftime("%H:%M"),
+		"durationMillis": 3600000, 
 		"date": start_time.strftime("%Y-%m-%d"),
 		"distance": new_step_count,
 		"distanceUnit": "steps"
