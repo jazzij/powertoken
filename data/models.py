@@ -20,6 +20,11 @@ from sqlalchemy.orm import relationship
 metadata = MetaData()
 Base = declarative_base(metadata=metadata)
 
+TALLY="tally"
+CHARGE="charge"
+WEIGHT="weighted progress"
+PROGRESS="progress"
+
 class Admin(Base):
 	"""
 	Represents a PowerToken administrator, capable of viewing the admin
@@ -45,7 +50,7 @@ class User(Base):
 	id = Column(Integer, primary_key=True)
 	username = Column(String(32), nullable=False, index=True, unique=True)
 	registered_on = Column(DateTime, index=True, default=datetime.now())
-	goal_period = Column(String(16), default="daily")
+	goal_period = Column(String(16), default=PROGRESS)
 	wc_id = Column(Integer, unique=True)
 	wc_token = Column(String(128))
 	fb_token = Column(String(256))

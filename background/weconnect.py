@@ -88,7 +88,7 @@ def update_db_events(activity_events, session):
 	@return: number of completed checkins detected, total events counted
 	'''
 	checkins = 0
-	event_ids = []
+	event_ids = set()
 	for activity in activity_events:
 		wc_act_id = activity["activityId"]
 		if pt_activityExists(wc_act_id, session): #ignore activities that were added that day
@@ -97,7 +97,7 @@ def update_db_events(activity_events, session):
 			if event is not None:
 				event.completed = activity["events"][0]["didCheckin"]
 				if event.completed: checkins+=1
-				event_ids.append(event.eid)
+				event_ids.add(event.eid)
 				logging.debug("{} completed? {}".format(event.eid, event.completed))
 	logging.debug("{} checkins logged.".format(checkins))
 	session.commit()

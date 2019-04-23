@@ -15,6 +15,7 @@ import math
 from datetime import datetime
 from database import db_session, close_connection
 from data.models import Activity, Event, Log, User, Day
+from data.models import TALLY, PROGRESS, WEIGHT, CHARGE
 import fitbit
 import weconnect
 import logging, sys
@@ -71,22 +72,28 @@ def poll_and_update():
 		logging.debug("Num activities completed: {} out of {}".format(num_completed, len(activity_events)))
 
 		#TALLY
-		tallyProgress = num_completed
-				
-		#BASIC PROGRESS --- THIS WILL BE HANDLED BY A LISTENER EVENTUALLY
-		num_activities = float(len(activity_events))
-		percentageProgress = num_completed / num_activities
-		logging.info("Today's Percentage Progress for {} is {}".format(user, percentageProgress))
+		progress = 0
+		if user.goal_period == TALLY:
+			progress = num_completed
+			logging.info("Tally progress: {}".format(progress))
+			
+		elif user.goal_period == PROGRESS:			
+			#BASIC PROGRESS --- THIS WILL BE HANDLED BY A LISTENER EVENTUALLY
+			num_activities = float(len(activity_events))
+			progress = num_completed / num_activities
+			logging.info("Today's Percentage Progress for {} is {}".format(user, progress))
+
+		elif user.goal_period == WEIGHT:		
+			#WEIGHTED PROGRESS
+			progress = weighted_progress(user, event_ids, db_session)
+			logging.info("Today's Weighted Progress for {} completed activities = {}".format(num_completed, progress))
 		
-		
-		#WEIGHTED PROGRESS
-		weightedProgress = weighted_progress(user, event_ids, db_session)
-		logging.info("Today's Weighted Progress for {} completed activities = {}".format(num_completed, weightedProgress))
-		
+		elif user.goal_period == CHARGE:	
+			pass
 		
 		
 		# Send progress to Fitbit
-		#step_count = fitbit.update_progress_decimal(user, percentageProgress)
+		#step_count = fitbit.update_progress_decimal(user, progress)
 		#logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 		
 		# Add a Log object to the database
@@ -95,7 +102,7 @@ def poll_and_update():
 		# on the last poll of the day, create Day total
 		#cur_time = datetime.now().time()
 		#if cur_time > LAST_POLL_TIME:
-		#	save_today(user, num_completed, percentageProgress, db_session)
+		#	save_today(user, num_completed, progress, db_session)
 		
 	db_session.commit()	
 	close_connection()
