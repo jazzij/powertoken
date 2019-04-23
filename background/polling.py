@@ -11,6 +11,7 @@ Last modified by Jasmine J on 4/2019.
 
 """
 import sys
+import math
 from datetime import datetime
 from database import db_session, close_connection
 from data.models import Activity, Event, Log, User, Day
@@ -65,34 +66,75 @@ def poll_and_update():
 		if len(activity_events) < 1: 
 			continue
 		
-		#logging.debug(activity_events)
-		num_completed = weconnect.update_db_events(activity_events, db_session)
-		#logging.debug("{} {}".format(num_completed, len(activity_events)))
+		#Update all events in the DB
+		num_completed, event_ids = weconnect.update_db_events(activity_events, db_session)
+		logging.debug("Num activities completed: {} out of {}".format(num_completed, len(activity_events)))
 
-		#PROGRESS TALLY --- THIS WILL BE HANDLED BY A LISTENER EVENTUALLY
+		#TALLY
+		tallyProgress = num_completed
+				
+		#BASIC PROGRESS --- THIS WILL BE HANDLED BY A LISTENER EVENTUALLY
 		num_activities = float(len(activity_events))
 		percentageProgress = num_completed / num_activities
 		logging.info("Today's Percentage Progress for {} is {}".format(user, percentageProgress))
 		
-		tallyProgress = None
 		
-		weightedProgress = None
+		#WEIGHTED PROGRESS
+		weightedProgress = weighted_progress(user, event_ids, db_session)
+		logging.info("Today's Weighted Progress for {} completed activities = {}".format(num_completed, weightedProgress))
+		
 		
 		
 		# Send progress to Fitbit
-		step_count = fitbit.update_progress_decimal(user, percentageProgress)
-		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+		#step_count = fitbit.update_progress_decimal(user, percentageProgress)
+		#logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 		
 		# Add a Log object to the database
 		#log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
 	
 		# on the last poll of the day, create Day total
-		cur_time = datetime.now().time()
-		if cur_time > LAST_POLL_TIME:
-			save_today(user, num_completed, percentageProgress, db_session)
+		#cur_time = datetime.now().time()
+		#if cur_time > LAST_POLL_TIME:
+		#	save_today(user, num_completed, percentageProgress, db_session)
 		
 	db_session.commit()	
 	close_connection()
+
+
+def weighted_progress(user, event_ids, session):
+	target= 0
+	completed=0
+	evs = session.query(Event).filter(Event.eid.in_(event_ids)).all()
+	for ev in evs:
+		weight = ev.activity.weight
+		target += weight
+		if ev.completed:
+			completed += weight
+
+	progress = completed / target
+	logging.info("{}'s weighted progress: {} / {} = {}".format(user, completed, target, progress ))
+	return progress
+	
+#def weighted_progress(user):
+#	target=0        #target=sum(all events for one day * their weights)
+#	completed=0     #completed=sum(completed events * their weights)
+#	today = datetime.now()
+#	activities=user.activities.all()
+#	for activity in activities:
+#		logging.debug("Activity {} with weight {}".format(activity.name, activity.weight))
+#		event=activity.events.filter_by(start_time=today.date()).first()
+#		if event.completed is True:
+#			target+=activity.weight
+#		for event in events:
+#			if(event.start_time.date()==today.date()):
+#				event.completed = True
+#				target+=activity.weight
+#				if(event.completed==True):
+#					completed+=activity.weight
+#	if target > 0:
+#		logging.debug("{} weighted_Progress: {} \ {}".format(user, completed, target))
+#		return completed/target
+
 
 
 def save_today(user, checkin_count, today_progress, session):
