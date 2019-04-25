@@ -15,13 +15,18 @@ import math
 from datetime import datetime
 from database import db_session, close_connection
 from data.models import Activity, Event, Log, User, Day
-from data.models import TALLY, PROGRESS, WEIGHT, CHARGE
+#from data.models import TALLY, PROGRESS, WEIGHT, CHARGE
 import fitbit
 import weconnect
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-LAST_POLL_TIME = datetime.strptime('14:30', '%H:%M').time()
+LAST_POLL_TIME = datetime.strptime('23:30', '%H:%M').time()
+TALLY="tally"
+CHARGE="charge"
+WEIGHT="weighted progress"
+PROGRESS="progress"
+
 
 import atexit
 def onExit():
@@ -100,9 +105,9 @@ def poll_and_update():
 		#log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
 	
 		# on the last poll of the day, create Day total
-		#cur_time = datetime.now().time()
-		#if cur_time > LAST_POLL_TIME:
-		#	save_today(user, num_completed, progress, db_session)
+		cur_time = datetime.now().time()
+		if cur_time > LAST_POLL_TIME:
+			save_today(user, num_completed, progress, db_session)
 		
 	db_session.commit()	
 	close_connection()
@@ -171,4 +176,7 @@ if __name__ == "__main__":
 	elif int(sys.argv[1]) == 1:
 		logging.info("Initiating update poll at {}".format(datetime.now()))
 		poll_and_update()
+		
+		if datetime.time() > LAST_POLL_TIME:
+				
 		
