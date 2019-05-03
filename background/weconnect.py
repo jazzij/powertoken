@@ -11,9 +11,17 @@ Using event listeners may prove to be useful: https://docs.sqlalchemy.org/en/lat
 from datetime import datetime, MAXYEAR, timedelta
 import json, logging, requests
 from data.models import User, Activity, Event, Error
+from sqlalchemy import event
+
+@event.listens_for(Event.completed, 'set')
+def append_listener(target, value, old_value, initiator):
+	#fitbit.update_progress_decimal(user, progress)
+	print("modified")
+	
 
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+
 
 
 
@@ -24,6 +32,8 @@ TODAY = datetime(datetime.now().year, datetime.now().month, datetime.now().day)
 
 DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 BASE_URL = "https://palalinq.herokuapp.com/api/people"
+
+
 
 ''' 
 FLOW: 
@@ -88,16 +98,18 @@ def update_db_events(activity_events, session):
 	@return: number of completed checkins detected, total events counted
 	'''
 	checkins = 0
-	event_ids = set()
+	event_ids = []
 	for activity in activity_events:
 		wc_act_id = activity["activityId"]
 		if pt_activityExists(wc_act_id, session): #ignore activities that were added that day
 			eid = activity["events"][0]["eid"]
 			event = session.query(Event).filter_by(eid=eid).first()
 			if event is not None:
-				event.completed = activity["events"][0]["didCheckin"]
-				if event.completed: checkins+=1
-				event_ids.add(event.eid)
+				checkin_val = activity["events"][0]["didCheckin"]
+				if not event.completed:
+					event.completed = checkin_val
+				if checkin_val: checkins+=1
+				event_ids.append(event.eid)
 				logging.debug("{} completed? {}".format(event.eid, event.completed))
 	logging.debug("{} checkins logged.".format(checkins))
 	session.commit()
@@ -259,17 +271,24 @@ def calculate_weightComplete(fromDate=datetime.now().date()):
 ###
 if __name__ == "__main__":
 	from database import db_session
-
+	all_evs = db_session.query(Event).all()
+	all_evs[-1].start_time = datetime.now()
+	db_session.commit()
+	
+	print("Completed poll") 
+'''
 	try:
 		all_users = db_session.query(User).all()
 		for user in all_users:
 			logging.info("Polling {}".format(user.username))
 			if user.wc_id and user.wc_token:	
-				activity_info = get_activity_info(user, db_session)
-				print(activity_info)
+				#activity_info = get_activity_info(user, db_session)
+				#print(activity_info)
 				evs = get_todays_events(user, db_session) or []
+				update_db_events(evs, db_session)
 				logging.info("Found {} events for user {}".format(len(evs), user.wc_id))
 			else:
 				logging.info("User {} has insufficient info".format(user.username))
 	finally:
 		db_session.close()
+'''

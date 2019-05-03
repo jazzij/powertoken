@@ -33,6 +33,9 @@ def onExit():
 	db_session.close()
 atexit.register(onExit)
 
+
+
+
 def poll_and_save():
 	"""
 	Check for new events (and activities) for every saved user and save them to the database 
@@ -164,7 +167,13 @@ def save_today(user, checkin_count, today_progress, session):
 		logging.debug(ev.day_id)	
 	db_session.commit()
 
+def weighted_tally(user, session):
+	pass
 
+
+def weekly_weighted(user, session):
+	#get user's progress from last 7 days (assume weighted progress)
+	pass
 
 if __name__ == "__main__":
 	if len(sys.argv) == 1:
