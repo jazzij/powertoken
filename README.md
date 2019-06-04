@@ -65,7 +65,12 @@ from python interpreter (same level as powertoken/):
 OR via FLASK
 go to localhost:xxxx/createDB
 
-
+MIGRATION
+Setup SQLALCHEMY Alembic (nice tutorial here:https://www.learndatasci.com/tutorials/using-databases-python-postgres-sqlalchemy-and-alembic/)
+After initializing, (>> alembic stamp head)
+To run migration, make changes to data.models and run
+>> alembic revision --autogenerate -m "describe here" 
+>>alembic upgrade head 
 
 
 
