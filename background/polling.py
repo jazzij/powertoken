@@ -13,16 +13,18 @@ Last modified by Jasmine J on 4/2019.
 import sys
 import math
 from datetime import datetime
-from database import db_session, close_connection
-from data.models import Activity, Event, Log, User, Day
+from database import get_session, close_connection
+#from data.models import Activity, Event, Log, User, Day
+from database import Activity, Event, Log, User, Day
+#from database import TALLY, CHARGE, WEIGHT, PLAN
 import fitbit
 import weconnect
 
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-<<<<<<< HEAD
 LAST_POLL_TIME = datetime.strptime('14:30', '%H:%M').time()
+
 TALLY="tally"
 CHARGE="charge"
 WEIGHT="weight"
@@ -30,7 +32,7 @@ PLAN="plan"
 
 import atexit
 def onExit():
-	db_session.close()
+	close_connection()
 atexit.register(onExit)
 
 
@@ -38,6 +40,7 @@ def poll_and_save():
 	"""
 	Check for new events (and activities) for every saved user and save them to the database 
 	"""
+	db_session = get_session()
 	users = db_session.query(User).all()
 	for user in users:
 		logging.debug("Polling for {}".format(user))
@@ -63,7 +66,7 @@ def poll_and_update():
 	   send the new progress to Fitbit as a walking activity with the following
 	   number of steps: progress * 1,000,000.
 	"""
-#	from data.models import TALLY, WEIGHT, PROGRESS, CHARGE
+	db_session = get_session()
 	users = db_session.query(User).all()
 	
 	for user in users:

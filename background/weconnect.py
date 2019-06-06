@@ -10,7 +10,7 @@ Using event listeners may prove to be useful: https://docs.sqlalchemy.org/en/lat
 """
 from datetime import datetime, MAXYEAR, timedelta
 import json, logging, requests
-from data.models import User, Activity, Event, Error
+from database import User, Activity, Event, Error
 from sqlalchemy import event
 
 @event.listens_for(Event.completed, 'set')
@@ -21,8 +21,6 @@ def append_listener(target, value, old_value, initiator):
 
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-
-
 
 
 #CONSTANTS
@@ -270,12 +268,14 @@ def calculate_weightComplete(fromDate=datetime.now().date()):
 ### SCRIPT TO RUN
 ###
 if __name__ == "__main__":
-	from database import db_session
+	from database import get_session, close_connection
+	db_session = get_session()
 	all_evs = db_session.query(Event).all()
 	all_evs[-1].start_time = datetime.now()
 	db_session.commit()
 	
 	print("Completed poll") 
+	close_connection()
 '''
 	try:
 		all_users = db_session.query(User).all()
