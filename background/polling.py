@@ -17,15 +17,16 @@ from database import db_session, close_connection
 from data.models import Activity, Event, Log, User, Day
 import fitbit
 import weconnect
+
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
+<<<<<<< HEAD
 LAST_POLL_TIME = datetime.strptime('14:30', '%H:%M').time()
 TALLY="tally"
 CHARGE="charge"
 WEIGHT="weight"
 PLAN="plan"
-
 
 import atexit
 def onExit():
@@ -180,7 +181,13 @@ def save_today(user, checkin_count, today_progress, session):
 		logging.debug(ev.day_id)	
 	db_session.commit()
 
+def weighted_tally(user, session):
+	pass
 
+
+def weekly_weighted(user, session):
+	#get user's progress from last 7 days (assume weighted progress)
+	pass
 
 if __name__ == "__main__":
 		
@@ -200,3 +207,4 @@ if __name__ == "__main__":
 		print(result)
 		result = calculate_progress_tally(3, [1,2,3,4,5])
 		print(result)
+
