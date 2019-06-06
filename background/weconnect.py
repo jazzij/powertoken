@@ -13,7 +13,7 @@ import json, logging, requests
 from data.models import User, Activity, Event, Error
 
 import logging, sys
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 
 
