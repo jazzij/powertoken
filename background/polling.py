@@ -15,25 +15,23 @@ import math
 from datetime import datetime
 from database import db_session, close_connection
 from data.models import Activity, Event, Log, User, Day
-#from data.models import TALLY, PROGRESS, WEIGHT, CHARGE
 import fitbit
 import weconnect
+
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
-LAST_POLL_TIME = datetime.strptime('23:30', '%H:%M').time()
+<<<<<<< HEAD
+LAST_POLL_TIME = datetime.strptime('14:30', '%H:%M').time()
 TALLY="tally"
 CHARGE="charge"
-WEIGHT="weighted progress"
-PROGRESS="progress"
-
+WEIGHT="weight"
+PLAN="plan"
 
 import atexit
 def onExit():
 	db_session.close()
 atexit.register(onExit)
-
-
 
 
 def poll_and_save():
@@ -65,7 +63,7 @@ def poll_and_update():
 	   send the new progress to Fitbit as a walking activity with the following
 	   number of steps: progress * 1,000,000.
 	"""
-	
+#	from data.models import TALLY, WEIGHT, PROGRESS, CHARGE
 	users = db_session.query(User).all()
 	
 	for user in users:
@@ -79,35 +77,50 @@ def poll_and_update():
 		num_completed, event_ids = weconnect.update_db_events(activity_events, db_session)
 		logging.debug("Num activities completed: {} out of {}".format(num_completed, len(activity_events)))
 
-		#TALLY
+		#CALCULATE PROGRESS, BASED ON INDIVIDUAL METAPHOR
 		progress = 0
-		if user.goal_period == TALLY:
-			progress = num_completed
-			logging.info("Tally progress: {}".format(progress))
-			
-		elif user.goal_period == PROGRESS:			
-			#BASIC PROGRESS --- THIS WILL BE HANDLED BY A LISTENER EVENTUALLY
-			num_activities = float(len(activity_events))
-			progress = num_completed / num_activities
+		if user.metaphor == PLAN:			
+			#BASIC PLAN --- PERCENTAGE COMPLETE VS PLANNED
+			progress = calculate_progress_plan(num_completed, event_ids)
 			logging.info("Today's Percentage Progress for {} is {}".format(user, progress))
-
-		elif user.goal_period == WEIGHT:		
+			
+			# Send progress to Fitbit
+			step_count = fitbit.update_progress_decimal(user, progress, db_session)
+			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+		
+		elif user.metaphor == WEIGHT:		
 			#WEIGHTED PROGRESS
-			progress = weighted_progress(user, event_ids, db_session)
-			logging.info("Today's Weighted Progress for {} completed activities = {}".format(num_completed, progress))
+			progress = calculate_progress_weight(event_ids, db_session)
+			logging.info("Today's Weighted Progress for {} is {}".format(user, progress))
 		
-		elif user.goal_period == CHARGE:	
-			pass
+			# Send progress to Fitbit
+			step_count = fitbit.update_progress_decimal(user, progress, db_session)
+			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+					
+		elif user.metaphor == TALLY:
+			# TALLY - BASIC COUNT	
+			progress = calculate_progress_tally(num_completed, event_ids)
+			logging.info("Today's TALLY Progress for {} is {}".format(user, progress))
+			
+			# Send progress to Fitbit
+			step_count = fitbit.update_progress_count(user, progress)
+			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+						
+			
+		elif user.metaphor == CHARGE:
+			# CHARGE - WEIGHTED COUNT
+			progress = calculate_progress_charge(num_completed, event_ids, session) 
+			logging.info("Today's CHARGE Progress for {} is {}".format(user, progress))
 		
-		
-		# Send progress to Fitbit
-		#step_count = fitbit.update_progress_decimal(user, progress)
-		#logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+			# Send progress to Fitbit
+			step_count = fitbit.update_progress_count(user, progress)
+			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+					
 		
 		# Add a Log object to the database
 		#log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
 	
-		# on the last poll of the day, create Day total
+		# on the last poll of the day, create Day total for the user
 		cur_time = datetime.now().time()
 		if cur_time > LAST_POLL_TIME:
 			save_today(user, num_completed, progress, db_session)
@@ -115,41 +128,42 @@ def poll_and_update():
 	db_session.commit()	
 	close_connection()
 
+	
 
-def weighted_progress(user, event_ids, session):
+def calculate_progress_plan(num_events_completed, event_id_list):
+	progress = num_events_completed / float(len(event_id_list))
+	return progress #percentage
+		
+def calculate_progress_weight(event_id_list, session):
 	target= 0
 	completed=0
-	evs = session.query(Event).filter(Event.eid.in_(event_ids)).all()
+	evs = session.query(Event).filter(Event.eid.in_(event_id_list)).all()
 	for ev in evs:
 		weight = ev.activity.weight
 		target += weight
 		if ev.completed:
 			completed += weight
 
-	progress = completed / target
-	logging.info("{}'s weighted progress: {} / {} = {}".format(user, completed, target, progress ))
-	return progress
-	
-#def weighted_progress(user):
-#	target=0        #target=sum(all events for one day * their weights)
-#	completed=0     #completed=sum(completed events * their weights)
-#	today = datetime.now()
-#	activities=user.activities.all()
-#	for activity in activities:
-#		logging.debug("Activity {} with weight {}".format(activity.name, activity.weight))
-#		event=activity.events.filter_by(start_time=today.date()).first()
-#		if event.completed is True:
-#			target+=activity.weight
-#		for event in events:
-#			if(event.start_time.date()==today.date()):
-#				event.completed = True
-#				target+=activity.weight
-#				if(event.completed==True):
-#					completed+=activity.weight
-#	if target > 0:
-#		logging.debug("{} weighted_Progress: {} \ {}".format(user, completed, target))
-#		return completed/target
+	progress = completed / float(target)
+	#logging.info("weighted progress: {} / {} = {}".format(completed, target, progress ))
+	return progress #percentage
 
+def calculate_progress_tally(num_completed, event_id_list):
+	max_steps = fitbit.DEFAULT_GOAL
+	activity_value = max_steps / 5 # number of LED's visible
+	return num_completed * activity_value		#raw number of steps
+
+def calculate_progress_charge(num_completed, event_id_list, session):
+	max_steps = fitbit.DEFAULT_GOAL
+	activity_value = fitbit.STEPS_PER_POINT
+	total = 0
+	evs = session.query(Event).filter(Event.eid.in_(event_id_list)).all()
+	for ev in evs:
+		weight = ev.activity.weight
+		if ev.completed:
+			weighted_value = activity_value * weight
+			total += weighted_value
+	return total	
 
 
 def save_today(user, checkin_count, today_progress, session):
@@ -176,6 +190,7 @@ def weekly_weighted(user, session):
 	pass
 
 if __name__ == "__main__":
+		
 	if len(sys.argv) == 1:
 		poll_and_save()
 	
@@ -185,7 +200,11 @@ if __name__ == "__main__":
 	elif int(sys.argv[1]) == 1:
 		logging.info("Initiating update poll at {}".format(datetime.now()))
 		poll_and_update()
-		
-		if datetime.time() > LAST_POLL_TIME:
-				
-		
+
+	#debug option
+	elif int(sys.argv[1]) == 3:
+		result = calculate_progress_plan( 3, [1,2,3,4,5])
+		print(result)
+		result = calculate_progress_tally(3, [1,2,3,4,5])
+		print(result)
+

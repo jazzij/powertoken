@@ -20,7 +20,7 @@ def append_listener(target, value, old_value, initiator):
 	
 
 import logging, sys
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 
 
