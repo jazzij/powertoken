@@ -10,9 +10,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import Config	#powertoken defined configuration class
-from data.models import metadata
+#from data.models import metadata
+from background.database_new import get_metadata
 
-db = SQLAlchemy(metadata=metadata)
+mt = get_metadata()
+db = SQLAlchemy(metadata=mt)
 migrate = Migrate()
 login = LoginManager()
 
