@@ -38,6 +38,13 @@ header h3 {
     margin: auto;
 }
 
+.content-wide{
+	max-width: 650px;
+	min-width: 300px;
+	position: relative;
+	margin: auto;
+}
+
 .card {
     box-sizing: border-box;
     width: 100%;

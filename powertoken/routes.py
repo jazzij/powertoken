@@ -42,6 +42,10 @@ def user_home():
 	# If the user is logged in, show the welcome page.
 	return render_template("user_home.html", username=username)
 
+@app.route("/info")
+def study_info():
+	return render_template("study_info.html")
+
 @app.route("/user_login", methods=["GET", "POST"])
 def user_login():
 	form = UserLoginForm()
