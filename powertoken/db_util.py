@@ -3,14 +3,14 @@ DB UTIL
 Abstract Database operations to support various Flask forms and views (routes.py)
 
 For use with FLASK and SQLalchemy
-Database schema / models - data.models
+Database schema / models - background.database
 Database session object instantiated as part of Flask app (see __init__.py)
 
-Last Update March 2019 by Jasmine Jones
+Last Update June 2019 by Jasmine Jones
 
 """
 #from powertoken.models import User, Activity, Event
-from data.models import User, Activity, Event
+from background.database import User, Activity, Event
 from powertoken import db
 from sqlalchemy import exc
 from werkzeug.datastructures import MultiDict

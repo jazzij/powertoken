@@ -6,8 +6,7 @@ Last modified by Jasmine Jones, 4/2019.
 from math import ceil
 from datetime import datetime, timedelta
 import json, logging, requests
-from database import db_session
-from data.models import User, Error
+from database import User, Error
 
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -18,7 +17,7 @@ DATE_FMT = "%Y-%m-%d"
 DEFAULT_GOAL = 100000
 STEPS_PER_POINT = .10 * DEFAULT_GOAL
 
-def change_step_goal(user, new_step_goal):
+def change_step_goal(user, new_step_goal, db_session):
 	"""
 	Change the step goal to new_step_goal. Return the new step goal (or 0 if
 	the request was unsuccessful).
@@ -48,7 +47,7 @@ def change_step_goal(user, new_step_goal):
 		db_session.commit()
 		return -1
 
-def get_step_goal(user):
+def get_step_goal(user, db_session):
 	"""
 	Get the user's step goal. 
 	If the request is unsuccessful, return -1
@@ -74,7 +73,7 @@ def get_step_goal(user):
 		return 0
 	
 
-def update_progress_decimal(user, progress):
+def update_progress_decimal(user, progress, db_session):
 	"""
 	Reset Fitbit to receive new step activities and return the number of
 	steps added; if there's an error, return an Error.
@@ -83,28 +82,29 @@ def update_progress_decimal(user, progress):
 	:param float progress: WEconnect progress as a decimal
 	"""	
 	# Update Fitbit with the new count, based on percentage
-	goal = get_step_goal(user) or DEFAULT_GOAL
+	goal = get_step_goal(user, db_session) or DEFAULT_GOAL
 	new_steps = int(ceil(progress * goal))
 	logging.debug("Logging new goal {} * {} = {} new steps".format(goal, progress, new_steps))
 	
 	#GET CURRENT STEPS
-	step_activities = get_daily_step_activities(user)
+	step_activities = get_daily_step_activities(user, db_session)
 	if len(step_activities) < 1:
 		cur_steps = 0
 	else:
 		cur_steps = step_activities[0]["steps"]
 	
+	# UPDATE FITBIT with NEW STEP COUNT
 	if cur_steps == new_steps:
 		logging.info("No progress made. {} steps already logged".format(new_steps))
 		return 0
 	else:	
-		clear_user_log(user)	
+		clear_user_log(user, db_session)	
 		log = log_step_activity(user, new_steps)
 		return log
 
-def update_progress_count(user, steps_to_add):
+def update_progress_count(user, steps_to_add, db_session):
 
-	old_steps = clear_user_log(user)
+	old_steps = clear_user_log(user, db_session)
 	
 	#Update fitbit with new count
 	stepCount = old_steps + steps_to_add
@@ -113,13 +113,13 @@ def update_progress_count(user, steps_to_add):
 
 	return log
 
-def clear_user_log(user):
+def clear_user_log(user, db_session):
 	'''
 		Deletes existing manual activity logs in user profile
 		Returns number of steps represented in log
 	'''
 	old_steps = 0
-	step_activities = get_logged_activities(user)
+	step_activities = get_logged_activities(user, db_session)
 	#logging.debug(step_activities)
 	for activity in step_activities:
 		old_steps += activity["steps"]
@@ -131,7 +131,7 @@ def log_addl_steps(user, add_steps):
 	# Count existing steps
 	# Add new steps
 	# Log old + new steps as updated count
-	step_activities = get_daily_step_activities(user)
+	step_activities = get_daily_step_activities(user, db_session)
 	cur_steps = step_activities[0]["steps"]
 	
 	updated_count = cur_steps + add_steps
@@ -142,7 +142,7 @@ def log_addl_steps(user, add_steps):
 
 	
 
-def get_daily_step_activities(user):
+def get_daily_step_activities(user, db_session):
 	"""
 	Return a list of all the activities the user has completed today. If
 	the request is unsuccessful, return an empty list.
@@ -234,7 +234,7 @@ def log_step_activity(user, new_step_count, time=None):
 		db_session.commit()
 		return 0
 
-def get_logged_activities(user, afterDate=None):
+def get_logged_activities(user, db_session, afterDate=None):
 	#GET https://api.fitbit.com/1/user/-/activities/list.json
 	#As written this duplicates functionality of get_daily_step_activity, returning a list of activities for a certain date
 	url = "{}/activities/list.json".format(BASE_URL)
@@ -286,9 +286,10 @@ def get_dashboard_state(user, date=None):
 		return -1	
 
 if __name__ == "__main__":
-	from database import db_session, close_connection
+	from database import get_session, close_connection
+	db_session = get_session()
 	user = db_session.query(User).filter_by(username="jazzij").first()
-	print( get_step_goal(user))
+	print( get_step_goal(user, db_session))
 	
 	before = datetime.now() - timedelta(hours = 1)
 	print( log_step_activity(user, 500, time=before))
@@ -296,9 +297,9 @@ if __name__ == "__main__":
 	#print( change_step_goal(user, 5000))
 	#update_progress_decimal()
 	#update_progress_count()
-	print( get_logged_activities(user))
+	print( get_logged_activities(user, db_session))
 	print(get_dashboard_state(user))
-	#print( get_daily_step_activities(user))
+	#print( get_daily_step_activities(user, db_session))
 	#print("A:{}, entered:{}, from:{} on {} steps:{}".format(l["activityName"], l["logType"], l["source"]["id"], l["originalStartTime"], l["steps"]))
 
 	close_connection()

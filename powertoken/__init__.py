@@ -11,7 +11,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import Config	#powertoken defined configuration class
 #from data.models import metadata
-from background.database_new import get_metadata
+from background.database import get_metadata
 
 mt = get_metadata()
 db = SQLAlchemy(metadata=mt)
