@@ -1,0 +1,1 @@
+{ "user": "PT002", "progress": 0.5, "activities": [{"start_time": "09:30:00", "weight": 5, "completed": false, "name": "act1"}, {"start_time": "13:16:00", "weight": 3, "completed": true, "name": "act2"}, {"start_time": "14:45:00", "weight": 1, "completed": false, "name": "act3"}]}

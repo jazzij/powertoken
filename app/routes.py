@@ -13,7 +13,7 @@ from werkzeug.datastructures import MultiDict
 from app import app, db
 from app.weconnect import check_wc_token_status, login_to_wc, set_wc_activities
 from app.helpers import complete_fb_login
-from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm, 
+from app.forms import (AdminLoginForm, AdminRegistrationForm, UserLoginForm,
 		UserWcLoginForm, UserActivityForm)
 from app.models import Activity, Admin, Error, Log, User
 from app.viewmodels import LogViewModel, UserViewModel, ActivityViewModel, EventLogViewModel
@@ -50,19 +50,19 @@ def user_login():
 			db.session.add(user)
 			db.session.commit()
 			return redirect(url_for("user_wc_login", username=username))
-		
-			
+
+
 		# If the user exists in the database, but the WEconnect (or Fitbit)
 		# info isn't filled out, redirect to the WEconnect login.
 		if any([not user.wc_id, not user.wc_token, not user.fb_token]):
 			return redirect(url_for("user_wc_login", username=username))
-		
+
 		#TODO Add token expiry check here
-		# If user exists in the db, but token returns an error, then login again to refresh 
+		# If user exists in the db, but token returns an error, then login again to refresh
 		if not check_wc_token_status(user.wc_id, user.wc_token):
 			return redirect(url_for("user_wc_login", username=username))
-			
-			
+
+
 		# If the user exists in the database, and the WEconnect and Fitbit info
 		# is already filled out, bypass the login process.
 		return redirect(url_for("user_home", username=username))
@@ -83,7 +83,7 @@ def user_wc_login():
 	if form.validate_on_submit():
 		username = request.args.get("username")
 
-		# If for whatever reason the username wasn't saved, return to the 
+		# If for whatever reason the username wasn't saved, return to the
 		# original PowerToken login page.
 		if username is None:
 			return redirect(url_for("user_login", error="Invalid username"))
@@ -91,7 +91,7 @@ def user_wc_login():
 		# Get the user with that username from the database.
 		user = User.query.filter_by(username=username).first()
 		priorUser = user is not None
-		
+
 		# If the user with that username isn't in the database for whatever
 		# reason, go back to the PowerToken login page.
 		if user is None:
@@ -115,13 +115,13 @@ def user_wc_login():
 		user.wc_id = result[0]
 		user.wc_token = result[1]
 		logging.info("Adding User {}".format(user.wc_id))
-		
+
 		try:
 			db.session.commit()
 		except:
 			error = "A user with the same WEconnect credentials already exists"
 			return render_template("user_wc_login.html", form=form, error=error)
-		
+
 		#TODO: CHECK TO MAKE SURE THIS WORKS. only execute when there is an new user
 		if not priorUser:
 			set_wc_activities(user)
@@ -149,10 +149,10 @@ def user_fb_login():
 		# reason, go back to the PowerToken login page.
 		if user is None:
 			return redirect(url_for("user_login", error="Invalid user"))
-		
+
 		# If everything is okay so far, add the Fitbit token to the database.
 		user.fb_token = fb_token
-		
+
 		try:
 			db.session.commit()
 		except:
@@ -171,14 +171,14 @@ def refresh_tokens():
 	# GET PT USERNAME
 	username = request.args.get("username")
 	return redirect(url_for("user_wc_login", username=username))
-	
-	
+
+
 
 @app.route("/user_activities", methods=["GET", "POST"])
 def user_activities():
 	username = request.args.get("username")
 
-	# If for whatever reason the username wasn't saved, go back to the 
+	# If for whatever reason the username wasn't saved, go back to the
 	# original login screen.
 	if username is None:
 		return redirect(url_for("user_login", error="Invalid username"))
@@ -209,6 +209,13 @@ def user_activities():
 					("weight", act.weight)])
 			form.activities.append_entry(data=d)
 		return render_template("user_activities.html", form=form)
+
+# define the visualization related stuff here
+@app.route("/user_overview")
+def user_overview():
+	return render_template("user_overview_viz.html")
+
+
 """
 ADMIN
 """
@@ -286,7 +293,7 @@ def admin_progress_logs():
 def admin_user_stats():
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
-	
+
 	return render_template("admin_user_stats.html", user_vms=user_vms)
 
 @app.route("/admin/event_stats")
@@ -294,7 +301,7 @@ def admin_user_stats():
 def admin_event_stats():
 	events = Event.query.all()
 	event_vms = [EventLogViewModel(event) for event in events]
-	
+
 	return render_template("admin_event_stats.html", event_vms=event_vms)
 
 
@@ -314,7 +321,7 @@ def admin_instructions():
 
 # TODO: Create some kind of help page, maybe with instructions on how to
 # troubleshoot the PowerToken system. This should be more for study
-# administrators than system administrators (i.e. more practical than 
+# administrators than system administrators (i.e. more practical than
 # technical).
 @app.route("/admin/help")
 @login_required
@@ -326,30 +333,3 @@ def admin_test():
 	users = User.query.order_by(User.registered_on).all()
 	user_vms = [UserViewModel(user) for user in users]
 	return render_template("admin_user_stats.html", user_vms=user_vms)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
