@@ -18,8 +18,8 @@ var mask;
 
 function preload(){
   // need to update this
-  data = loadJSON("../data/viz_activity_data.json");
-  mask = loadImage("../img/mask.png");
+  data = loadJSON("../static/data/viz_activity_data.json");
+  mask = loadImage("../static/img/mask.png");
 }
 
 function setup() {
@@ -51,14 +51,14 @@ function setup() {
 
 function draw() {
   background(255);
-  //
+  // 
   drawWave();
   image(mask, canvasW/2-canvasH/2, 0, canvasH, canvasH);
   fill(255);
   noStroke();
   rect(0,0,canvasW/2-canvasH/2,canvasH);
   rect(canvasW-canvasW/2+canvasH/2-5,0,canvasW/2-canvasH/2+10,canvasH);
-
+	
   //
   var startA = -PI/2;
   for (var i = 0; i < activities.length; i++){
@@ -106,7 +106,7 @@ class Activity {
     this.completed = completed;
     this.length = 0;
     if (this.completed == true){
-      this.color = color(150,150,150);
+      this.color = color(150,150,150); //edit color based on...
     }else {
       this.color = color(220,220,220);
     }
