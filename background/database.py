@@ -164,6 +164,8 @@ def get_session():
 
 def close_connection(session):
 	session.close()
+	
+	
 
 #SETUP - RUN ONCE
 def setup_db():
