@@ -5,7 +5,7 @@ from sqlalchemy.pool import NullPool
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 #imports for models
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import MetaData, Column, ForeignKey, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -51,7 +51,7 @@ class User(Base):
 	wc_id = Column(Integer, unique=True)
 	wc_token = Column(String(128))
 	fb_token = Column(String(256))
-	logs = relationship("Log", backref="user", lazy="dynamic")
+	#logs = relationship("Log", backref="user", lazy="dynamic")
 	activities = relationship("Activity", backref="user", lazy="dynamic")
 	errors = relationship("Error", backref="user", lazy="dynamic")
 	days = relationship("Day", backref="user", lazy="dynamic")
@@ -60,6 +60,12 @@ class User(Base):
 		d = datetime.now()
 		today = datetime(d.year, d.month, d.day)
 		return self.days.filter(Day.date == today).first()
+
+	def yesterday(self):
+		d = datetime.now().date()
+		yester = d - timedelta(days=1)
+		ydt = datetime.combine(yester, datetime.min.time())
+		return self.days.filter(Day.date == ydt).first()
 
 	def __repr__(self):
 		return "<User {}>".format(self.username)
@@ -134,6 +140,7 @@ class Event(Base):
 		return output
 
 
+
 ''' --------- ####
 
 '''
@@ -155,6 +162,8 @@ def get_session():
 	db_session = DBSession()
 	return db_session
 
+def close_connection(session):
+	session.close()
 
 #SETUP - RUN ONCE
 def setup_db():

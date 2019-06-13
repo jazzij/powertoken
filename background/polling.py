@@ -14,26 +14,25 @@ import sys
 import math
 from datetime import datetime
 from database import get_session, close_connection
-#from data.models import Activity, Event, Log, User, Day
-from database import Activity, Event, Log, User, Day
-#from database import TALLY, CHARGE, WEIGHT, PLAN
+from database import Activity, Event, User, Day
+from database import TALLY, CHARGE, WEIGHT, PLAN
 import fitbit
 import weconnect
 
 import logging, sys
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
-LAST_POLL_TIME = datetime.strptime('14:30', '%H:%M').time()
+LAST_POLL_TIME = datetime.strptime('23:30', '%H:%M').time()
 
 TALLY="tally"
 CHARGE="charge"
 WEIGHT="weight"
 PLAN="plan"
 
-import atexit
-def onExit():
-	close_connection()
-atexit.register(onExit)
+#import atexit
+#def onExit():
+#	close_connection()
+#atexit.register(onExit)
 
 
 def poll_and_save():
@@ -49,11 +48,23 @@ def poll_and_save():
 		activity_events = weconnect.get_todays_events(user, db_session)
 		weconnect.add_events_to_db(activity_events, db_session)
 		logging.info("Found {} new events for user {}".format(len(activity_events), user.wc_id))
-	
+
+		# Add "progress" based on metaphor
+		step_count = 0
+		if user.metaphor == CHARGE:
+			#get yesterDay
+			yesterDay = user.yesterday()
+			#get progress from yesterDay, add as starting progress to Fitbit
+			step_count = fitbit.update_progress_count(user, yesterDay.computed_progress, db_session)
+			logging.info("Just added {} prelim steps to {}'s account!".format(step_count, user.username))
+					
+		#Setup new DAY for each user
+		newDay = create_today(user, 0, step_count, db_session)
+		
 	logging.info("Completed first POLL for {} users at {}.".format(len(users), datetime.now()))
 	
 	db_session.commit()
-	close_connection()
+	close_connection(db_session)
 
 def poll_and_update():
 	"""
@@ -106,20 +117,19 @@ def poll_and_update():
 			logging.info("Today's TALLY Progress for {} is {}".format(user, progress))
 			
 			# Send progress to Fitbit
-			step_count = fitbit.update_progress_count(user, progress)
+			step_count = fitbit.update_progress_count(user, progress, db_session)
 			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 						
 			
 		elif user.metaphor == CHARGE:
 			# CHARGE - WEIGHTED COUNT
-			progress = calculate_progress_charge(num_completed, event_ids, session) 
+			progress = calculate_progress_charge(num_completed, event_ids, db_session) 
 			logging.info("Today's CHARGE Progress for {} is {}".format(user, progress))
 		
 			# Send progress to Fitbit
-			step_count = fitbit.update_progress_count(user, progress)
+			step_count = fitbit.update_progress_count(user, progress, db_session)
 			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 					
-		
 		# Add a Log object to the database
 		#log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
 	
@@ -127,12 +137,10 @@ def poll_and_update():
 		cur_time = datetime.now().time()
 		if cur_time > LAST_POLL_TIME:
 			save_today(user, num_completed, progress, db_session)
-		
-	db_session.commit()	
-	close_connection()
+	
+	close_connection(db_session)
 
 	
-
 def calculate_progress_plan(num_events_completed, event_id_list):
 	progress = num_events_completed / float(len(event_id_list))
 	return progress #percentage
@@ -169,28 +177,32 @@ def calculate_progress_charge(num_completed, event_id_list, session):
 	return total	
 
 
-def save_today(user, checkin_count, today_progress, session):
+def create_today(user, checkin_count, today_progress, session):
 	'''
-	on Last Poll, create a new DAY for the user, save the calculated checkin count and progress 
+	on FIRST Poll, create a new DAY for the user, save the calculated checkin count and progress 
 	'''
-	thisDay = Day(user_id=user.id, date=datetime.now().date(), computed_progress=today_progress, checkin_count=checkin_count)
-	db_session.add(thisDay)
-	db_session.commit()
-
-	today_events = weconnect.get_events_for_user(user, db_session)
-	logging.debug(today_events)
+	thisDay = Day(user_id=user.id, date=datetime.now().date(), computed_progress=today_progress, complete_count=checkin_count)
+	session.add(thisDay)
+	session.commit()
+	
+	#add day id to each event in DB for better searchability
+	today_events = weconnect.get_events_for_user(user, session)
 	for ev in today_events:
 		ev.day_id = thisDay.id
-		logging.debug(ev.day_id)	
-	db_session.commit()
+	session.commit()
 
-def weighted_tally(user, session):
-	pass
+	
+def save_today(user, checkin_count, today_progress, session):
+	'''
+	on Poll, save the calculated checkin count and progress 
+	'''
+	thisDay = user.thisday()
+	thisDay.computed_progress = today_progress
+	thisDay.complete_count = checkin_count
+	session.commit()
 
 
-def weekly_weighted(user, session):
-	#get user's progress from last 7 days (assume weighted progress)
-	pass
+
 
 if __name__ == "__main__":
 		
