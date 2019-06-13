@@ -225,10 +225,10 @@ def get_events_for_user( user, session, onDate=None):
 		ev = a.events.filter(Event.start_time >= onDate.date()).first()
 		if ev is not None: 
 			today_events.append(ev)
-	print(today_events)	
+	logging.debug(today_events)	
 	
 	for ev in today_events:
-		print("Ev {} checked in? {}".format(ev.activity.name, ev.completed))
+		logging.debug("Ev {} checked in? {}".format(ev.activity.name, ev.completed))
 	
 	return today_events
 		
