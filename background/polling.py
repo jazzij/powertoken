@@ -132,7 +132,7 @@ def poll_and_update():
 	close_connection()
 
 	
-
+''' ~~~ PROGRESS CALCULATIONS ~~~'''
 def calculate_progress_plan(num_events_completed, event_id_list):
 	progress = num_events_completed / float(len(event_id_list))
 	return progress #percentage
@@ -184,13 +184,7 @@ def save_today(user, checkin_count, today_progress, session):
 		logging.debug(ev.day_id)	
 	db_session.commit()
 
-def weighted_tally(user, session):
-	pass
 
-
-def weekly_weighted(user, session):
-	#get user's progress from last 7 days (assume weighted progress)
-	pass
 
 if __name__ == "__main__":
 		

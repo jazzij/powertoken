@@ -7,6 +7,7 @@ import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 from datetime import datetime
+import json
 from flask import redirect, render_template, request, url_for
 #from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
@@ -295,3 +296,9 @@ def shutdown_session(exception=None):
 @app.route("/user_overview")
 def user_overview():
 	return render_template("user_overview_viz.html")
+
+@app.route("/practice")
+def practice():
+	jstr = { "user": "PT002", "progress": 0.25, "activities": [{"start_time": "09:30:00", "weight": 5, "completed": "false", "name": "act1"}, {"start_time": "13:16:00", "weight": 3, "completed": "true", "name": "act2"}, {"start_time": "14:45:00", "weight": 1, "completed": "false", "name": "act3"}, {"start_time": "05:00:00", "weight": 2, "completed": "true", "name": "act4"}]}
+	
+	return render_template("overview_viz.html", activity_data= jstr)

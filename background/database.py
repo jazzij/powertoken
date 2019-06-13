@@ -51,7 +51,7 @@ class User(Base):
 	wc_id = Column(Integer, unique=True)
 	wc_token = Column(String(128))
 	fb_token = Column(String(256))
-	logs = relationship("Log", backref="user", lazy="dynamic")
+	#logs = relationship("Log", backref="user", lazy="dynamic")
 	activities = relationship("Activity", backref="user", lazy="dynamic")
 	errors = relationship("Error", backref="user", lazy="dynamic")
 	days = relationship("Day", backref="user", lazy="dynamic")
