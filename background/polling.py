@@ -93,54 +93,13 @@ def poll_and_update():
 
 		#CALCULATE PROGRESS, BASED ON INDIVIDUAL METAPHOR
 		progress, step_count = calculate_progress( user, num_completed, event_ids, db_session)
-		'''
-		progress = 0
-		if user.metaphor == PLAN:			
-			#BASIC PLAN --- PERCENTAGE COMPLETE VS PLANNED
-			progress = calculate_progress_plan(num_completed, event_ids)
-			logging.info("Today's Percentage Progress for {} is {}".format(user, progress))
-			
-			# Send progress to Fitbit
-			step_count = fitbit.update_progress_decimal(user, progress, db_session)
-			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
-		
-		elif user.metaphor == WEIGHT:		
-			#WEIGHTED PROGRESS
-			progress = calculate_progress_weight(event_ids, db_session)
-			logging.info("Today's Weighted Progress for {} is {}".format(user, progress))
-		
-			# Send progress to Fitbit
-			step_count = fitbit.update_progress_decimal(user, progress, db_session)
-			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
-					
-		elif user.metaphor == TALLY:
-			# TALLY - BASIC COUNT	
-			progress = calculate_progress_tally(num_completed, event_ids)
-			logging.info("Today's TALLY Progress for {} is {}".format(user, progress))
-			
-			# Send progress to Fitbit
-			step_count = fitbit.update_progress_count(user, progress, db_session)
-			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
-						
-			
-		elif user.metaphor == CHARGE:
-			# CHARGE - WEIGHTED COUNT
-			progress = calculate_progress_charge(num_completed, event_ids, db_session) 
-			logging.info("Today's CHARGE Progress for {} is {}".format(user, progress))
-		
-			# Send progress to Fitbit
-			step_count = fitbit.update_progress_count(user, progress, db_session)
-			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
-		'''			
-		# Add a Log object to the database
-		#log = Log(wc_progress=progress, fb_step_count=step_count, user=user)
-		
+		logging.info("{} made {} progress today, with a updated step count of {}".format(user.username, progress, step_count))
+
 		# on the last poll of the day, create Day total for the user
 		#cur_time = datetime.now().time()
 		#if cur_time > LAST_POLL_TIME:
 		#	save_today(user, num_completed, progress, db_session)
-		save_today(user, num_completed, progress, db_session)
-
+		#save_today(user, num_completed, progress, db_session)
 
 	close_connection(db_session)
 
@@ -157,6 +116,9 @@ def calculate_progress(user, num_completed, event_ids, session):
 		step_count = fitbit.update_progress_decimal(user, progress, session)
 		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 		
+		#update percentage for today
+		save_today(user, num_completed, progress, session)
+		
 	elif user.metaphor == WEIGHT:		
 		#WEIGHTED PROGRESS
 		progress = calculate_progress_weight(event_ids, session)
@@ -165,6 +127,9 @@ def calculate_progress(user, num_completed, event_ids, session):
 		# Send progress to Fitbit
 		step_count = fitbit.update_progress_decimal(user, progress, session)
 		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+		
+		#update percentage for today
+		save_today(user, num_completed, progress, session)		
 					
 	elif user.metaphor == TALLY:
 		# TALLY - BASIC COUNT	
@@ -174,17 +139,27 @@ def calculate_progress(user, num_completed, event_ids, session):
 		# Send progress to Fitbit
 		step_count = fitbit.update_progress_count(user, progress, session)
 		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
-						
+		
+		#update step count for today ( one LED per activitiy)
+		save_today(user, num_completed, step_count, session)				
 			
 	elif user.metaphor == CHARGE:
 		# CHARGE - WEIGHTED COUNT
-		progress = calculate_progress_charge(num_completed, event_ids, session) 
-		logging.info("Today's CHARGE Progress for {} is {}".format(user, progress))
+		today = user.thisday()
+		if today.complete_count < num_completed:
+			progress = calculate_progress_charge(num_completed, event_ids, session) 
+			progress_change = progress - today.computed_progress
+			logging.info("Today's CHARGE Progress update for {} is {}".format(user, progress_change))
 		
-		# Send progress to Fitbit
-		step_count = fitbit.update_progress_count(user, progress, session)
-		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
+			
+			
+			# Send progress change to Fitbit
+			step_count = fitbit.update_progress_count(user, progress_change, session)
+			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 
+		#update step count for today ( weighted*.10 per activity)
+		save_today(user, num_completed, step_count, session)
+		
 	return progress, step_count
 
 def calculate_progress_plan(num_events_completed, event_id_list):
@@ -214,6 +189,7 @@ def calculate_progress_charge(num_completed, event_id_list, session):
 	max_steps = fitbit.DEFAULT_GOAL
 	activity_value = fitbit.STEPS_PER_POINT
 	total = 0
+		
 	evs = session.query(Event).filter(Event.eid.in_(event_id_list)).all()
 	for ev in evs:
 		weight = ev.activity.weight
@@ -245,7 +221,7 @@ def save_today(user, checkin_count, today_progress, session):
 	thisDay = user.thisday()
 	#only update if there has been a change
 	if thisDay.complete_count < checkin_count:	
-		thisDay.computed_progress = today_progress
+		thisDay.computed_progress = today_progress 
 		thisDay.complete_count = checkin_count
 	session.commit()
 

@@ -99,7 +99,7 @@ def update_progress_decimal(user, progress, db_session):
 		return 0
 	else:	
 		clear_user_log(user, db_session)	
-		log = log_step_activity(user, new_steps)
+		log = log_step_activity(user, new_steps, db_session)
 		return log
 
 def update_progress_count(user, steps_to_add, db_session):
@@ -108,7 +108,7 @@ def update_progress_count(user, steps_to_add, db_session):
 	
 	#Update fitbit with new count
 	stepCount = old_steps + steps_to_add
-	log = log_step_activity(user, stepCount)
+	log = log_step_activity(user, stepCount, db_session)
 	logging.debug("Logging additional {} to get total {}".format(steps_to_add, log))
 
 	return log
@@ -126,7 +126,7 @@ def clear_user_log(user, db_session):
 		delete_activity(user, activity["logId"])
 	return old_steps
 
-def log_addl_steps(user, add_steps):
+def log_addl_steps(user, add_steps, db_session):
 	#DEPRECATED
 	# Count existing steps
 	# Add new steps
@@ -135,7 +135,7 @@ def log_addl_steps(user, add_steps):
 	cur_steps = step_activities[0]["steps"]
 	
 	updated_count = cur_steps + add_steps
-	log = log_step_activity(user, updated_count)
+	log = log_step_activity(user, updated_count, db_session)
 	logging.debug("Logging additional {} to get total {}".format(add_steps, log))
 	return log
 
@@ -197,7 +197,7 @@ def delete_activity(user, log_id):
 		return False
 
 
-def log_step_activity(user, new_step_count, time=None):
+def log_step_activity(user, new_step_count, db_session, time=None):
 	""" POST
 	Log a walking activity containing the number of steps specified in
 	new_step_count. Return the new step count (0 if the POST request is

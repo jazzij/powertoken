@@ -7,11 +7,15 @@ users = session.query(User).all()
 
 for user in users:
 	events = get_events_for_user(user, session)
-	print("{} metaphor: {}", user.username, user.metaphor)
+	print("{}'s metaphor: {}".format(user.username, user.metaphor))
 	for ev in events:
 		act = ev.activity
 		print("{} weight:{}, completed: {}".format(act.name, act.weight, ev.completed ))
-	print("User sees on Fitbit: ")
+
+	today = user.thisday()
+	if today is not None:
+		print("User's day-- count: {}, progress:{}".format(today.complete_count, today.computed_progress))
+		print("User sees on Fitbit: ")
 	print( get_dashboard_state(user))
 
 
