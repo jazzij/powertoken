@@ -33,7 +33,7 @@ function setup() {
   centerY = canvasH / 2;
   //
   gap = 2.5*PI/180;
-  innerR = canvasW/3;
+  innerR = canvasW/4;
   outerR = canvasH/1.3;
   //
   progress = data.progress;
@@ -51,18 +51,19 @@ function setup() {
 
 function draw() {
   background(255);
-  // 
+  //
   drawWave();
   image(mask, canvasW/2-canvasH/2, 0, canvasH, canvasH);
   fill(255);
   noStroke();
   rect(0,0,canvasW/2-canvasH/2,canvasH);
   rect(canvasW-canvasW/2+canvasH/2-5,0,canvasW/2-canvasH/2+10,canvasH);
-	
+
   //
   var startA = -PI/2;
   for (var i = 0; i < activities.length; i++){
     activities[i].draw(startA);
+    activities[i].drawText(startA);
     startA = startA + activities[i].length;
   }
 
@@ -73,7 +74,7 @@ function drawWave(){
   //var width = calculateW(height)/2;
   var height = canvasH*progress;
   push();
-  translate(0, height);
+  translate(0, (canvasH-height));
   noStroke();
 
   for (var x = radius; x <= width-radius; x += diameter*1.5) {
@@ -105,7 +106,7 @@ class Activity {
     this.startT = startTime;
     this.completed = completed;
     this.length = 0;
-    if (this.completed == true){
+    if (this.completed == "true"){
       this.color = color(150,150,150); //edit color based on...
     }else {
       this.color = color(220,220,220);
@@ -123,7 +124,22 @@ class Activity {
       arc(centerX,centerY,outerR-2*i,outerR-2*i,startA,startA+this.length-3*gap);
     }
   }
-  drawText(){
-
+  drawText(startA){
+    var arc = innerR*2*PI*startA/(2*PI);
+    for (var i=0; i < this.name.length; i++){
+      var char = this.name.charAt(i);
+      var w = textWidth(char);
+      arc = arc + w;
+      var theta = arc/(innerR);
+      push();
+      translate(centerX+(innerR)*Math.cos(theta), centerY+(innerR)*Math.sin(theta));
+      rotate(theta+PI/2);
+      fill(0,0,0,100);
+      noStroke();
+      textSize(20);
+      text(char,0,0);
+      pop();
+      arc += w;
+    }
   }
 }
