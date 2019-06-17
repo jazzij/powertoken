@@ -15,7 +15,7 @@ from werkzeug.datastructures import MultiDict
 
 from powertoken import app
 import powertoken.db_util as db_util
-import powertoken.db_util_test
+#import powertoken.db_util_test
 import powertoken.api_util as api_util #import check_wc_token_status, login_to_wc, set_wc_activities
 
 from powertoken.forms import UserLoginForm, UserWcLoginForm, UserActivityForm
