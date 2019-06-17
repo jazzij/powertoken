@@ -15,13 +15,11 @@ from werkzeug.datastructures import MultiDict
 
 from powertoken import app
 import powertoken.db_util as db_util
+import powertoken.db_util_test
 import powertoken.api_util as api_util #import check_wc_token_status, login_to_wc, set_wc_activities
 
-#from app.helpers import complete_fb_login
 from powertoken.forms import UserLoginForm, UserWcLoginForm, UserActivityForm
-#from powertoken.forms import AdminLoginForm, AdminRegistrationForm
-#from powertoken.models import Activity, Admin, Error, Log, User, Event
-#from app.viewmodels import LogViewModel, UserViewModel, ActivityViewModel, EventLogViewModel
+
 
 @app.route("/createDB")
 def create_db():
@@ -127,44 +125,6 @@ def user_wc_login():
 	return render_template("user_wc_login.html", form=form)
 
 
-'''		user = User.query.filter_by(username=username).first()
-		priorUser = user is not None
-
-		# If the user with that username isn't in the database for whatever
-		# reason, go back to the PowerToken login page.
-		if user is None:
-			return redirect(url_for("user_login", error="Invalid user"))
-
-		# If everything is okay so far, get WEconnect info from the form and
-		# login to external WEconnect server.
-		email = form.email.data
-		password = form.password.data
-		success, result = login_to_wc(email, password)
-
-		# If the username or password is incorrect, prompt the user to re-enter
-		# credentials.
-		if not success:
-			error = "Incorrect username or password"
-			return render_template("user_wc_login.html", form=form, error=error)
-
-		# If the login was successful, store the WEconnect ID and access token
-		# in the database, pull the user's WEconnect activities into the
-		# database, and redirect to the Fitbit login.
-		user.wc_id = result[0]
-		user.wc_token = result[1]
-		logging.info("Adding User {}".format(user.wc_id))
-
-		try:
-			db.session.commit()
-		except:
-			error = "A user with the same WEconnect credentials already exists"
-			return render_template("user_wc_login.html", form=form, error=error)
-
-		#TODO: CHECK TO MAKE SURE THIS WORKS. only execute when there is an new user
-		if not priorUser:
-			set_wc_activities(user)
-		return redirect(url_for("user_fb_login", username=username))
-		'''
 
 @app.route("/user_fb_login", methods=["GET", "POST"])
 def user_fb_login():
@@ -196,26 +156,6 @@ def user_fb_login():
 
 		return render_template("user_home.html", username=username)
 
-		'''
-		# Get the user with that username from the database.
-		user = User.query.filter_by(username=username).first()
-
-		# If the user with that username isn't in the database for whatever
-		# reason, go back to the PowerToken login page.
-		if user is None:
-			return redirect(url_for("user_login", error="Invalid user"))
-
-		# If everything is okay so far, add the Fitbit token to the database.
-		user.fb_token = fb_token
-
-		try:
-			db.session.commit()
-		except:
-			db.rollback()
-
-		# This code will never be called but must be present.
-		return render_template("user_home.html", username=username)
-		'''
 	# GET: Render Fitbit page, which redirects to external login.
 	elif request.method == "GET":
 		username = request.args.get("username")
@@ -293,12 +233,18 @@ def shutdown_session(exception=None):
 	
 
 # define the visualization related stuff here
-@app.route("/user_overview")
-def user_overview():
-	return render_template("user_overview_viz.html")
-
-@app.route("/practice")
-def practice():
-	jstr = { "user": "PT002", "progress": 0.25, "activities": [{"start_time": "09:30:00", "weight": 5, "completed": "false", "name": "act1"}, {"start_time": "13:16:00", "weight": 3, "completed": "true", "name": "act2"}, {"start_time": "14:45:00", "weight": 1, "completed": "false", "name": "act3"}, {"start_time": "05:00:00", "weight": 2, "completed": "true", "name": "act4"}]}
+@app.route("/overview/<name>")
+def user_overview(name):
+	dict = db_util.viz_dataDict(name)
+	return render_template("overview_viz.html", activity_data= dict)	
 	
-	return render_template("overview_viz.html", activity_data= jstr)
+	
+@app.route("/practice/<name>")
+def practice(name):
+
+	#username = request.args.get("username")
+	username = name
+	dict = db_util.viz_dataDict(name)
+	
+	
+	return render_template("overview_viz.html", activity_data= dict)

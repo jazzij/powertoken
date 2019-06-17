@@ -193,6 +193,29 @@ def printTables():
 	[print(e.name) for e in Event.columns]
 	[print(f.name) for f in Activity.columns]
 
+#CLEAR
+def clear_db(username, session):
+	user = session.query(User).filter_by(username=username).first()
+	
+	all_days = session.query(Day).filter_by(user_id=user.id)#.all()
+	all_activities = session.query(Activity).filter_by(user_id=user.wc_id or 0)#.all()
+	all_events = session.query(Event).filter(Event.activity in all_activities)#.all()
+	all_errors = session.query(Error).filter_by(user_id=user.id)#.all()
+
+	all_errors.delete()
+	all_events.delete()
+	all_activities.delete()
+	all_days.delete()
+
+	session.delete(user)
+	
+	try:
+		session.commit()
+	except:
+		print("Could not delete {}".format(username))
+		session.rollback()
+
+
 
 if __name__ == "__main__":
 	print("Running new database as main")

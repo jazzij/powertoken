@@ -1,3 +1,17 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="120">
+    <title>Activities Overview</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,800&display=swap" rel="stylesheet">
+    <script src="{{url_for('static', filename='js/p5/p5.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/p5/addons/p5.dom.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/p5/addons/p5.sound.min.js')}}"></script>
+   
+   
+	<script type="text/javascript">
 var amplitude = 10;
 var frequency = .15;
 var time = 0;
@@ -18,8 +32,8 @@ var mask;
 
 function preload(){
   // need to update this
-  //data = {{activity_data |tojson }}
-  data = loadJSON("../static/data/viz_activity_data.json");
+  data = {{activity_data |tojson }}
+  //data = loadJSON("../static/data/viz_activity_data.json");
   mask = loadImage("../static/img/mask.png");
 }
 
@@ -36,6 +50,8 @@ function setup() {
   gap = 2.5*PI/180;
   innerR = canvasW/4;
   outerR = canvasH/1.3;
+
+  frameRate(16)
   //
   progress = data.progress;
   activities = [];
@@ -144,3 +160,10 @@ class Activity {
     }
   }
 }
+	
+	</script>  
+
+  </head>
+  <body>
+  </body>
+</html>

@@ -199,8 +199,8 @@ def delete_activity(user, log_id):
 
 def log_step_activity(user, new_step_count, db_session, time=None):
 	""" POST
-	Log a walking activity containing the number of steps specified in
-	new_step_count. Return the new step count (0 if the POST request is
+	Log a walking activity with fitbit containing the number of steps specified in
+	new_step_count. Return the new updated step count (0 if the POST request is
 	unsuccessful).
 
 	:param background.models.User user\n
@@ -284,6 +284,11 @@ def get_dashboard_state(user, date=None):
 	else:
 		print("Error: {}".format(response.json()))
 		return -1	
+
+
+
+	
+	 
 
 if __name__ == "__main__":
 	from database import get_session, close_connection

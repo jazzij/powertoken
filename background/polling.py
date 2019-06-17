@@ -54,10 +54,13 @@ def poll_and_save():
 		if user.metaphor == CHARGE:
 			#get yesterDay
 			yesterDay = user.yesterday()
-			#get progress from yesterDay, add as starting progress to Fitbit
-			step_count = fitbit.update_progress_count(user, yesterDay.computed_progress, db_session)
-			logging.info("Just added {} prelim steps to {}'s account!".format(step_count, user.username))
-					
+			if yesterDay is not None:
+				#get progress from yesterDay, add as starting progress to Fitbit
+				step_count = fitbit.update_progress_count(user, yesterDay.computed_progress, db_session)
+				logging.info("Just added {} prelim steps to {}'s account!".format(step_count, user.username))
+			else:
+				logging.info("CHARGE: Starting fresh from today: {}".format(datetime.now()))
+		
 		#Setup new DAY for each user
 		newDay = create_today(user, 0, step_count, db_session)
 		
