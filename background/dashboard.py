@@ -1,9 +1,20 @@
 from database import get_session, User, Day, Activity, Event
-from fitbit import get_dashboard_state
+from fitbit import get_dashboard_state, update_progress_count
 from weconnect import get_events_for_user
 
 session = get_session()
 users = session.query(User).all()
+
+def change_steps(user, target_steps, session):
+	day = user.thisday()
+	
+	#change step count in fitbit
+	diff = target_steps - day.computed_progress
+	update = update_progress_count(user, diff, session)
+	
+	#change step count in day
+	day.computed_progress = update
+	session.commit()
 
 for user in users:
 	events = get_events_for_user(user, session)
