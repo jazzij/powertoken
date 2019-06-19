@@ -13,14 +13,11 @@ Last modified by Jasmine J on 4/2019.
 import sys
 import math
 from datetime import datetime
-from sqlalchemy import event
-
 from database import get_session, close_connection
 from database import Activity, Event, User, Day
 from database import TALLY, CHARGE, WEIGHT, PLAN
 import fitbit
 import weconnect
-
 
 import logging, sys
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
@@ -32,16 +29,10 @@ CHARGE="charge"
 WEIGHT="weight"
 PLAN="plan"
 
-
 #import atexit
 #def onExit():
 #	close_connection()
 #atexit.register(onExit)
-
-@event.listens_for(User, 'after_insert')
-def new_user_handler(mapper, connection, target):
-	print("(Poll) After insert triggered")
-	poll_and_save()
 
 
 def poll_and_save():
@@ -50,7 +41,6 @@ def poll_and_save():
 	"""
 	db_session = get_session()
 	users = db_session.query(User).all()
-
 	for user in users:
 		logging.debug("Polling for {}".format(user))
 		
@@ -77,7 +67,7 @@ def poll_and_save():
 	logging.info("Completed first POLL for {} users at {}.".format(len(users), datetime.now()))
 	
 	db_session.commit()
-	#close_connection(db_session)
+	close_connection(db_session)
 
 def poll_and_update():
 	"""
@@ -95,6 +85,12 @@ def poll_and_update():
 	
 	for user in users:
 		logging.info("polling for {}".format(user))
+		
+######	#if a user for some reason doesn't have DAY setup, then rerun poll_and_save for all
+		if user.thisday() is None:
+			poll_and_save()
+#######
+			
 		# API call to WEconnect activities-with-events
 		activity_events = weconnect.get_todays_events(user, db_session)
 		if len(activity_events) < 1: 
@@ -230,9 +226,12 @@ def create_today(user, checkin_count, today_progress, session):
 	today_events = weconnect.get_events_for_user(user, session)
 	for ev in today_events:
 		ev.day_id = thisDay.id
-		
-	session.commit()
 
+	logging.info("Creating this day: {}".format(thisDay))	
+	try:		
+		session.commit()
+	except:
+		session.rollback()
 	
 def save_today(user, checkin_count, today_progress, session):
 	'''
@@ -248,9 +247,6 @@ def save_today(user, checkin_count, today_progress, session):
 
 
 if __name__ == "__main__":
-	
-	#session = get_session()
-	#users = session.query(User).all()
 		
 	if len(sys.argv) == 1:
 		poll_and_save()
@@ -261,14 +257,6 @@ if __name__ == "__main__":
 	elif int(sys.argv[1]) == 1:
 		logging.info("Initiating update poll at {}".format(datetime.now()))
 		poll_and_update()
-	
-	#debug
-	elif int(sys.argv[1]) == 2:
-		newUser = User(username="testUser2")
-		session.add(newUser)
-		session.commit()
-		print("added test user")
-		
 
 	#debug option
 	elif int(sys.argv[1]) == 3:
@@ -277,4 +265,3 @@ if __name__ == "__main__":
 		result = calculate_progress_tally(3, [1,2,3,4,5])
 		print(result)
 
-	close_connection(session)

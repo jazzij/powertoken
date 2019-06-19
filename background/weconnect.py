@@ -182,6 +182,25 @@ def create_new_activity(activity, session):
 		logging.error("Session commit failed for {}".format(act_dict["wc_act_id"]))
 	finally:
 		return
+
+def wc_create_new_user(email, pw, phone, session):
+	params = {"email":email, 
+		"password":pw, 
+		"firstName":"pt", 
+		"lastName":"user", 
+		"gender":"male", 
+		"birthday":"1990-01-01", 
+		"soberday":"2019-06-18", 
+		"phone": phone
+		}
+	
+	response = requests.post(WC_URL, data=params)
+	if response.status_code == 200:
+		return response.json()
+	else:
+		logging.error("Could not create new user. Response code {}, text".format(response.status_code, response.text))
+	
+	
 	
 			
 #HELPER FUNCTION FOR SAVE NEW ACTIVITIES (duplicated from powertoken/api_util.py)
@@ -225,7 +244,7 @@ def get_events_for_user( user, session, onDate=None):
 		ev = a.events.filter(Event.start_time >= onDate.date()).first()
 		if ev is not None: 
 			today_events.append(ev)
-	logging.debug(today_events)	
+	logging.debug("(GET EVENTS FOR USER): {}".format(today_events))	
 	
 	for ev in today_events:
 		logging.debug("Ev {} checked in? {}".format(ev.activity.name, ev.completed))

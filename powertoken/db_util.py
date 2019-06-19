@@ -155,18 +155,21 @@ def viz_dataDict(username):
 	Returns dict of data needed to generate vizualization
 	'''
 	# FORMAT	jstr = { "user": "PT002", "progress": 0.25, "activities": [{"start_time": "09:30:00", "weight": 5, "completed": "false", "name": "act1"}, {"start_time": "13:16:00", "weight": 3, "completed": "true", "name": "act2"}, {"start_time": "14:45:00", "weight": 1, "completed": "false", "name": "act3"}, {"start_time": "05:00:00", "weight": 2, "completed": "true", "name": "act4"}]}
+	jstr = { "user": "test", "progress": 0.25, "activities": [{"start_time": "09:30:00", "weight": 5, "completed": "false", "name": "act1"}, {"start_time": "13:16:00", "weight": 3, "completed": "true", "name": "act2"}, {"start_time": "14:45:00", "weight": 1, "completed": "false", "name": "act3"}, {"start_time": "05:00:00", "weight": 2, "completed": "true", "name": "act4"}]}
 
 	user = db.session.query(User).filter_by(username=username).first()
 	if user is None:
 		logging.info("User {} not found. Returning test data".format(username))
-		jstr = { "user": "test", "progress": 0.25, "activities": [{"start_time": "09:30:00", "weight": 5, "completed": "false", "name": "act1"}, {"start_time": "13:16:00", "weight": 3, "completed": "true", "name": "act2"}, {"start_time": "14:45:00", "weight": 1, "completed": "false", "name": "act3"}, {"start_time": "05:00:00", "weight": 2, "completed": "true", "name": "act4"}]}
 		return jstr
 		
 	user_name = user.username
 	#from day get list of activities
 	day = user.thisday() 
+	if day is None:
+		logging.info("User {} does not have this day. Returning test data".format(username))
+		return jstr
+		
 	progress = day.computed_progress
-	
 	activities = [] #info: start_time, weight, name
 	for event in day.events.all():
 		time = event.start_time

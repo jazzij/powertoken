@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import MetaData, Column, ForeignKey, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from sqlalchemy import event
+#from sqlalchemy.event import listens
 
 #CONSTANTS
 DB_REL_PATH = "sqlite:///" + "data/pt_data.db"
@@ -138,6 +140,15 @@ class Event(Base):
 	def __repr__(self):
 		output = "<Event '{}'>".format(self.eid)
 		return output
+
+
+''' ---- EVENT LISTENERS ----'''
+@event.listens_for(User, 'after_insert')
+def db_update_handler(mapper, connection, target):
+	''' WHEN NEW USER IS ADDED, populate their events in the db (run poll & save)'''
+	print("(db)After insert triggered")
+
+
 
 
 
