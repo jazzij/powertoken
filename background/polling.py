@@ -93,10 +93,10 @@ def poll_and_update():
 		#Update all events in the DB
 		num_completed, event_ids = weconnect.update_db_events(activity_events, db_session)
 		logging.debug("Num activities completed: {} out of {}".format(num_completed, len(activity_events)))
-
-		#CALCULATE PROGRESS, BASED ON INDIVIDUAL METAPHOR
-		progress, step_count = calculate_progress( user, num_completed, event_ids, db_session)
-		logging.info("{} made {} progress today, with a updated step count of {}".format(user.username, progress, step_count))
+		if len(event_ids) > 0:
+			#CALCULATE PROGRESS, BASED ON INDIVIDUAL METAPHOR
+			progress, step_count = calculate_progress( user, num_completed, event_ids, db_session)
+			logging.info("{} made {} progress today, with a updated step count of {}".format(user.username, progress, step_count))
 
 		# on the last poll of the day, create Day total for the user
 		#cur_time = datetime.now().time()
@@ -149,20 +149,21 @@ def calculate_progress(user, num_completed, event_ids, session):
 	elif user.metaphor == CHARGE:
 		# CHARGE - WEIGHTED COUNT
 		today = user.thisday()
+		logging.debug("User {} prior count: {}, now completed {}".format(user.username, today.complete_count, num_completed ))
 		if today.complete_count < num_completed:
 			progress = calculate_progress_charge(num_completed, event_ids, session) 
 			progress_change = progress - today.computed_progress
 			logging.info("Today's CHARGE Progress update for {} is {}".format(user, progress_change))
-		
-			
 			
 			# Send progress change to Fitbit
 			step_count = fitbit.update_progress_count(user, progress_change, session)
 			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 
-		#update step count for today ( weighted*.10 per activity)
-		save_today(user, num_completed, step_count, session)
-		
+			#update step count for today ( weighted*.10 per activity)
+			save_today(user, num_completed, step_count, session)
+		else:
+			step_count = fitbit.get_dashboard_state(user)
+			progress = user.thisday().computed_progress
 	return progress, step_count
 
 def calculate_progress_plan(num_events_completed, event_id_list):
@@ -206,14 +207,20 @@ def create_today(user, checkin_count, today_progress, session):
 	'''
 	on FIRST Poll, create a new DAY for the user, save the calculated checkin count and progress 
 	'''
-	thisDay = Day(user_id=user.id, date=datetime.now().date(), computed_progress=today_progress, complete_count=checkin_count)
-	session.add(thisDay)
-	session.commit()
-	
+	thisDay = user.thisday() #prevent duplicates
+	if thisDay is None:
+		thisDay = Day(user_id=user.id, date=datetime.now().date(), computed_progress=today_progress, complete_count=checkin_count)	
+		session.add(thisDay)
+		session.commit()
+	else:
+		thisDay.computed_progress = today_progress
+		thisDay.complete_count = checkin_count
+		
 	#add day id to each event in DB for better searchability
 	today_events = weconnect.get_events_for_user(user, session)
 	for ev in today_events:
 		ev.day_id = thisDay.id
+		
 	session.commit()
 
 	
