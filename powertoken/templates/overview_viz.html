@@ -9,8 +9,8 @@
     <script src="{{url_for('static', filename='js/p5/p5.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/p5/addons/p5.dom.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/p5/addons/p5.sound.min.js')}}"></script>
-   
-   
+
+
 	<script type="text/javascript">
 var amplitude = 10;
 var frequency = .15;
@@ -89,9 +89,10 @@ function draw() {
 function drawWave(){
   //var height = innerR * 2* progress;
   //var width = calculateW(height)/2;
-  var height = canvasH*progress;
+  var bottom = (canvasH - innerR*2)/2+30;
+  var height = (canvasH-bottom*2)*progress;
   push();
-  translate(0, (canvasH-height));
+  translate(0, (canvasH-height-bottom));
   noStroke();
 
   for (var x = radius; x <= width-radius; x += diameter*1.5) {
@@ -160,8 +161,8 @@ class Activity {
     }
   }
 }
-	
-	</script>  
+
+	</script>
 
   </head>
   <body>
