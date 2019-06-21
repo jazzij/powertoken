@@ -147,6 +147,7 @@ class Activity {
     }
   }
   drawText(startA){
+    textSize(16);
     var arc = innerR*2*PI*startA/(2*PI);
     for (var i=0; i < this.name.length; i++){
       var char = this.name.charAt(i);
@@ -158,7 +159,7 @@ class Activity {
       rotate(theta+PI/2);
       fill(0,0,0,100);
       noStroke();
-      textSize(20);
+      textSize(18);
       text(char,0,0);
       pop();
       arc += w;
