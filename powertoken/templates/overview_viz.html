@@ -151,7 +151,7 @@ class Activity {
     var arc = innerR*2*PI*startA/(2*PI);
     for (var i=0; i < this.name.length; i++){
       var char = this.name.charAt(i);
-      var w = textWidth(char);
+      var w = textWidth(char)/1.2;
       arc = arc + w;
       var theta = arc/(innerR);
       push();
