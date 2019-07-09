@@ -7,11 +7,12 @@ First poll of the day adds new events (poll_and_save)
 Subsequent polls should update completion status (poll_and_update)
 
 Created by Abigail Franz on 2/28/2018.\n
-Last modified by Jasmine J on 4/2019.
+Last modified by Jasmine J on 6/2019.
 
 """
 import sys
 import math
+import csv
 from datetime import datetime
 from database import get_session, close_connection
 from database import Activity, Event, User, Day
@@ -82,13 +83,16 @@ def poll_and_update():
 	"""
 	db_session = get_session()
 	users = db_session.query(User).all()
-	
+	timestamp = datetime.now()
 	for user in users:
 		logging.info("polling for {}".format(user))
 		
 ######	#if a user for some reason doesn't have DAY setup, then rerun poll_and_save for all
-		if user.thisday() is None:
+		today = user.thisday()
+		if today is None:
 			poll_and_save()
+			today = user.thisday()
+			logging.info ("{} was incomplete. Ran poll-save to add {} day".format(user, today))
 #######
 			
 		# API call to WEconnect activities-with-events
@@ -99,11 +103,20 @@ def poll_and_update():
 		#Update all events in the DB
 		num_completed, event_ids = weconnect.update_db_events(activity_events, db_session)
 		logging.debug("Num activities completed: {} out of {}".format(num_completed, len(activity_events)))
-		if len(event_ids) > 0:
-			#CALCULATE PROGRESS, BASED ON INDIVIDUAL METAPHOR
-			progress, step_count = calculate_progress( user, num_completed, event_ids, db_session)
-			logging.info("{} made {} progress today, with a updated step count of {}".format(user.username, progress, step_count))
 
+		#calculate progress if there is a change
+		if len(event_ids) > 0:
+			logging.debug("detected {} vs {}".format(num_completed, today.complete_count))
+			if num_completed <= today.complete_count:
+				logging.info("No more progress made yet.")
+			else:	
+				#CALCULATE PROGRESS, BASED ON INDIVIDUAL METAPHOR
+				progress, step_count = calculate_progress( user, num_completed, event_ids, db_session)
+				logging.info("{} made {} progress today, with a updated step count of {}".format(user.username, progress, step_count))
+		
+		#log today
+		printout(user, timestamp)
+			
 		# on the last poll of the day, create Day total for the user
 		#cur_time = datetime.now().time()
 		#if cur_time > LAST_POLL_TIME:
@@ -134,7 +147,7 @@ def calculate_progress(user, num_completed, event_ids, session):
 		logging.info("Today's Weighted Progress for {} is {}".format(user, progress))
 		
 		# Send progress to Fitbit
-		step_count = fitbit.update_progress_decimal(user, progress, session)
+		#step_count = fitbit.update_progress_decimal(user, progress, session)
 		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 		
 		#update percentage for today
@@ -146,7 +159,9 @@ def calculate_progress(user, num_completed, event_ids, session):
 		logging.info("Today's TALLY Progress for {} is {}".format(user, progress))
 			
 		# Send progress to Fitbit
-		step_count = fitbit.update_progress_count(user, progress, session)
+		today = user.thisday()
+		new_step_count = progress - today.computed_progress
+		step_count = fitbit.update_progress_count(user, new_step_count, session)
 		logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 		
 		#update step count for today ( one LED per activitiy)
@@ -162,7 +177,8 @@ def calculate_progress(user, num_completed, event_ids, session):
 			logging.info("Today's CHARGE Progress update for {} is {}".format(user, progress_change))
 			
 			# Send progress change to Fitbit
-			step_count = fitbit.update_progress_count(user, progress_change, session)
+			#step_count = fitbit.update_progress_count(user, progress_change, session)
+			step_count = progress
 			logging.info("Just added {} steps to {}'s account!".format(step_count, user.username))
 
 			#update step count for today ( weighted*.10 per activity)
@@ -191,8 +207,8 @@ def calculate_progress_weight(event_id_list, session):
 	return progress #percentage
 
 def calculate_progress_tally(num_completed, event_id_list):
-	max_steps = fitbit.DEFAULT_GOAL
-	activity_value = max_steps / 5 # number of LED's visible
+	max_steps = 100000
+	activity_value = max_steps / 4 # number of LED's visible
 	return num_completed * activity_value		#raw number of steps
 
 def calculate_progress_charge(num_completed, event_id_list, session):
@@ -245,6 +261,29 @@ def save_today(user, checkin_count, today_progress, session):
 	session.commit()
 
 
+def printout(user, timestamp):
+	# timestamp, username, metaphor, day.complete_count, day.computed_progress, list of activities and weights, 
+	logging.debug("printing...")
+	file_dict = {}
+	file_dict["timestamp"] = timestamp
+	file_dict["user"] = user.username
+	file_dict["metaphor"] = user.metaphor
+	
+	day = user.thisday()
+	file_dict["checkins"] = day.complete_count
+	file_dict["computed_progress"] = day.computed_progress
+	
+	act_list = []
+	activities = user.activities.all()
+	for a in activities:
+		act = (a.name, a.weight)
+		act_list.append(act)
+	file_dict["activities"] = act_list
+	with open("log.csv", "a", newline='') as file:
+		fieldnames = file_dict.keys()
+		writer = csv.DictWriter(file, fieldnames=fieldnames, quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
+		writer.writerow(file_dict)
+		
 
 if __name__ == "__main__":
 		

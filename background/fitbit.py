@@ -17,7 +17,7 @@ DATE_FMT = "%Y-%m-%d"
 DEFAULT_GOAL = 100000
 STEPS_PER_POINT = .10 * DEFAULT_GOAL
 
-def change_step_goal(user, new_step_goal, db_session):
+def change_step_goal(user, db_session, new_step_goal=DEFAULT_GOAL):
 	"""
 	Change the step goal to new_step_goal. Return the new step goal (or 0 if
 	the request was unsuccessful).
@@ -103,11 +103,11 @@ def update_progress_decimal(user, progress, db_session):
 		return log
 
 def update_progress_count(user, steps_to_add, db_session):
-
+	
 	old_steps = clear_user_log(user, db_session)
 	
 	#Update fitbit with new count
-	stepCount = old_steps + steps_to_add
+	stepCount = old_steps + ceil(steps_to_add)
 	log = log_step_activity(user, stepCount, db_session)
 	logging.debug("Logging additional {} to get total {}".format(steps_to_add, log))
 
@@ -208,7 +208,7 @@ def log_step_activity(user, new_step_count, db_session, time=None):
 	"""	
 	#POST new steps
 	url = "{}/activities.json".format(BASE_URL)
-	
+	logging.debug("About to log {}'s new step count: {}".format(user.username, new_step_count))
 	start_time = datetime.now()
 	params = {
 		"activityId": '90013',
@@ -221,6 +221,7 @@ def log_step_activity(user, new_step_count, db_session, time=None):
 	auth_headers = {"Authorization": "Bearer " + user.fb_token}
 	response = requests.post(url, headers=auth_headers, params=params)
 	if response.status_code == 201: #POST success is 201
+		logging.info("LOG_STEP_ACTIVITY: Success!")
 		return new_step_count
 	else:
 		error_msg = response.text

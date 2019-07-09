@@ -1,22 +1,20 @@
 """
 Handles routing and form processing for the PowerToken Flask app.\n
 Created by Jasmine Jones in 11/2017.\n
-Modified by Abigail Franz, J. Jones. Last on Feb 2018.
+Modified by Abigail Franz, J. Jones. Last on July 2019.
 """
 import logging, sys
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 from datetime import datetime
 import json
 from flask import redirect, render_template, request, url_for
-#from flask_login import current_user, login_required, login_user, logout_user
 from werkzeug.urls import url_parse
 from werkzeug.datastructures import MultiDict
 
 from powertoken import app
 import powertoken.db_util as db_util
-#import powertoken.db_util_test
-import powertoken.api_util as api_util #import check_wc_token_status, login_to_wc, set_wc_activities
+import powertoken.api_util as api_util 
 
 from powertoken.forms import UserLoginForm, UserWcLoginForm, UserActivityForm
 
@@ -151,8 +149,11 @@ def user_fb_login():
 		if not db_util.pt_userExists(username):
 			return redirect(url_for("user_login", error="Invalid username. Please create user profile"))
 
-		#TODO: WHY NO SAVE INFO???
+		#ADD INFO TO DB
 		db_util.fb_addInfo(username, fb_token)
+		
+		#UPDATE USERS STEP GOAL IN FITBIT
+		api_util.fb_updateUserGoal(fb_token)
 
 		return render_template("user_home.html", username=username)
 

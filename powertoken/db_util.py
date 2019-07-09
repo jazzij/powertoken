@@ -18,7 +18,7 @@ import datetime
 import logging, sys
 import traceback
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 def close_session():
 	db.session.close()
@@ -51,6 +51,7 @@ def pt_addUser(username, db=db):
 		return
 		
 	user= User(username=username)
+	user.metaphor = "tally"
 	db.session.add(user)
 	errorMsg = None
 	
@@ -183,7 +184,7 @@ def viz_dataDict(username):
 	# map charge/tally  step count to 0-1 scale
 	if progress > 1	:
 		progress = map_steps_to_progress(progress)
-		logging.debug("(db_util) Steps to progress: {} to {}".format(day.computed_progress, progress))
+		logging.info("(db_util.viz_data) Steps to progress: {} to {}".format(day.computed_progress, progress))
 
 	data = {"user":user_name, "progress":progress, "activities": activities}
 	return data

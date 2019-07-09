@@ -49,7 +49,7 @@ class User(Base):
 	id = Column(Integer, primary_key=True)
 	username = Column(String(32), nullable=False, index=True, unique=True)
 	registered_on = Column(DateTime, index=True, default=datetime.now())
-	metaphor = Column(String(16), default=PLAN)
+	metaphor = Column(String(16), default=TALLY)
 	wc_id = Column(Integer, unique=True)
 	wc_token = Column(String(128))
 	fb_token = Column(String(256))
@@ -207,7 +207,10 @@ def printTables():
 #CLEAR
 def clear_db(username, session):
 	user = session.query(User).filter_by(username=username).first()
-	
+	if user is None:
+		print("User {} does not exist".format(username))
+		return
+		
 	all_days = session.query(Day).filter_by(user_id=user.id)#.all()
 	all_activities = session.query(Activity).filter_by(user_id=user.wc_id or 0)#.all()
 	all_events = session.query(Event).filter(Event.activity in all_activities)#.all()

@@ -133,3 +133,18 @@ def complete_fb_login(fb_response):
 	data_json = json.loads(data_utf)
 	logging.debug(data_json)
 	return data_json["tok"], data_json["username"]
+	
+def fb_updateUserGoal(fbtoken):	
+
+	BASE_URL = "https://api.fitbit.com/1/user/-"
+	url = "{}/activities/goals/daily.json".format(BASE_URL)
+	new_step_goal = 100000
+	params = {
+		"period" : "daily",
+		"type" : "steps",
+		"value" : new_step_goal
+	}	
+	auth_headers = {"Authorization": "Bearer " + fb_token}
+	response = requests.post(url, headers=auth_headers, params=params)
+	if response.status_code == 200:
+		return response.json()["goals"]["steps"]
