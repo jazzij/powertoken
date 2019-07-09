@@ -9,8 +9,8 @@
     <script src="{{url_for('static', filename='js/p5/p5.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/p5/addons/p5.dom.min.js')}}"></script>
     <script src="{{url_for('static', filename='js/p5/addons/p5.sound.min.js')}}"></script>
-   
-   
+
+
 	<script type="text/javascript">
 var amplitude = 10;
 var frequency = .15;
@@ -18,8 +18,8 @@ var time = 0;
 var diameter = 20;
 var radius = diameter/2;
 
-var cavansW = 600;
-var canvasH = 400;
+var cavansW = 1280;
+var canvasH = 800;
 var margin = 20;
 var centerX, centerY;
 
@@ -40,9 +40,13 @@ function preload(){
 function setup() {
   // get window height and width, min are 600 x 400
   if(window.innerWidth > 600){
-    canvasW = window.innerWidth;}
+    canvasW = window.innerWidth;
+    //canvasW = 1280;
+  }
   if(window.innerHeight > 400){
-    canvasH = window.innerHeight;}
+    canvasH = window.innerHeight;
+    //canvasH = 800;
+  }
   createCanvas(canvasW, canvasH);
   centerX = canvasW / 2;
   centerY = canvasH / 2;
@@ -87,9 +91,13 @@ function draw() {
 }
 
 function drawWave(){
-  var height = canvasH*progress;
+
+  //var height = innerR * 2* progress;
+  //var width = calculateW(height)/2;
+  var bottom = (canvasH - innerR*2)/2+30;
+  var height = (canvasH-bottom*2)*progress;
   push();
-  translate(0, (canvasH-height));
+  translate(0, (canvasH-height-bottom));
   noStroke();
 
   for (var x = radius; x <= width-radius; x += diameter*1.5) {
@@ -160,10 +168,11 @@ class Activity {
     }
   }
   drawText(startA){
+    textSize(16);
     var arc = innerR*2*PI*startA/(2*PI);
     for (var i=0; i < this.name.length; i++){
       var char = this.name.charAt(i);
-      var w = textWidth(char);
+      var w = textWidth(char)/1.2;
       arc = arc + w;
       var theta = arc/(innerR);
       push();
@@ -171,7 +180,7 @@ class Activity {
       rotate(theta+PI/2);
       fill(0,0,0,100);
       noStroke();
-      textSize(20);
+      textSize(18);
       text(char,0,0);
       pop();
       arc += w;
@@ -179,8 +188,7 @@ class Activity {
   }
 }
 
-	
-	</script>  
+	</script>
 
   </head>
   <body>
