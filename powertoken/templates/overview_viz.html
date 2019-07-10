@@ -91,11 +91,10 @@ function draw() {
 }
 
 function drawWave(){
-
   //var height = innerR * 2* progress;
   //var width = calculateW(height)/2;
   var bottom = (canvasH - innerR*2)/2+30;
-  var height = (canvasH-bottom*2)*progress;
+  var height = (canvasH-bottom*2)*0.85*progress;
   push();
   translate(0, (canvasH-height-bottom));
   noStroke();
@@ -105,7 +104,7 @@ function drawWave(){
     fill('#B2E5FC');
     ellipse(x, amplitude*sin(frequency * time + phi), 100, diameter);
   	ellipse(x, amplitude*sin(frequency * time + phi) + 17, 100, diameter);
-  	rect(0, 0, width, height);
+  	rect(0, 0, width, height/0.6);
   }
   time += .5;
   noStroke();
@@ -168,17 +167,47 @@ class Activity {
     }
   }
   drawText(startA){
+    //textFont(fontRegular);
+    var lineW = 275;
+    var x = centerX+(innerR)*Math.cos(startA);
+    var y = centerY+(innerR)*Math.sin(startA);
+    stroke(205);
+    strokeWeight(0.5);
+    if(x >= centerX){
+      line(x,y,x+lineW,y);
+    } else {
+      line(x,y,x-lineW,y);
+    }
+    textSize(18);
+    var name = this.name;
+    fill(150);
+    noStroke();
+    var textX, textY;
+    if(x >= centerX){
+      textX = x+lineW-50;
+    } else if (x < centerX) {
+      textX = x-lineW-50;
+    }
+    if(y >= centerY){
+      textY = y-20*Math.ceil(name.length*8/200)-5;
+    }else if (y<=centerY) {
+      textY = y+10;
+    }
+    text(name,textX,textY,200,100);
+  }
+  drawTextArc(startA){
     textSize(16);
-    var arc = innerR*2*PI*startA/(2*PI);
+    //textFont(fontRegular);
+    var arc = innerR*2*PI*(startA)/(2*PI);
     for (var i=0; i < this.name.length; i++){
       var char = this.name.charAt(i);
       var w = textWidth(char)/1.2;
-      arc = arc + w;
+      arc = arc + w ;
       var theta = arc/(innerR);
       push();
       translate(centerX+(innerR)*Math.cos(theta), centerY+(innerR)*Math.sin(theta));
       rotate(theta+PI/2);
-      fill(0,0,0,100);
+      fill(0,0,0,200);
       noStroke();
       textSize(18);
       text(char,0,0);
