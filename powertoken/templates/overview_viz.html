@@ -162,13 +162,13 @@ class Activity {
     noFill();
     stroke(this.color);
     strokeWeight(10);
-    for(var i = 0; i < 50; i=i+2){
+    for(var i = 0; i < 40; i=i+2){
       arc(centerX,centerY,outerR-2*i,outerR-2*i,startA,startA+this.length-3*gap);
     }
   }
   drawText(startA){
     //textFont(fontRegular);
-    var lineW = 275;
+    var lineW = 185;
     var x = centerX+(innerR)*Math.cos(startA);
     var y = centerY+(innerR)*Math.sin(startA);
     stroke(205);
@@ -178,7 +178,7 @@ class Activity {
     } else {
       line(x,y,x-lineW,y);
     }
-    textSize(18);
+    textSize(16);
     var name = this.name;
     fill(150);
     noStroke();
@@ -186,14 +186,14 @@ class Activity {
     if(x >= centerX){
       textX = x+lineW-50;
     } else if (x < centerX) {
-      textX = x-lineW-50;
+      textX = x-lineW-35;
     }
     if(y >= centerY){
-      textY = y-20*Math.ceil(name.length*8/200)-5;
+      textY = y-20*Math.ceil(name.length*8/150)-5;
     }else if (y<=centerY) {
       textY = y+10;
     }
-    text(name,textX,textY,200,100);
+    text(name,textX,textY,155,100);
   }
   drawTextArc(startA){
     textSize(16);
