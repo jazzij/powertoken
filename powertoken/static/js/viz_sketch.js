@@ -16,12 +16,10 @@ var gap;
 var innerR, outerR;
 var mask;
 
-
 function preload(){
   // need to update this
-  //data = {{activity_data |tojson }}
-  data = loadJSON("../static/data/viz_activity_data.json");
-  mask = loadImage("../static/img/mask.png");
+  data = loadJSON("../data/viz_activity_data.json");
+  mask = loadImage("../img/mask.png");
 }
 
 function setup() {
@@ -35,7 +33,7 @@ function setup() {
   centerY = canvasH / 2;
   //
   gap = 2.5*PI/180;
-  innerR = canvasW/4;
+  innerR = canvasW/3;
   outerR = canvasH/1.3;
   //
   progress = data.progress;
@@ -65,27 +63,29 @@ function draw() {
   var startA = -PI/2;
   for (var i = 0; i < activities.length; i++){
     activities[i].draw(startA);
-    activities[i].drawText(startA);
     startA = startA + activities[i].length;
   }
 
 }
 
 function drawWave(){
+  //var height = innerR * 2* progress;
+  //var width = calculateW(height)/2;
   var height = canvasH*progress;
   push();
-  translate(0, (canvasH-height));
+  translate(0, height);
   noStroke();
 
   for (var x = radius; x <= width-radius; x += diameter*1.5) {
     var phi = -x*.01;
-    fill('#B2E5FC');
+    fill(35,183,211);
     ellipse(x, amplitude*sin(frequency * time + phi), 100, diameter);
   	ellipse(x, amplitude*sin(frequency * time + phi) + 17, 100, diameter);
   	rect(0, 0, width, height);
   }
   time += .5;
   noStroke();
+  //line(0, 0, width, 0);
   pop();
 }
 
@@ -105,31 +105,10 @@ class Activity {
     this.startT = startTime;
     this.completed = completed;
     this.length = 0;
-    if (this.completed == "true"){
-      // set up color
-      if (this.absoluteW == 1){
-        this.color = color('#9856CA');
-      } else if(this.absoluteW == 2){
-        this.color = color('#2096F3');
-      } else if (this.absoluteW == 3){
-        this.color = color('#00BCD4');
-      } else if (this.absoluteW == 4){
-        this.color = color('#FFC105');
-      } else {
-        this.color = color('#FF5005');
-      }
+    if (this.completed == true){
+      this.color = color(150,150,150);
     }else {
-      if (this.absoluteW == 1){
-        this.color = color('#E5D5F2');
-      } else if(this.absoluteW == 2){
-        this.color = color('#C7E5FC');
-      } else if (this.absoluteW == 3){
-        this.color = color('#BFEEF4');
-      } else if (this.absoluteW == 4){
-        this.color = color('#FFEFC0');
-      } else {
-        this.color = color('#FFD3C0');
-      }
+      this.color = color(220,220,220);
     }
   }
   update(totalW){
@@ -140,26 +119,11 @@ class Activity {
     noFill();
     stroke(this.color);
     strokeWeight(10);
-    for(var i = 0; i < 50; i=i+2){
+    for(var i = 0; i < 60; i=i+2){
       arc(centerX,centerY,outerR-2*i,outerR-2*i,startA,startA+this.length-3*gap);
     }
   }
-  drawText(startA){
-    var arc = innerR*2*PI*startA/(2*PI);
-    for (var i=0; i < this.name.length; i++){
-      var char = this.name.charAt(i);
-      var w = textWidth(char);
-      arc = arc + w;
-      var theta = arc/(innerR);
-      push();
-      translate(centerX+(innerR)*Math.cos(theta), centerY+(innerR)*Math.sin(theta));
-      rotate(theta+PI/2);
-      fill(0,0,0,100);
-      noStroke();
-      textSize(20);
-      text(char,0,0);
-      pop();
-      arc += w;
-    }
+  drawText(){
+
   }
 }
