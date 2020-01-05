@@ -6,8 +6,8 @@ Last modified by Abigail Franz on 5/5/2018.
 import logging, sys
 import json, requests
 from datetime import datetime, timedelta, MAXYEAR
-from background import db
-from app.models import Activity
+#from background import db
+#from app.models import Activity
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
@@ -59,16 +59,15 @@ def check_wc_token_status(wc_user_id, wc_token):
 		return True
 
 
-def get_wc_activities(user):
+def get_wc_activities(wc_id, wc_token):
 	"""
-	Pulls all of a user's activities from the WEconnect backend and stores
-	information about them in the database. Returns a list of app.model.Activity
-	objects.
+	Pulls all of a user's activities from the WEconnect backend and parses
+	information about them to prepare for stores. Returns a list of activity dicts
 
-	:param app.models.User user: a user from the database
+	:param a user's weconnect id, token
 	"""
-	url = "{}/{}/activities?access_token={}".format(WC_URL, user.wc_id, 
-			user.wc_token)
+	url = "{}/{}/activities?access_token={}".format(WC_URL, wc_id, 
+			wc_token)
 	response = requests.get(url)
 	if response.status_code != 200:
 		# Return an empty list if the request was unsuccessful
@@ -78,6 +77,11 @@ def get_wc_activities(user):
 	#TODO: EVERYTHING PAST HERE MODIFIED TO use WECONNECT.PY
 	# Data to use: user, activity
 	acts = []
+	
+	for p in parsed:
+		act = wc_json_to_db(p)
+		acts.append(act)
+	'''
 	for item in parsed:
 		activity = wc_json_to_db(item, user)
 		if activity.expiration > datetime.now():
@@ -85,16 +89,17 @@ def get_wc_activities(user):
 			db.session.add(activity)
 			acts.append(activity)
 	db.session.commit()
-	
+	'''
 	return acts
 	
-def wc_json_to_db(wc_act, user):
+#def wc_json_to_db(wc_act, user):
+def wc_json_to_db(wc_act):
 	"""
-	Given a JSON activity object from WEconnect, convert it to an Activity
+	Given a JSON activity object from WEconnect, convert it to an activity dict
 	object compatible with the database.
 
 	:param dict wc_act: an activity from WEconnect in JSON format
-	:param app.models.User user
+	return activity{ id, name, expiration, user=None}
 	"""
 	# Determine the start and end times
 	ts = datetime.strptime(wc_act["dateStart"], WC_DATE_FMT)
@@ -106,9 +111,14 @@ def wc_json_to_db(wc_act, user):
 		expiration = te
 	if wc_act["repeatEnd"] != None:
 		expiration = datetime.strptime(wc_act["repeatEnd"], WC_DATE_FMT)
-
-	activity = Activity(wc_act_id=wc_act["activityId"], name=wc_act["name"],
-			expiration=expiration, user=user)
+	
+	activity = {}
+	activity["id"] = wc_act["activityId"]
+	activity["name"] = wc_act["name"]
+	activity["expiration"] = expiration
+	activity["user"] = None
+	#activity = Activity(wc_act_id=wc_act["activityId"], name=wc_act["name"],
+	#		expiration=expiration, user=user)
 	return activity
 
 def complete_fb_login(fb_response):
@@ -121,4 +131,20 @@ def complete_fb_login(fb_response):
 	"""
 	data_utf = fb_response.decode("utf-8")
 	data_json = json.loads(data_utf)
+	logging.debug(data_json)
 	return data_json["tok"], data_json["username"]
+	
+def fb_updateUserGoal(fbtoken):	
+
+	BASE_URL = "https://api.fitbit.com/1/user/-"
+	url = "{}/activities/goals/daily.json".format(BASE_URL)
+	new_step_goal = 100000
+	params = {
+		"period" : "daily",
+		"type" : "steps",
+		"value" : new_step_goal
+	}	
+	auth_headers = {"Authorization": "Bearer " + fb_token}
+	response = requests.post(url, headers=auth_headers, params=params)
+	if response.status_code == 200:
+		return response.json()["goals"]["steps"]

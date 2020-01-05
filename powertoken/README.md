@@ -73,7 +73,7 @@ gunicorn --bind 127.0.0.1:5000 wsgi --workers 3
 ```
 
 You will probably want to create a new email address to use as your mail server. See [part 7](https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-error-handling) of Miguel Grinberg's excellent Flask tutorial for more details.
-
+To quit gunicorn, use >>pkill -f gunicorn
 
 ## Tips
 

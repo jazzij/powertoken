@@ -1,12 +1,17 @@
-from background.db import session
-from app.models import User, Event, Activity
-from app.viewmodels import EventLogViewModel
+from background.database import db_session, closeConnection
+from data.models import User, Event, Activity
 
-events = session.query(Event).all()
-eventz = Event.query.all()
-acts = Activity.query.all()
+users = db_session.query(User).all()
+events = db_session.query(Event).all()
 
-selected = Event.query.filter_by()
+for user in users:
+	print("{} {} {}".format(user.username, user.wc_id, user.fb_token))
 
-em = EventLogViewModel(events[2])
-print(em)
+for user in users:
+	user.wc_token = None
+	user.fb_token = None
+	user.fb_id = None
+db_session.commit()
+
+closeConnection()
+
