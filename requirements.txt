@@ -11,7 +11,7 @@ gunicorn==19.7.1
 idna==2.7
 itsdangerous==1.1.0
 Jinja2==2.10
-Mako==1.0.7
+Mako==1.2.2
 MarkupSafe==1.1.0
 multidict==4.5.2
 -e git+https://github.com/jazzij/powertoken.git@57b3ed3a58fd96e8eb22ca1ca296a6816f99c77c#egg=powertoken
